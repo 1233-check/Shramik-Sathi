@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-* { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
 
 :root {
   --primary: #1e293b;
@@ -120,16 +122,135 @@ body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--b
 .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
-/* MOBILE */
+/* ========== RESPONSIVE BREAKPOINTS ========== */
+
+/* Small laptops & landscape tablets (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .hero h1 { font-size: 3rem; }
+  .metrics { gap: 3rem; }
+  .market-grid, .comp-grid { max-width: 100%; }
+  .about-inner, .contact-grid { max-width: 100%; }
+  .nav { padding: 0 1.5rem; }
+}
+
+/* Tablets portrait (max-width: 768px) */
 @media (max-width: 768px) {
-  .nav-links { position: fixed; top: 72px; left: 0; right: 0; background: white; flex-direction: column; padding: 2rem; gap: 1.5rem; transform: translateY(-120%); transition: transform 0.3s; border-bottom: 1px solid #e2e8f0; z-index: 99; }
+  .nav-links { position: fixed; top: 72px; left: 0; right: 0; background: white; flex-direction: column; padding: 2rem; gap: 1.5rem; transform: translateY(-120%); transition: transform 0.3s ease; border-bottom: 1px solid #e2e8f0; z-index: 99; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
   .nav-links.open { transform: translateY(0); }
+  .nav-cta { display: none; }
   .hamburger { display: flex; }
-  .hero h1 { font-size: 2.2rem; }
-  .hero h2 { font-size: 1rem; }
+  .hero { min-height: 80vh; }
+  .hero h1 { font-size: 2.5rem; }
+  .hero h2 { font-size: 1.1rem; }
+  .hero-content { padding: 1.5rem; }
   .metrics { gap: 2rem; }
-  .metric .num { font-size: 2rem; }
+  .metric .num { font-size: 2.2rem; }
   .market-grid, .comp-grid, .about-inner, .contact-grid { grid-template-columns: 1fr; }
+  .marketplace, .compliance, .about, .contact { padding: 3.5rem 1.5rem; }
+  .marketplace .section-title, .compliance .section-title, .contact .section-title { font-size: 1.8rem; }
+  .about-text h2 { font-size: 1.7rem; }
   .logo-row { gap: 1.5rem; }
   .logo-row span { font-size: 1rem; }
+  .about-img img { max-height: 350px; }
+}
+
+/* Large phones / phablets (max-width: 640px) */
+@media (max-width: 640px) {
+  .hero { min-height: 75vh; }
+  .hero h1 { font-size: 2.1rem; }
+  .hero h2 { font-size: 1rem; margin-bottom: 2rem; }
+  .hero-btns { flex-direction: column; align-items: center; }
+  .btn-solid, .btn-outline { width: 80%; text-align: center; padding: 0.85rem 1.5rem; }
+  .trust-band { padding: 2.5rem 1.25rem; }
+  .metrics { gap: 1rem; }
+  .metric { min-width: 45%; }
+  .metric .num { font-size: 2rem; }
+  .metric .label { font-size: 0.8rem; }
+  .market-card { padding: 2rem 1.5rem; }
+  .comp-card { padding: 1.5rem; }
+  .comp-grid { gap: 1rem; }
+  .contact-form { padding: 1.5rem; }
+  .footer-links { flex-direction: column; gap: 0.75rem; }
+}
+
+/* Regular phones (max-width: 480px) */
+@media (max-width: 480px) {
+  .nav { padding: 0 1rem; }
+  .nav-inner { height: 64px; }
+  .nav-logo-img { height: 44px; }
+  .nav-links { top: 64px; }
+  .hero { min-height: 70vh; padding: 0; }
+  .hero h1 { font-size: 1.8rem; line-height: 1.15; }
+  .hero h2 { font-size: 0.95rem; line-height: 1.5; }
+  .hero-content { padding: 1rem; }
+  .btn-solid, .btn-outline { width: 100%; font-size: 0.95rem; }
+  .marketplace, .compliance, .about, .contact { padding: 3rem 1rem; }
+  .marketplace .section-title, .compliance .section-title, .contact .section-title { font-size: 1.5rem; }
+  .marketplace .section-sub, .compliance .section-sub, .contact .section-sub { font-size: 0.9rem; }
+  .market-card h3 { font-size: 1.2rem; }
+  .market-card li { font-size: 0.9rem; }
+  .comp-card h3 { font-size: 1.05rem; }
+  .comp-card p { font-size: 0.85rem; }
+  .about-text h2 { font-size: 1.5rem; }
+  .about-text p { font-size: 0.9rem; }
+  .about-img img { max-height: 280px; }
+  .contact-info h3, .contact-form h3 { font-size: 1.15rem; }
+  .form-group input, .form-group select { padding: 0.65rem 0.85rem; font-size: 0.9rem; }
+  .logo-row span { font-size: 0.85rem; }
+  .logo-row { gap: 1rem; }
+}
+
+/* Small phones (max-width: 375px) — iPhone SE, Galaxy S series */
+@media (max-width: 375px) {
+  .hero h1 { font-size: 1.55rem; }
+  .hero h2 { font-size: 0.88rem; }
+  .metric { min-width: 42%; }
+  .metric .num { font-size: 1.7rem; }
+  .marketplace .section-title, .compliance .section-title, .contact .section-title { font-size: 1.35rem; }
+  .market-card { padding: 1.5rem 1.2rem; }
+  .comp-card { padding: 1.25rem 1rem; }
+  .nav-logo-img { height: 40px; }
+}
+
+/* Very small phones (max-width: 320px) — iPhone 5/SE 1st gen */
+@media (max-width: 320px) {
+  .hero h1 { font-size: 1.4rem; }
+  .hero h2 { font-size: 0.82rem; }
+  .metric .num { font-size: 1.5rem; }
+  .metric .label { font-size: 0.75rem; }
+  .btn-solid, .btn-outline { padding: 0.75rem 1rem; font-size: 0.88rem; }
+  .nav-logo-img { height: 36px; }
+}
+
+/* iOS Safe Areas — notch handling for iPhone X+ */
+@supports (padding: env(safe-area-inset-top)) {
+  .nav { padding-top: env(safe-area-inset-top); padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); }
+  .footer { padding-bottom: calc(2rem + env(safe-area-inset-bottom)); }
+  .hero { padding-top: env(safe-area-inset-top); }
+}
+
+/* Touch-friendly tap targets for mobile */
+@media (pointer: coarse) {
+  .nav-links a { padding: 0.5rem 0; min-height: 44px; display: flex; align-items: center; }
+  .btn-solid, .btn-outline { min-height: 48px; }
+  .form-group input, .form-group select { min-height: 48px; }
+  .form-submit { min-height: 50px; }
+  .hamburger { min-width: 44px; min-height: 44px; justify-content: center; }
+  .contact-item .ci-icon { width: 48px; height: 48px; }
+}
+
+/* Landscape phone orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero { min-height: auto; padding: 3rem 2rem; }
+  .hero h1 { font-size: 1.8rem; }
+  .hero h2 { font-size: 0.95rem; margin-bottom: 1.5rem; }
+  .metrics { gap: 2rem; }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .market-card:hover { transform: none; }
+  .btn-solid:hover, .btn-outline:hover, .nav-cta:hover, .form-submit:hover { transform: none; }
 }
