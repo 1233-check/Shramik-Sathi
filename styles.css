@@ -254,3 +254,72 @@ body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--b
   .market-card:hover { transform: none; }
   .btn-solid:hover, .btn-outline:hover, .nav-cta:hover, .form-submit:hover { transform: none; }
 }
+
+/* ========== HIRE WIZARD STYLES ========== */
+
+.page-header { background-color: var(--primary); color: white; padding: 6rem 2rem 4rem; text-align: center; }
+.page-header h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+.page-header p { font-size: 1.1rem; color: #cbd5e1; max-width: 600px; margin: 0 auto; }
+
+.wizard-section { padding: 4rem 2rem; background-color: var(--bg); min-height: 60vh; }
+.wizard-container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); padding: 2rem; }
+
+/* Stepper */
+.stepper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; padding: 0 1rem; overflow-x: auto; scrollbar-width: none; }
+.stepper::-webkit-scrollbar { display: none; }
+.step { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; position: relative; z-index: 2; min-width: 80px; }
+.step-circle { width: 40px; height: 40px; border-radius: 50%; background-color: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; font-weight: 600; border: 2px solid #e2e8f0; transition: all 0.3s; }
+.step-label { font-size: 0.85rem; font-weight: 500; color: #64748b; transition: all 0.3s; }
+.step.active .step-circle { background-color: var(--primary); color: white; border-color: var(--primary); }
+.step.active .step-label { color: var(--primary); font-weight: 600; }
+.step.completed .step-circle { background-color: var(--secondary); color: white; border-color: var(--secondary); }
+.step-line { flex-grow: 1; height: 2px; background-color: #e2e8f0; margin: 0 -30px 25px -30px; position: relative; z-index: 1; min-width: 30px; }
+.step.completed + .step-line { background-color: var(--secondary); }
+
+/* Form Steps */
+.form-step { display: none; animation: fadeIn 0.4s ease; }
+.form-step.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.step-header { margin-bottom: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; }
+.step-header h2 { font-size: 1.5rem; color: var(--text-dark); margin-bottom: 0.5rem; }
+.step-header p { color: var(--text-light); font-size: 0.95rem; }
+
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+.form-group.full-width { grid-column: 1 / -1; }
+.subsection-title { font-size: 1.1rem; color: var(--primary); margin-top: 1rem; border-bottom: 1px dashed #cbd5e1; padding-bottom: 0.5rem; }
+
+.required { color: #ef4444; }
+
+/* Inputs */
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 1rem; transition: border-color 0.2s; background: #fff; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1); }
+.form-group input.error, .form-group select.error { border-color: #ef4444; background-color: #fef2f2; }
+
+.input-with-icon { position: relative; }
+.input-with-icon .icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #64748b; font-weight: 500; }
+.input-with-icon input { padding-left: 2.5rem; }
+
+.file-upload input { padding: 0.5rem; border: 1px dashed #cbd5e1; background: #f8fafc; cursor: pointer; }
+
+/* Actions */
+.form-actions { display: flex; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; }
+.form-actions.right { justify-content: flex-end; }
+.form-actions.split { justify-content: space-between; }
+.form-actions button { padding: 0.75rem 2rem; font-size: 1rem; }
+
+/* Success */
+.success-message { display: none; text-align: center; padding: 3rem 1rem; }
+.success-message svg { margin: 0 auto 1.5rem; }
+.success-message h3 { font-size: 1.8rem; color: var(--text-dark); margin-bottom: 1rem; }
+.success-message p { color: var(--text-light); font-size: 1.1rem; max-width: 400px; margin: 0 auto; }
+
+/* Mobile Wizard */
+@media (max-width: 768px) {
+  .wizard-container { padding: 1.5rem; }
+  .form-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+  .stepper { padding: 0; }
+  .step-label { display: none; } /* Hide text on mobile */
+  .step-line { margin: 0 -15px; }
+  .page-header { padding: 5rem 1rem 3rem; }
+}
