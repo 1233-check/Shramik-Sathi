@@ -59,11 +59,11 @@
       <form id="loginForm" class="space-y-5">
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">Company Email</label>
-          <input type="email" value="admin@tatasteel.com" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
+          <input type="email" placeholder="admin@company.com" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-          <input type="password" value="password123" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
+          <input type="password" placeholder="Enter password" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
         </div>
         <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-slate-800 transition shadow-md flex justify-center items-center gap-2">
           Sign In <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -121,16 +121,18 @@
       </div>
 
       <!-- CLMS Navigation Tabs -->
-      <div class="bg-[#0055a5] flex text-white text-xs font-bold uppercase tracking-wider mb-4 border border-[#003d7a] overflow-x-auto whitespace-nowrap">
-        <button class="px-4 py-2.5 bg-[#003d7a] border-r border-[#004080] hover:bg-[#003d7a]">Employee Master</button>
-        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Gate Pass Mgmt.</button>
-        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">PF / ESI Challans</button>
-        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Wage Register</button>
-        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Medical Clearances</button>
-        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">B-Pass / C-Pass</button>
-        <button class="px-4 py-2.5 hover:bg-[#003d7a]">Compliance Reports</button>
+      <div id="clmsTabs" class="bg-[#0055a5] flex text-white text-xs font-bold uppercase tracking-wider mb-4 border border-[#003d7a] overflow-x-auto whitespace-nowrap">
+        <button data-tab="empMaster" class="clms-tab px-4 py-2.5 bg-[#003d7a] border-r border-[#004080] hover:bg-[#003d7a]">Employee Master</button>
+        <button data-tab="gatePass" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Gate Pass Mgmt.</button>
+        <button data-tab="pfEsi" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">PF / ESI Challans</button>
+        <button data-tab="wageReg" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Wage Register</button>
+        <button data-tab="medical" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Medical Clearances</button>
+        <button data-tab="bpass" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">B-Pass / C-Pass</button>
+        <button data-tab="reports" class="clms-tab px-4 py-2.5 hover:bg-[#003d7a]">Compliance Reports</button>
       </div>
 
+      <!-- TAB: Employee Master -->
+      <div data-tab-content="empMaster" class="tab-panel">
       <!-- Search & Filters Container (CLMS Style) -->
       <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
@@ -139,6 +141,11 @@
             <select class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
               <option>-- ALL --</option>
               <option selected>Tata Steel Ltd.</option>
+              <option>JUSCO (Jamshedpur Utilities)</option>
+              <option>L&T Construction</option>
+              <option>Adani Power</option>
+              <option>JSW Steel</option>
+              <option>Tata Projects Ltd.</option>
             </select>
           </div>
           <div>
@@ -173,64 +180,295 @@
             </tr>
           </thead>
           <tbody class="text-[13px] text-slate-800">
-            <!-- Row 1 -->
             <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]">
               <td class="p-2 border-r border-slate-200 text-center">
                 <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
                 <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
               </td>
-              <td class="p-2 border-r border-slate-200">15937</td>
-              <td class="p-2 border-r border-slate-200 font-bold">Virat Singh</td>
-              <td class="p-2 border-r border-slate-200">Ramesh Singh</td>
-              <td class="p-2 border-r border-slate-200">XXXX-XXXX-3593</td>
+              <td class="p-2 border-r border-slate-200">20147</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Rajendra Mahto</td>
+              <td class="p-2 border-r border-slate-200">Shivnath Mahto</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-4821</td>
               <td class="p-2 border-r border-slate-200">Mechanical Fitter</td>
-              <td class="p-2 border-r border-slate-200">100987654321</td>
-              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">31-Dec-2026</td>
+              <td class="p-2 border-r border-slate-200">101145782390</td>
+              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">31-Mar-2027</td>
               <td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td>
             </tr>
-            <!-- Row 2 -->
             <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]">
               <td class="p-2 border-r border-slate-200 text-center">
                 <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
                 <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
               </td>
-              <td class="p-2 border-r border-slate-200">15938</td>
-              <td class="p-2 border-r border-slate-200 font-bold">Amit Kumar</td>
-              <td class="p-2 border-r border-slate-200">Suresh Kumar</td>
-              <td class="p-2 border-r border-slate-200">XXXX-XXXX-9128</td>
-              <td class="p-2 border-r border-slate-200">Helper</td>
-              <td class="p-2 border-r border-slate-200">Pending</td>
-              <td class="p-2 border-r border-slate-200 text-red-600 font-semibold">Expired</td>
-              <td class="p-2 text-center"><span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs border border-red-300">Inactive</span></td>
+              <td class="p-2 border-r border-slate-200">20148</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Sunil Oraon</td>
+              <td class="p-2 border-r border-slate-200">Mangal Oraon</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-7356</td>
+              <td class="p-2 border-r border-slate-200">Rigger Grade-I</td>
+              <td class="p-2 border-r border-slate-200">101298456710</td>
+              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">30-Sep-2026</td>
+              <td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td>
             </tr>
-            <!-- Row 3 -->
             <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]">
               <td class="p-2 border-r border-slate-200 text-center">
                 <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
                 <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
               </td>
-              <td class="p-2 border-r border-slate-200">15945</td>
-              <td class="p-2 border-r border-slate-200 font-bold">Deepak Sharma</td>
-              <td class="p-2 border-r border-slate-200">Mohan Sharma</td>
-              <td class="p-2 border-r border-slate-200">XXXX-XXXX-1122</td>
-              <td class="p-2 border-r border-slate-200">Welder</td>
-              <td class="p-2 border-r border-slate-200">100554433221</td>
-              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">15-Jun-2025</td>
+              <td class="p-2 border-r border-slate-200">20152</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Birsa Munda</td>
+              <td class="p-2 border-r border-slate-200">Sugna Munda</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-1903</td>
+              <td class="p-2 border-r border-slate-200">Crane Operator</td>
+              <td class="p-2 border-r border-slate-200">100876543219</td>
+              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">15-Dec-2026</td>
               <td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td>
+            </tr>
+            <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]">
+              <td class="p-2 border-r border-slate-200 text-center">
+                <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+              <td class="p-2 border-r border-slate-200">20155</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Manoj Tiwari</td>
+              <td class="p-2 border-r border-slate-200">Ramchandra Tiwari</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-5547</td>
+              <td class="p-2 border-r border-slate-200">TIG Welder</td>
+              <td class="p-2 border-r border-slate-200">Pending</td>
+              <td class="p-2 border-r border-slate-200 text-amber-600 font-semibold">Under Process</td>
+              <td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs border border-amber-300">Pending</span></td>
+            </tr>
+            <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]">
+              <td class="p-2 border-r border-slate-200 text-center">
+                <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+              <td class="p-2 border-r border-slate-200">20159</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Lakshmi Devi Hembrom</td>
+              <td class="p-2 border-r border-slate-200">Late Soren Hembrom</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-8834</td>
+              <td class="p-2 border-r border-slate-200">Safety Steward</td>
+              <td class="p-2 border-r border-slate-200">101034567812</td>
+              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">28-Feb-2027</td>
+              <td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td>
+            </tr>
+            <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]">
+              <td class="p-2 border-r border-slate-200 text-center">
+                <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+              <td class="p-2 border-r border-slate-200">20163</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Pramod Yadav</td>
+              <td class="p-2 border-r border-slate-200">Baleshwar Yadav</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-2210</td>
+              <td class="p-2 border-r border-slate-200">Electrician Grade-II</td>
+              <td class="p-2 border-r border-slate-200">100654321098</td>
+              <td class="p-2 border-r border-slate-200 text-red-600 font-semibold">Expired (01-Jan-2026)</td>
+              <td class="p-2 text-center"><span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs border border-red-300">Inactive</span></td>
+            </tr>
+            <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]">
+              <td class="p-2 border-r border-slate-200 text-center">
+                <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+              <td class="p-2 border-r border-slate-200">20170</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Ranjit Hansda</td>
+              <td class="p-2 border-r border-slate-200">Doman Hansda</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-6691</td>
+              <td class="p-2 border-r border-slate-200">Scaffolder</td>
+              <td class="p-2 border-r border-slate-200">101456789023</td>
+              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">30-Jun-2027</td>
+              <td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td>
+            </tr>
+            <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]">
+              <td class="p-2 border-r border-slate-200 text-center">
+                <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+              <td class="p-2 border-r border-slate-200">20174</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Santosh Gope</td>
+              <td class="p-2 border-r border-slate-200">Dashrath Gope</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-3378</td>
+              <td class="p-2 border-r border-slate-200">General Helper</td>
+              <td class="p-2 border-r border-slate-200">Pending</td>
+              <td class="p-2 border-r border-slate-200 text-amber-600 font-semibold">Under Process</td>
+              <td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs border border-amber-300">Pending</span></td>
             </tr>
           </tbody>
         </table>
         
-        <!-- Pagination Mock -->
+        <!-- Pagination -->
         <div class="bg-[#f5f5f5] p-2 flex justify-between items-center text-xs text-slate-600 border-t border-slate-300">
-          <span>Showing 1 to 3 of 3 entries</span>
+          <span>Showing 1 to 8 of 47 entries</span>
           <div class="flex gap-1">
-            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-50">Previous</button>
+            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-50" disabled>Previous</button>
             <button class="px-2 py-1 border border-[#0055a5] bg-[#0055a5] text-white">1</button>
-            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-50">Next</button>
+            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100">2</button>
+            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100">3</button>
+            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100">...</button>
+            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100">6</button>
+            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100">Next</button>
           </div>
         </div>
       </div>
+      </div><!-- end empMaster tab -->
+
+      <!-- TAB: Gate Pass Management -->
+      <div data-tab-content="gatePass" class="tab-panel hidden">
+        <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Employee Name / ID</label><input type="text" class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]" placeholder="Search..."></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Pass Status</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option>-- ALL --</option><option>Valid</option><option>Expired</option><option>Under Process</option></select></div>
+            <div><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Search</button></div>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse whitespace-nowrap">
+            <thead><tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a]">Emp ID</th><th class="p-2 border-r border-[#003d7a]">Employee Name</th><th class="p-2 border-r border-[#003d7a]">Designation</th><th class="p-2 border-r border-[#003d7a]">Pass No.</th><th class="p-2 border-r border-[#003d7a]">Issue Date</th><th class="p-2 border-r border-[#003d7a]">Valid Upto</th><th class="p-2 border-r border-[#003d7a]">Area Permitted</th><th class="p-2 text-center">Status</th>
+            </tr></thead>
+            <tbody class="text-[13px] text-slate-800">
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20147</td><td class="p-2 border-r border-slate-200 font-bold">Rajendra Mahto</td><td class="p-2 border-r border-slate-200">Mechanical Fitter</td><td class="p-2 border-r border-slate-200">GP-2026-04821</td><td class="p-2 border-r border-slate-200">01-Apr-2026</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">31-Mar-2027</td><td class="p-2 border-r border-slate-200">LD Shop, BF-5</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Valid</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20148</td><td class="p-2 border-r border-slate-200 font-bold">Sunil Oraon</td><td class="p-2 border-r border-slate-200">Rigger Grade-I</td><td class="p-2 border-r border-slate-200">GP-2025-07356</td><td class="p-2 border-r border-slate-200">01-Oct-2025</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">30-Sep-2026</td><td class="p-2 border-r border-slate-200">CRM, HSM</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Valid</span></td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20152</td><td class="p-2 border-r border-slate-200 font-bold">Birsa Munda</td><td class="p-2 border-r border-slate-200">Crane Operator</td><td class="p-2 border-r border-slate-200">GP-2026-01903</td><td class="p-2 border-r border-slate-200">16-Dec-2025</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">15-Dec-2026</td><td class="p-2 border-r border-slate-200">Steel Yard, BOF</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Valid</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20155</td><td class="p-2 border-r border-slate-200 font-bold">Manoj Tiwari</td><td class="p-2 border-r border-slate-200">TIG Welder</td><td class="p-2 border-r border-slate-200">—</td><td class="p-2 border-r border-slate-200">—</td><td class="p-2 border-r border-slate-200 text-amber-600 font-semibold">—</td><td class="p-2 border-r border-slate-200">—</td><td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs border border-amber-300">Under Process</span></td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20163</td><td class="p-2 border-r border-slate-200 font-bold">Pramod Yadav</td><td class="p-2 border-r border-slate-200">Electrician Grade-II</td><td class="p-2 border-r border-slate-200">GP-2024-02210</td><td class="p-2 border-r border-slate-200">02-Jan-2025</td><td class="p-2 border-r border-slate-200 text-red-600 font-semibold">01-Jan-2026</td><td class="p-2 border-r border-slate-200">Power House, Substation</td><td class="p-2 text-center"><span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs border border-red-300">Expired</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20170</td><td class="p-2 border-r border-slate-200 font-bold">Ranjit Hansda</td><td class="p-2 border-r border-slate-200">Scaffolder</td><td class="p-2 border-r border-slate-200">GP-2026-06691</td><td class="p-2 border-r border-slate-200">01-Jul-2026</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">30-Jun-2027</td><td class="p-2 border-r border-slate-200">All Zones</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Valid</span></td></tr>
+            </tbody>
+          </table>
+          <div class="bg-[#f5f5f5] p-2 flex justify-between items-center text-xs text-slate-600 border-t border-slate-300"><span>Showing 1 to 6 of 47 entries</span><div class="flex gap-1"><button class="px-2 py-1 border border-slate-300 bg-white disabled:opacity-50" disabled>Previous</button><button class="px-2 py-1 border border-[#0055a5] bg-[#0055a5] text-white">1</button><button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100">2</button><button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100">Next</button></div></div>
+        </div>
+      </div><!-- end gatePass tab -->
+
+      <!-- TAB: PF / ESI Challans -->
+      <div data-tab-content="pfEsi" class="tab-panel hidden">
+        <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Financial Year</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option selected>2026-2027</option><option>2025-2026</option><option>2024-2025</option></select></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Month</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option>-- ALL --</option><option>April</option><option selected>May</option><option>June</option><option>July</option></select></div>
+            <div><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">View Challans</button></div>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse whitespace-nowrap">
+            <thead><tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a]">Month</th><th class="p-2 border-r border-[#003d7a]">PF Challan No.</th><th class="p-2 border-r border-[#003d7a]">PF Amount (₹)</th><th class="p-2 border-r border-[#003d7a]">PF Status</th><th class="p-2 border-r border-[#003d7a]">ESI Challan No.</th><th class="p-2 border-r border-[#003d7a]">ESI Amount (₹)</th><th class="p-2 border-r border-[#003d7a]">ESI Status</th><th class="p-2 text-center">Filing Date</th>
+            </tr></thead>
+            <tbody class="text-[13px] text-slate-800">
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200 font-bold">May 2026</td><td class="p-2 border-r border-slate-200">TRRN/2026/05/0048172</td><td class="p-2 border-r border-slate-200 text-right font-semibold">1,82,460</td><td class="p-2 border-r border-slate-200 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Paid</span></td><td class="p-2 border-r border-slate-200">ESI/JH/2026/05/3391</td><td class="p-2 border-r border-slate-200 text-right font-semibold">47,320</td><td class="p-2 border-r border-slate-200 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Paid</span></td><td class="p-2 text-center">15-May-2026</td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200 font-bold">Apr 2026</td><td class="p-2 border-r border-slate-200">TRRN/2026/04/0047891</td><td class="p-2 border-r border-slate-200 text-right font-semibold">1,78,920</td><td class="p-2 border-r border-slate-200 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Paid</span></td><td class="p-2 border-r border-slate-200">ESI/JH/2026/04/3287</td><td class="p-2 border-r border-slate-200 text-right font-semibold">46,110</td><td class="p-2 border-r border-slate-200 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Paid</span></td><td class="p-2 text-center">14-Apr-2026</td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200 font-bold">Mar 2026</td><td class="p-2 border-r border-slate-200">TRRN/2026/03/0047502</td><td class="p-2 border-r border-slate-200 text-right font-semibold">1,85,100</td><td class="p-2 border-r border-slate-200 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Paid</span></td><td class="p-2 border-r border-slate-200">ESI/JH/2026/03/3190</td><td class="p-2 border-r border-slate-200 text-right font-semibold">48,050</td><td class="p-2 border-r border-slate-200 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Paid</span></td><td class="p-2 text-center">15-Mar-2026</td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200 font-bold">Feb 2026</td><td class="p-2 border-r border-slate-200">TRRN/2026/02/0047103</td><td class="p-2 border-r border-slate-200 text-right font-semibold">1,74,680</td><td class="p-2 border-r border-slate-200 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Paid</span></td><td class="p-2 border-r border-slate-200">ESI/JH/2026/02/3098</td><td class="p-2 border-r border-slate-200 text-right font-semibold">44,790</td><td class="p-2 border-r border-slate-200 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Paid</span></td><td class="p-2 text-center">14-Feb-2026</td></tr>
+            </tbody>
+          </table>
+          <div class="bg-emerald-50 p-3 border-t border-slate-300 flex items-center gap-2 text-sm text-emerald-800 font-semibold"><i data-lucide="check-circle-2" class="w-4 h-4"></i> All PF/ESI challans for FY 2026-27 are filed and paid on time. Next due: 15-Jun-2026.</div>
+        </div>
+      </div><!-- end pfEsi tab -->
+
+      <!-- TAB: Wage Register -->
+      <div data-tab-content="wageReg" class="tab-panel hidden">
+        <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Wage Month</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option selected>May 2026</option><option>April 2026</option><option>March 2026</option></select></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Employee</label><input type="text" class="w-full border border-slate-300 p-1.5 text-sm" placeholder="Search by name..."></div>
+            <div class="flex gap-2"><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Generate</button><button class="bg-white text-slate-700 px-4 py-1.5 text-sm font-bold hover:bg-slate-100 border border-slate-300">Export PDF</button></div>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse whitespace-nowrap">
+            <thead><tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a]">Emp ID</th><th class="p-2 border-r border-[#003d7a]">Name</th><th class="p-2 border-r border-[#003d7a]">Designation</th><th class="p-2 border-r border-[#003d7a]">Days Worked</th><th class="p-2 border-r border-[#003d7a]">Basic (₹)</th><th class="p-2 border-r border-[#003d7a]">DA (₹)</th><th class="p-2 border-r border-[#003d7a]">HRA (₹)</th><th class="p-2 border-r border-[#003d7a]">OT (₹)</th><th class="p-2 border-r border-[#003d7a]">Gross (₹)</th><th class="p-2 border-r border-[#003d7a]">PF Ded. (₹)</th><th class="p-2 border-r border-[#003d7a]">ESI Ded. (₹)</th><th class="p-2 text-center">Net Pay (₹)</th>
+            </tr></thead>
+            <tbody class="text-[13px] text-slate-800">
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20147</td><td class="p-2 border-r border-slate-200 font-bold">Rajendra Mahto</td><td class="p-2 border-r border-slate-200">Mech. Fitter</td><td class="p-2 border-r border-slate-200 text-center">26</td><td class="p-2 border-r border-slate-200 text-right">9,880</td><td class="p-2 border-r border-slate-200 text-right">4,940</td><td class="p-2 border-r border-slate-200 text-right">1,580</td><td class="p-2 border-r border-slate-200 text-right">1,200</td><td class="p-2 border-r border-slate-200 text-right font-semibold">17,600</td><td class="p-2 border-r border-slate-200 text-right text-red-600">2,112</td><td class="p-2 border-r border-slate-200 text-right text-red-600">132</td><td class="p-2 text-right font-bold text-emerald-700">15,356</td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20148</td><td class="p-2 border-r border-slate-200 font-bold">Sunil Oraon</td><td class="p-2 border-r border-slate-200">Rigger Gr-I</td><td class="p-2 border-r border-slate-200 text-center">24</td><td class="p-2 border-r border-slate-200 text-right">9,120</td><td class="p-2 border-r border-slate-200 text-right">4,560</td><td class="p-2 border-r border-slate-200 text-right">1,460</td><td class="p-2 border-r border-slate-200 text-right">0</td><td class="p-2 border-r border-slate-200 text-right font-semibold">15,140</td><td class="p-2 border-r border-slate-200 text-right text-red-600">1,817</td><td class="p-2 border-r border-slate-200 text-right text-red-600">114</td><td class="p-2 text-right font-bold text-emerald-700">13,209</td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20152</td><td class="p-2 border-r border-slate-200 font-bold">Birsa Munda</td><td class="p-2 border-r border-slate-200">Crane Op.</td><td class="p-2 border-r border-slate-200 text-center">26</td><td class="p-2 border-r border-slate-200 text-right">11,440</td><td class="p-2 border-r border-slate-200 text-right">5,720</td><td class="p-2 border-r border-slate-200 text-right">1,830</td><td class="p-2 border-r border-slate-200 text-right">2,400</td><td class="p-2 border-r border-slate-200 text-right font-semibold">21,390</td><td class="p-2 border-r border-slate-200 text-right text-red-600">2,567</td><td class="p-2 border-r border-slate-200 text-right text-red-600">160</td><td class="p-2 text-right font-bold text-emerald-700">18,663</td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20159</td><td class="p-2 border-r border-slate-200 font-bold">Lakshmi D. Hembrom</td><td class="p-2 border-r border-slate-200">Safety Steward</td><td class="p-2 border-r border-slate-200 text-center">25</td><td class="p-2 border-r border-slate-200 text-right">8,750</td><td class="p-2 border-r border-slate-200 text-right">4,375</td><td class="p-2 border-r border-slate-200 text-right">1,400</td><td class="p-2 border-r border-slate-200 text-right">600</td><td class="p-2 border-r border-slate-200 text-right font-semibold">15,125</td><td class="p-2 border-r border-slate-200 text-right text-red-600">1,815</td><td class="p-2 border-r border-slate-200 text-right text-red-600">113</td><td class="p-2 text-right font-bold text-emerald-700">13,197</td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20170</td><td class="p-2 border-r border-slate-200 font-bold">Ranjit Hansda</td><td class="p-2 border-r border-slate-200">Scaffolder</td><td class="p-2 border-r border-slate-200 text-center">26</td><td class="p-2 border-r border-slate-200 text-right">9,100</td><td class="p-2 border-r border-slate-200 text-right">4,550</td><td class="p-2 border-r border-slate-200 text-right">1,456</td><td class="p-2 border-r border-slate-200 text-right">1,800</td><td class="p-2 border-r border-slate-200 text-right font-semibold">16,906</td><td class="p-2 border-r border-slate-200 text-right text-red-600">2,029</td><td class="p-2 border-r border-slate-200 text-right text-red-600">127</td><td class="p-2 text-right font-bold text-emerald-700">14,750</td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20174</td><td class="p-2 border-r border-slate-200 font-bold">Santosh Gope</td><td class="p-2 border-r border-slate-200">Gen. Helper</td><td class="p-2 border-r border-slate-200 text-center">22</td><td class="p-2 border-r border-slate-200 text-right">6,600</td><td class="p-2 border-r border-slate-200 text-right">3,300</td><td class="p-2 border-r border-slate-200 text-right">1,056</td><td class="p-2 border-r border-slate-200 text-right">0</td><td class="p-2 border-r border-slate-200 text-right font-semibold">10,956</td><td class="p-2 border-r border-slate-200 text-right text-red-600">1,315</td><td class="p-2 border-r border-slate-200 text-right text-red-600">82</td><td class="p-2 text-right font-bold text-emerald-700">9,559</td></tr>
+            </tbody>
+          </table>
+          <div class="bg-[#f5f5f5] p-2 flex justify-between items-center text-xs text-slate-600 border-t border-slate-300"><span>Total Gross: ₹97,117 | Total Net: ₹84,734 | Wage period: 01-May to 31-May-2026</span></div>
+        </div>
+      </div><!-- end wageReg tab -->
+
+      <!-- TAB: Medical Clearances -->
+      <div data-tab-content="medical" class="tab-panel hidden">
+        <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Fitness Status</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option>-- ALL --</option><option>Fit</option><option>Conditionally Fit</option><option>Due for Renewal</option><option>Unfit</option></select></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Employee Name</label><input type="text" class="w-full border border-slate-300 p-1.5 text-sm" placeholder="Search..."></div>
+            <div><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Search</button></div>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse whitespace-nowrap">
+            <thead><tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a]">Emp ID</th><th class="p-2 border-r border-[#003d7a]">Name</th><th class="p-2 border-r border-[#003d7a]">Designation</th><th class="p-2 border-r border-[#003d7a]">Exam Date</th><th class="p-2 border-r border-[#003d7a]">Valid Until</th><th class="p-2 border-r border-[#003d7a]">Examining Doctor</th><th class="p-2 border-r border-[#003d7a]">Blood Grp</th><th class="p-2 text-center">Fitness</th>
+            </tr></thead>
+            <tbody class="text-[13px] text-slate-800">
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20147</td><td class="p-2 border-r border-slate-200 font-bold">Rajendra Mahto</td><td class="p-2 border-r border-slate-200">Mech. Fitter</td><td class="p-2 border-r border-slate-200">10-Jan-2026</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">09-Jan-2027</td><td class="p-2 border-r border-slate-200">Dr. S.K. Sinha</td><td class="p-2 border-r border-slate-200">B+</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Fit</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20148</td><td class="p-2 border-r border-slate-200 font-bold">Sunil Oraon</td><td class="p-2 border-r border-slate-200">Rigger Gr-I</td><td class="p-2 border-r border-slate-200">22-Sep-2025</td><td class="p-2 border-r border-slate-200 text-amber-600 font-semibold">21-Sep-2026</td><td class="p-2 border-r border-slate-200">Dr. S.K. Sinha</td><td class="p-2 border-r border-slate-200">O+</td><td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs border border-amber-300">Due Soon</span></td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20152</td><td class="p-2 border-r border-slate-200 font-bold">Birsa Munda</td><td class="p-2 border-r border-slate-200">Crane Op.</td><td class="p-2 border-r border-slate-200">05-Mar-2026</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">04-Mar-2027</td><td class="p-2 border-r border-slate-200">Dr. P. Murmu</td><td class="p-2 border-r border-slate-200">A+</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Fit</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20155</td><td class="p-2 border-r border-slate-200 font-bold">Manoj Tiwari</td><td class="p-2 border-r border-slate-200">TIG Welder</td><td class="p-2 border-r border-slate-200">—</td><td class="p-2 border-r border-slate-200">—</td><td class="p-2 border-r border-slate-200">—</td><td class="p-2 border-r border-slate-200">AB+</td><td class="p-2 text-center"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs border border-slate-300">Pending Exam</span></td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200">20159</td><td class="p-2 border-r border-slate-200 font-bold">Lakshmi D. Hembrom</td><td class="p-2 border-r border-slate-200">Safety Steward</td><td class="p-2 border-r border-slate-200">18-Feb-2026</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">17-Feb-2027</td><td class="p-2 border-r border-slate-200">Dr. P. Murmu</td><td class="p-2 border-r border-slate-200">O-</td><td class="p-2 text-center"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs border border-blue-300">Cond. Fit</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200">20170</td><td class="p-2 border-r border-slate-200 font-bold">Ranjit Hansda</td><td class="p-2 border-r border-slate-200">Scaffolder</td><td class="p-2 border-r border-slate-200">01-Jun-2026</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">31-May-2027</td><td class="p-2 border-r border-slate-200">Dr. S.K. Sinha</td><td class="p-2 border-r border-slate-200">B-</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Fit</span></td></tr>
+            </tbody>
+          </table>
+          <div class="bg-amber-50 p-3 border-t border-slate-300 flex items-center gap-2 text-sm text-amber-800 font-semibold"><i data-lucide="alert-triangle" class="w-4 h-4"></i> 1 employee medical due for renewal within 90 days. 1 employee awaiting initial medical exam.</div>
+        </div>
+      </div><!-- end medical tab -->
+
+      <!-- TAB: B-Pass / C-Pass -->
+      <div data-tab-content="bpass" class="tab-panel hidden">
+        <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Pass Type</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option>-- ALL --</option><option>B-Pass (Building)</option><option>C-Pass (Contractor)</option></select></div>
+            <div><label class="block text-xs font-bold text-slate-700 mb-1">Contractor Name</label><input type="text" class="w-full border border-slate-300 p-1.5 text-sm" placeholder="Search..."></div>
+            <div><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Search</button></div>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse whitespace-nowrap">
+            <thead><tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a]">Pass Type</th><th class="p-2 border-r border-[#003d7a]">Pass No.</th><th class="p-2 border-r border-[#003d7a]">Contractor / Agency</th><th class="p-2 border-r border-[#003d7a]">Work Area</th><th class="p-2 border-r border-[#003d7a]">Workers Covered</th><th class="p-2 border-r border-[#003d7a]">Issue Date</th><th class="p-2 border-r border-[#003d7a]">Expiry Date</th><th class="p-2 text-center">Status</th>
+            </tr></thead>
+            <tbody class="text-[13px] text-slate-800">
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-bold">C-Pass</span></td><td class="p-2 border-r border-slate-200 font-semibold">CP-2026-0041</td><td class="p-2 border-r border-slate-200 font-bold">Shramik Sathi Pvt. Ltd.</td><td class="p-2 border-r border-slate-200">LD Shop, BF-5, CRM</td><td class="p-2 border-r border-slate-200 text-center">47</td><td class="p-2 border-r border-slate-200">01-Apr-2026</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">31-Mar-2027</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-bold">B-Pass</span></td><td class="p-2 border-r border-slate-200 font-semibold">BP-2026-0118</td><td class="p-2 border-r border-slate-200 font-bold">Shramik Sathi Pvt. Ltd.</td><td class="p-2 border-r border-slate-200">New BOF Extension Block</td><td class="p-2 border-r border-slate-200 text-center">12</td><td class="p-2 border-r border-slate-200">15-Feb-2026</td><td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">14-Aug-2026</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs font-bold">B-Pass</span></td><td class="p-2 border-r border-slate-200 font-semibold">BP-2025-0094</td><td class="p-2 border-r border-slate-200 font-bold">Shramik Sathi Pvt. Ltd.</td><td class="p-2 border-r border-slate-200">Power House Maintenance</td><td class="p-2 border-r border-slate-200 text-center">5</td><td class="p-2 border-r border-slate-200">01-Jul-2025</td><td class="p-2 border-r border-slate-200 text-red-600 font-semibold">31-Dec-2025</td><td class="p-2 text-center"><span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs border border-red-300">Expired</span></td></tr>
+            </tbody>
+          </table>
+          <div class="bg-[#f5f5f5] p-2 flex justify-between items-center text-xs text-slate-600 border-t border-slate-300"><span>Showing 1 to 3 of 3 entries</span></div>
+        </div>
+      </div><!-- end bpass tab -->
+
+      <!-- TAB: Compliance Reports -->
+      <div data-tab-content="reports" class="tab-panel hidden">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white border border-slate-300 p-4 shadow-sm text-center"><div class="text-3xl font-bold text-[#0055a5]">47</div><div class="text-xs font-bold text-slate-600 mt-1 uppercase">Total Workforce</div></div>
+          <div class="bg-white border border-slate-300 p-4 shadow-sm text-center"><div class="text-3xl font-bold text-green-600">39</div><div class="text-xs font-bold text-slate-600 mt-1 uppercase">Active Gate Passes</div></div>
+          <div class="bg-white border border-slate-300 p-4 shadow-sm text-center"><div class="text-3xl font-bold text-amber-600">6</div><div class="text-xs font-bold text-slate-600 mt-1 uppercase">Pending Actions</div></div>
+          <div class="bg-white border border-slate-300 p-4 shadow-sm text-center"><div class="text-3xl font-bold text-red-600">2</div><div class="text-xs font-bold text-slate-600 mt-1 uppercase">Non-Compliant</div></div>
+        </div>
+        <div class="bg-white border border-slate-300 overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse whitespace-nowrap">
+            <thead><tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a]">Compliance Area</th><th class="p-2 border-r border-[#003d7a]">Requirement</th><th class="p-2 border-r border-[#003d7a]">Due Date</th><th class="p-2 border-r border-[#003d7a]">Filed / Completed</th><th class="p-2 text-center">Status</th>
+            </tr></thead>
+            <tbody class="text-[13px] text-slate-800">
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200 font-bold">PF Remittance</td><td class="p-2 border-r border-slate-200">Monthly ECR filing & payment — May 2026</td><td class="p-2 border-r border-slate-200">15-Jun-2026</td><td class="p-2 border-r border-slate-200">15-May-2026</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Compliant</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200 font-bold">ESI Contribution</td><td class="p-2 border-r border-slate-200">Monthly ESI challan — May 2026</td><td class="p-2 border-r border-slate-200">15-Jun-2026</td><td class="p-2 border-r border-slate-200">15-May-2026</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Compliant</span></td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200 font-bold">Wage Register</td><td class="p-2 border-r border-slate-200">Monthly wage register submission — May 2026</td><td class="p-2 border-r border-slate-200">10-Jun-2026</td><td class="p-2 border-r border-slate-200">08-Jun-2026</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Compliant</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200 font-bold">Contractor License</td><td class="p-2 border-r border-slate-200">CLRA License Renewal — Form V</td><td class="p-2 border-r border-slate-200">31-Mar-2027</td><td class="p-2 border-r border-slate-200">—</td><td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Valid</span></td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200 font-bold">Medical Fitness</td><td class="p-2 border-r border-slate-200">Annual fitness certificates for all workers</td><td class="p-2 border-r border-slate-200">Ongoing</td><td class="p-2 border-r border-slate-200">44 of 47 cleared</td><td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs border border-amber-300">Action Needed</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200 font-bold">Gate Pass Validity</td><td class="p-2 border-r border-slate-200">All workers must hold valid gate passes</td><td class="p-2 border-r border-slate-200">Ongoing</td><td class="p-2 border-r border-slate-200">39 of 47 valid</td><td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs border border-amber-300">Action Needed</span></td></tr>
+              <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]"><td class="p-2 border-r border-slate-200 font-bold">Safety Training</td><td class="p-2 border-r border-slate-200">Quarterly safety induction — Q2 2026</td><td class="p-2 border-r border-slate-200">30-Jun-2026</td><td class="p-2 border-r border-slate-200">Scheduled: 20-Jun-2026</td><td class="p-2 text-center"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs border border-blue-300">Scheduled</span></td></tr>
+              <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]"><td class="p-2 border-r border-slate-200 font-bold">Half-Yearly Return</td><td class="p-2 border-r border-slate-200">Form XXIV — Half-yearly return</td><td class="p-2 border-r border-slate-200">30-Jun-2026</td><td class="p-2 border-r border-slate-200">—</td><td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-xs border border-amber-300">Upcoming</span></td></tr>
+            </tbody>
+          </table>
+          <div class="bg-emerald-50 p-3 border-t border-slate-300 flex items-center gap-2 text-sm text-emerald-800 font-semibold"><i data-lucide="shield-check" class="w-4 h-4"></i> Overall compliance score: 93% — 6 of 8 areas fully compliant. Last audit: 15-Apr-2026 by Labour Inspector, East Singhbhum.</div>
+        </div>
+      </div><!-- end reports tab -->
+
     </div>
 
     <!-- 4. FIND AN EMPLOYEE PANEL -->
@@ -260,29 +498,70 @@
       </div>
 
       <div class="grid md:grid-cols-3 gap-6">
-        <!-- Candidate Card -->
         <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
           <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">RS</div>
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">AK</div>
             <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs font-bold border border-emerald-100">Verified</span>
           </div>
-          <h3 class="font-bold text-lg text-primary">Rahul Sharma</h3>
-          <p class="text-sm text-slate-500 mb-4">Senior Welder • 5 Yrs Exp.</p>
-          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">
-            Onboard Instantly
-          </button>
+          <h3 class="font-bold text-lg text-primary">Ajay Kerketta</h3>
+          <p class="text-sm text-slate-500 mb-1">MIG/TIG Welder • 7 Yrs Exp.</p>
+          <p class="text-xs text-slate-400 mb-4">Ranchi, Jharkhand • Available Immediately</p>
+          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">Onboard Instantly</button>
         </div>
 
         <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
           <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">DK</div>
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">MD</div>
             <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs font-bold border border-emerald-100">Verified</span>
           </div>
-          <h3 class="font-bold text-lg text-primary">Deepak Kumar</h3>
-          <p class="text-sm text-slate-500 mb-4">Heavy Machinery Operator • 3 Yrs Exp.</p>
-          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">
-            Onboard Instantly
-          </button>
+          <h3 class="font-bold text-lg text-primary">Mukesh Dubey</h3>
+          <p class="text-sm text-slate-500 mb-1">Crane Operator (EOT) • 4 Yrs Exp.</p>
+          <p class="text-xs text-slate-400 mb-4">Adityapur, Jharkhand • Available Immediately</p>
+          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">Onboard Instantly</button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">PN</div>
+            <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs font-bold border border-emerald-100">Verified</span>
+          </div>
+          <h3 class="font-bold text-lg text-primary">Pawan Nayak</h3>
+          <p class="text-sm text-slate-500 mb-1">Electrician Grade-I • 6 Yrs Exp.</p>
+          <p class="text-xs text-slate-400 mb-4">Gamharia, Jharkhand • Notice Period: 7 Days</p>
+          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">Onboard Instantly</button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">SH</div>
+            <span class="px-2 py-1 bg-amber-50 text-amber-700 rounded text-xs font-bold border border-amber-100">KYC Pending</span>
+          </div>
+          <h3 class="font-bold text-lg text-primary">Suman Hembrom</h3>
+          <p class="text-sm text-slate-500 mb-1">Safety Officer • 3 Yrs Exp.</p>
+          <p class="text-xs text-slate-400 mb-4">Chaibasa, Jharkhand • Available Immediately</p>
+          <button class="w-full bg-white border border-slate-300 text-slate-500 transition font-semibold py-2 rounded-lg text-sm" disabled>KYC Verification Pending</button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">DT</div>
+            <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs font-bold border border-emerald-100">Verified</span>
+          </div>
+          <h3 class="font-bold text-lg text-primary">Dilip Tudu</h3>
+          <p class="text-sm text-slate-500 mb-1">Scaffolder / Rigger • 5 Yrs Exp.</p>
+          <p class="text-xs text-slate-400 mb-4">Jamshedpur, Jharkhand • Available Immediately</p>
+          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">Onboard Instantly</button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">RG</div>
+            <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs font-bold border border-emerald-100">Verified</span>
+          </div>
+          <h3 class="font-bold text-lg text-primary">Rohit Gupta</h3>
+          <p class="text-sm text-slate-500 mb-1">General Helper • 2 Yrs Exp.</p>
+          <p class="text-xs text-slate-400 mb-4">Mango, Jamshedpur • Available Immediately</p>
+          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">Onboard Instantly</button>
         </div>
       </div>
     </div>
@@ -398,6 +677,35 @@
     
     backToDashBtns.forEach(btn => {
       btn.addEventListener('click', () => showView(dashboardView));
+    });
+
+    // CLMS Tab Switching Logic
+    const clmsTabs = document.querySelectorAll('.clms-tab');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    
+    function switchTab(tabName) {
+      // Update tab button styles
+      clmsTabs.forEach(tab => {
+        if (tab.dataset.tab === tabName) {
+          tab.classList.add('bg-[#003d7a]');
+        } else {
+          tab.classList.remove('bg-[#003d7a]');
+        }
+      });
+      // Show/hide tab content panels
+      tabPanels.forEach(panel => {
+        if (panel.dataset.tabContent === tabName) {
+          panel.classList.remove('hidden');
+        } else {
+          panel.classList.add('hidden');
+        }
+      });
+      // Re-init icons for newly visible content
+      lucide.createIcons();
+    }
+
+    clmsTabs.forEach(tab => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
 
     // Modal Logic
