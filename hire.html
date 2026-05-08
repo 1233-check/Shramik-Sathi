@@ -109,57 +109,115 @@
 
     </div>
 
-    <!-- 3. COMPLIANCE MANAGEMENT PANEL -->
-    <div id="compliancePanel" class="w-full max-w-5xl hidden flex-col gap-6 mt-4">
+    <!-- 3. COMPLIANCE MANAGEMENT PANEL (CLMS Style) -->
+    <div id="compliancePanel" class="w-full max-w-[1200px] hidden flex-col mt-4">
       
-      <div class="flex items-center gap-4 mb-4">
-        <button class="back-to-dash text-slate-500 hover:text-primary transition flex items-center gap-1 font-medium">
-          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+      <!-- Top Actions -->
+      <div class="flex items-center justify-between bg-white border border-slate-300 p-3 mb-4 shadow-sm">
+        <h1 class="text-xl font-bold text-[#0055a5]">Contract Labour Management System (CLMS)</h1>
+        <button class="back-to-dash text-sm text-slate-600 hover:text-slate-900 font-semibold border border-slate-300 px-3 py-1 bg-slate-100">
+          Return to Dashboard
         </button>
       </div>
 
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 class="text-2xl font-bold text-primary flex items-center gap-2">
-            <i data-lucide="shield-check" class="text-blue-600"></i> Compliance Management
-          </h1>
-          <p class="text-slate-500">Track and manage your active workforce.</p>
+      <!-- Search & Filters Container (CLMS Style) -->
+      <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Company Name</label>
+            <select class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
+              <option>-- ALL --</option>
+              <option selected>Tata Steel Ltd.</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Employee Name</label>
+            <input type="text" class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Aadhar No.</label>
+            <input type="text" class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
+          </div>
+          <div class="flex gap-2">
+            <button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Search</button>
+            <button id="addEmployeeBtn" class="bg-[#28a745] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#218838] border border-[#1e7e34]">Add New Employee</button>
+          </div>
         </div>
-        <button id="addEmployeeBtn" class="bg-primary text-white font-semibold py-2.5 px-5 rounded-lg hover:bg-slate-800 transition shadow-sm flex items-center gap-2">
-          <i data-lucide="plus-circle" class="w-5 h-5"></i> Add Employee
-        </button>
       </div>
 
-      <!-- Worker Table -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200 text-sm text-slate-500 font-semibold uppercase tracking-wider">
-                <th class="p-4">Worker Name</th>
-                <th class="p-4">Role</th>
-                <th class="p-4">Origin</th>
-                <th class="p-4">UAN Status</th>
-                <th class="p-4">Action</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 text-sm">
-              <tr class="hover:bg-slate-50 transition">
-                <td class="p-4 font-medium text-primary">Virat Singh</td>
-                <td class="p-4 text-slate-600">Fitter</td>
-                <td class="p-4"><span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md font-medium text-xs border border-emerald-100">Shramik Sathi</span></td>
-                <td class="p-4"><span class="text-emerald-600 font-semibold flex items-center gap-1"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Verified</span></td>
-                <td class="p-4"><button class="text-blue-600 hover:underline font-medium">View</button></td>
-              </tr>
-              <tr class="hover:bg-slate-50 transition">
-                <td class="p-4 font-medium text-primary">Amit Kumar</td>
-                <td class="p-4 text-slate-600">Helper</td>
-                <td class="p-4"><span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md font-medium text-xs border border-slate-200">Manual Entry</span></td>
-                <td class="p-4"><span class="text-amber-600 font-semibold flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> Pending</span></td>
-                <td class="p-4"><button class="text-blue-600 hover:underline font-medium">View</button></td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- Enterprise Data Grid (CLMS GridView Style) -->
+      <div class="bg-white border border-slate-300 overflow-x-auto">
+        <table class="w-full text-left text-sm border-collapse whitespace-nowrap">
+          <thead>
+            <tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a] text-center w-16">Action</th>
+              <th class="p-2 border-r border-[#003d7a]">Emp ID</th>
+              <th class="p-2 border-r border-[#003d7a]">Employee Name</th>
+              <th class="p-2 border-r border-[#003d7a]">Father's Name</th>
+              <th class="p-2 border-r border-[#003d7a]">Aadhar No</th>
+              <th class="p-2 border-r border-[#003d7a]">Designation</th>
+              <th class="p-2 border-r border-[#003d7a]">UAN No</th>
+              <th class="p-2 border-r border-[#003d7a]">Gate Pass Valid Upto</th>
+              <th class="p-2 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody class="text-[13px] text-slate-800">
+            <!-- Row 1 -->
+            <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]">
+              <td class="p-2 border-r border-slate-200 text-center">
+                <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+              <td class="p-2 border-r border-slate-200">15937</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Virat Singh</td>
+              <td class="p-2 border-r border-slate-200">Ramesh Singh</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-3593</td>
+              <td class="p-2 border-r border-slate-200">Mechanical Fitter</td>
+              <td class="p-2 border-r border-slate-200">100987654321</td>
+              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">31-Dec-2026</td>
+              <td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td>
+            </tr>
+            <!-- Row 2 -->
+            <tr class="bg-[#f9f9f9] border-b border-slate-200 hover:bg-[#f1f1f1]">
+              <td class="p-2 border-r border-slate-200 text-center">
+                <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+              <td class="p-2 border-r border-slate-200">15938</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Amit Kumar</td>
+              <td class="p-2 border-r border-slate-200">Suresh Kumar</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-9128</td>
+              <td class="p-2 border-r border-slate-200">Helper</td>
+              <td class="p-2 border-r border-slate-200">Pending</td>
+              <td class="p-2 border-r border-slate-200 text-red-600 font-semibold">Expired</td>
+              <td class="p-2 text-center"><span class="bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs border border-red-300">Inactive</span></td>
+            </tr>
+            <!-- Row 3 -->
+            <tr class="border-b border-slate-200 hover:bg-[#f9f9f9]">
+              <td class="p-2 border-r border-slate-200 text-center">
+                <button class="text-blue-600 hover:underline mr-2" title="Edit"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                <button class="text-red-600 hover:underline" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+              </td>
+              <td class="p-2 border-r border-slate-200">15945</td>
+              <td class="p-2 border-r border-slate-200 font-bold">Deepak Sharma</td>
+              <td class="p-2 border-r border-slate-200">Mohan Sharma</td>
+              <td class="p-2 border-r border-slate-200">XXXX-XXXX-1122</td>
+              <td class="p-2 border-r border-slate-200">Welder</td>
+              <td class="p-2 border-r border-slate-200">100554433221</td>
+              <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">15-Jun-2025</td>
+              <td class="p-2 text-center"><span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs border border-green-300">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Pagination Mock -->
+        <div class="bg-[#f5f5f5] p-2 flex justify-between items-center text-xs text-slate-600 border-t border-slate-300">
+          <span>Showing 1 to 3 of 3 entries</span>
+          <div class="flex gap-1">
+            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-50">Previous</button>
+            <button class="px-2 py-1 border border-[#0055a5] bg-[#0055a5] text-white">1</button>
+            <button class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100 disabled:opacity-50">Next</button>
+          </div>
         </div>
       </div>
     </div>
