@@ -1,0 +1,285 @@
+/* NBU App Simulator Styles - Custom Tailwind-like Utilities */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg-gray-50: #f8fafc;
+  --bg-white: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --emerald-600: #059669;
+  --emerald-50: #ecfdf5;
+  --blue-600: #2563eb;
+  --blue-50: #eff6ff;
+  --amber-500: #f59e0b;
+  --amber-50: #fffbeb;
+  --gray-200: #e2e8f0;
+  --gray-100: #f1f5f9;
+  --border-light: #f1f5f9;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-top: 0 -4px 6px -1px rgb(0 0 0 / 0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #cbd5e1; /* Darker background outside the app frame */
+  color: var(--text-main);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* App Container Simulation */
+.app-container {
+  max-width: 480px; /* Mobile width constraint */
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: var(--bg-gray-50);
+  position: relative;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-top: 64px; /* Space for top bar */
+  padding-bottom: 80px; /* Space for bottom bar */
+}
+
+/* Utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.p-4 { padding: 1rem; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mt-2 { margin-top: 0.5rem; }
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+.rounded-lg { border-radius: 0.5rem; }
+.rounded-xl { border-radius: 0.75rem; }
+.rounded-full { border-radius: 9999px; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Colors */
+.bg-white { background-color: var(--bg-white); }
+.bg-emerald { background-color: var(--emerald-600); color: white; }
+.text-muted { color: var(--text-muted); }
+.text-emerald { color: var(--emerald-600); }
+.text-blue { color: var(--blue-600); }
+.text-amber { color: var(--amber-500); }
+
+/* Touch Targets - NBU Crucial Rule */
+button, a.touch-target {
+  min-height: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  background: none;
+  text-decoration: none;
+  font-family: inherit;
+  transition: transform 0.1s;
+}
+
+button:active, a.touch-target:active {
+  transform: scale(0.95);
+  background-color: var(--gray-200);
+}
+
+.bg-emerald:active {
+  background-color: #047857; /* Darker emerald */
+}
+
+/* Specific Components */
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: white;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: var(--blue-50);
+  color: var(--blue-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border-radius: 50%;
+}
+
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--text-muted);
+}
+
+/* Search Hub */
+.search-hub {
+  background: white;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bg-gray-50);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  border: 1px solid var(--gray-200);
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 1rem;
+  outline: none;
+  min-height: 48px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-muted);
+}
+
+.mic-btn {
+  background: var(--blue-50);
+  color: var(--blue-600);
+  border-radius: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.quick-action-btn {
+  flex: 1;
+  background: white;
+  border: 1px solid var(--gray-200);
+  color: var(--text-main);
+  font-weight: 500;
+  gap: 0.5rem;
+}
+
+/* Tools Grid */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.tool-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem 0.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.tool-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+}
+
+.bg-emerald-light { background: var(--emerald-50); color: var(--emerald-600); }
+.bg-blue-light { background: var(--blue-50); color: var(--blue-600); }
+.bg-amber-light { background: var(--amber-50); color: var(--amber-500); }
+
+/* Trust Profile */
+.trust-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.trust-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.trust-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: white;
+  box-shadow: var(--shadow-top);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 50;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 25%;
+  height: 100%;
+  color: var(--text-muted);
+  gap: 0.25rem;
+}
+
+.nav-item.active {
+  color: var(--emerald-600);
+}
