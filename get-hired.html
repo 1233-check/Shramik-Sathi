@@ -2,225 +2,194 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#1e293b">
-  <title>Get Hired | Employee Portal</title>
+  <title>Get Hired | Worker Portal</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="employee-app.css">
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gray-50">
+<body class="dashboard-bg">
 
-  <!-- STANDARD NAV (from index) -->
+  <!-- NAV -->
   <nav class="nav" role="navigation" aria-label="Main Navigation">
     <div class="nav-inner">
-      <a href="index.html" class="nav-logo" aria-label="Shramik Sathi Home">
-        <img src="logo.png" alt="Shramik Sathi Private Limited" class="nav-logo-img">
-      </a>
+      <a href="index.html" class="nav-logo" aria-label="Shramik Sathi Home"><img src="logo.png" alt="Shramik Sathi Private Limited" class="nav-logo-img"></a>
       <ul class="nav-links" id="navLinks" role="menubar">
         <li role="none"><a href="index.html#services" role="menuitem">Services</a></li>
         <li role="none"><a href="index.html#compliance" role="menuitem">Compliance</a></li>
         <li role="none"><a href="index.html#about" role="menuitem">About Us</a></li>
         <li role="none"><a href="index.html#contact" role="menuitem">Contact</a></li>
       </ul>
-      <div class="flex items-center gap-4">
-        <div class="portal-user-info desktop-only">
-          <span class="text-sm font-semibold">Hello, Virat (ID: 15937)</span>
-        </div>
-        <button class="icon-btn" aria-label="Notifications" style="color: var(--primary);">
-          <i data-lucide="bell"></i>
-        </button>
-        <button class="hamburger" id="hamburger" aria-label="Toggle Navigation" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
+      <a href="hire.html" class="nav-cta" aria-label="Hire Workers">Hire Workers</a>
+      <button class="hamburger" id="hamburger" aria-label="Toggle Navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
-  <!-- PAGE HEADER -->
-  <header class="page-header" style="padding-top: 8rem; padding-bottom: 3rem;">
-    <div class="container text-center">
-      <h1>Employee Portal</h1>
-      <p>Find jobs, mark attendance, and track your verification status.</p>
+  <!-- DASHBOARD HEADER -->
+  <header class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-title">
+        <h1>Worker Portal</h1>
+        <p>Find jobs, mark attendance, and track your compliance.</p>
+      </div>
+      <div class="user-badge">
+        <div class="user-avatar">VS</div>
+        <div class="user-info">
+          <span class="user-name">Virat Singh</span>
+          <span class="user-id">ID: 15937</span>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- MAIN DASHBOARD CONTENT -->
-  <main class="container py-8" style="max-width: 1200px; margin: 0 auto; padding: 3rem 1.5rem;">
+  <!-- DASHBOARD CONTENT -->
+  <main class="dash-container">
     
-    <div class="dashboard-grid" style="display: grid; gap: 2rem; grid-template-columns: 1fr; @media(min-width: 992px) { grid-template-columns: 2fr 1fr; }">
+    <!-- LEFT COLUMN -->
+    <div class="dash-main">
       
-      <!-- LEFT COLUMN -->
-      <div class="dashboard-left flex-col gap-6" style="display: flex; flex-direction: column; gap: 2rem;">
+      <!-- Job Search Card -->
+      <div class="dash-card">
+        <h2 class="dash-card-title">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          Find Verified Jobs
+        </h2>
         
-        <!-- Job Search Hub -->
-        <section class="search-hub bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
-            <i data-lucide="briefcase" class="text-blue"></i> Find Verified Jobs
-          </h2>
-          
-          <div class="search-input-wrapper mb-4 border border-gray-300 rounded-lg overflow-hidden flex bg-gray-50">
-            <div class="p-3 text-muted"><i data-lucide="search"></i></div>
-            <input type="text" class="search-input w-full bg-transparent border-none p-3 text-lg outline-none" placeholder="Search by role (e.g., Fitter, Welder)">
-            <button class="p-3 text-blue hover:bg-blue-50 transition" aria-label="Voice Search">
-              <i data-lucide="mic"></i>
-            </button>
+        <div class="job-search-wrapper">
+          <div class="search-icon-box">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </div>
-
-          <div class="flex gap-4">
-            <button class="btn-outline flex items-center justify-center gap-2 flex-1 py-3 text-lg">
-              <i data-lucide="sliders-horizontal"></i> Filters
-            </button>
-            <button class="btn-solid flex items-center justify-center gap-2 flex-1 py-3 text-lg bg-emerald hover:bg-emerald-700" style="background-color: var(--emerald-600); border-color: var(--emerald-600);">
-              <i data-lucide="file-up"></i> Upload Profile
-            </button>
-          </div>
-        </section>
-
-        <!-- Tools Grid -->
-        <section class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
-            <i data-lucide="layout-grid" class="text-blue"></i> My Work & Money
-          </h2>
-          <div class="tools-grid-desktop" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1.5rem;">
-            
-            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
-              <div class="tool-icon-wrapper bg-emerald-light mb-3" style="width: 64px; height: 64px;">
-                <i data-lucide="map-pin" style="width: 32px; height: 32px;"></i>
-              </div>
-              <span class="text-sm font-semibold">Mark Attendance</span>
-            </button>
-
-            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
-              <div class="tool-icon-wrapper bg-blue-light mb-3" style="width: 64px; height: 64px;">
-                <i data-lucide="calendar-days" style="width: 32px; height: 32px;"></i>
-              </div>
-              <span class="text-sm font-semibold">Apply Leave</span>
-            </button>
-
-            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
-              <div class="tool-icon-wrapper bg-amber-light mb-3" style="width: 64px; height: 64px;">
-                <i data-lucide="indian-rupee" style="width: 32px; height: 32px;"></i>
-              </div>
-              <span class="text-sm font-semibold">Advance Salary</span>
-            </button>
-
-            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
-              <div class="tool-icon-wrapper bg-blue-light mb-3" style="width: 64px; height: 64px;">
-                <i data-lucide="calculator" style="width: 32px; height: 32px;"></i>
-              </div>
-              <span class="text-sm font-semibold">Income Calculator</span>
-            </button>
-
-            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
-              <div class="tool-icon-wrapper bg-emerald-light mb-3" style="width: 64px; height: 64px;">
-                <i data-lucide="hard-hat" style="width: 32px; height: 32px;"></i>
-              </div>
-              <span class="text-sm font-semibold">Safety Training</span>
-            </button>
-
-            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
-              <div class="tool-icon-wrapper bg-amber-light mb-3" style="width: 64px; height: 64px;">
-                <i data-lucide="star" style="width: 32px; height: 32px;"></i>
-              </div>
-              <span class="text-sm font-semibold">Rate Employer</span>
-            </button>
-
-          </div>
-        </section>
-
+          <input type="text" class="job-search-input" placeholder="Search by role (e.g. Fitter, Welder, Helper)">
+          <button class="job-search-btn">Search Jobs</button>
+        </div>
+        
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn-outline" style="flex: 1; padding: 0.85rem;">Advanced Filters</button>
+          <button class="btn-solid" style="flex: 1; padding: 0.85rem;">Upload CV</button>
+        </div>
       </div>
 
-      <!-- RIGHT COLUMN -->
-      <div class="dashboard-right">
+      <!-- Tools Grid Card -->
+      <div class="dash-card">
+        <h2 class="dash-card-title">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          My Daily Tools
+        </h2>
         
-        <section class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 sticky" style="top: 100px;">
-          <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
-            <i data-lucide="shield-check" class="text-emerald"></i> Trust Profile
-          </h2>
+        <div class="action-grid">
           
-          <div class="trust-list flex-col gap-4">
-            
-            <div class="trust-card border border-emerald-200 bg-emerald-50 p-4 rounded-lg flex items-center gap-4">
-              <div class="trust-icon bg-white text-emerald flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <i data-lucide="check-circle-2"></i>
-              </div>
-              <div>
-                <h4 class="font-semibold text-lg text-gray-900">UAN / PF Status</h4>
-                <p class="text-sm text-emerald font-medium">Verified & Active</p>
-              </div>
+          <div class="action-btn">
+            <div class="action-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             </div>
-
-            <div class="trust-card border border-amber-200 bg-amber-50 p-4 rounded-lg flex items-center gap-4">
-              <div class="trust-icon bg-white text-amber flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <i data-lucide="clock"></i>
-              </div>
-              <div>
-                <h4 class="font-semibold text-lg text-gray-900">ESIC Number</h4>
-                <p class="text-sm text-amber font-medium">Pending Verification</p>
-              </div>
-            </div>
-
-            <div class="trust-card border border-blue-200 bg-blue-50 p-4 rounded-lg flex items-center gap-4">
-              <div class="trust-icon bg-white text-blue flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                <i data-lucide="info"></i>
-              </div>
-              <div>
-                <h4 class="font-semibold text-lg text-gray-900">Police Verification</h4>
-                <p class="text-sm text-blue font-medium">Submitted (20/10)</p>
-              </div>
-            </div>
-
+            Mark Attendance
           </div>
 
-          <div class="mt-8 pt-6 border-t border-gray-200">
-            <h3 class="font-semibold mb-3">Support</h3>
-            <button class="btn-outline w-full flex items-center justify-center gap-2">
-              <i data-lucide="phone"></i> Contact Helpdesk
-            </button>
+          <div class="action-btn">
+            <div class="action-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            Apply Leave
           </div>
-        </section>
 
+          <div class="action-btn">
+            <div class="action-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 3h12M6 8h12M14 8a4 4 0 010 8H6m8 0l-4 5"></path></svg>
+            </div>
+            Advance Salary
+          </div>
+
+          <div class="action-btn">
+            <div class="action-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="16" y1="18" x2="16" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="8" y1="18" x2="8" y2="18"></line></svg>
+            </div>
+            Income Calculator
+          </div>
+
+          <div class="action-btn">
+            <div class="action-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            Safety Training
+          </div>
+
+          <div class="action-btn">
+            <div class="action-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            Rate Employer
+          </div>
+
+        </div>
       </div>
+    </div>
 
+    <!-- RIGHT COLUMN -->
+    <div class="dash-sidebar">
+      
+      <div class="dash-card">
+        <h2 class="dash-card-title">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          Trust Profile
+        </h2>
+        
+        <div class="status-list">
+          
+          <div class="status-item">
+            <div class="status-icon verified">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div class="status-text">
+              <h4>UAN / PF Status</h4>
+              <p class="verified">Verified & Active</p>
+            </div>
+          </div>
+
+          <div class="status-item">
+            <div class="status-icon pending">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div class="status-text">
+              <h4>ESIC Number</h4>
+              <p class="pending">Pending Verification</p>
+            </div>
+          </div>
+
+          <div class="status-item">
+            <div class="status-icon info">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            </div>
+            <div class="status-text">
+              <h4>Police Verification</h4>
+              <p class="info">Submitted (20/10/2024)</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+          <h4 style="font-size: 1rem; color: var(--primary); margin-bottom: 1rem; font-weight: 600;">Support</h4>
+          <button class="btn-outline" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 0.85rem;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            Contact Helpdesk
+          </button>
+        </div>
+      </div>
+      
     </div>
   </main>
 
   <!-- FOOTER -->
-  <footer class="footer mt-auto">
+  <footer class="footer">
     <div class="footer-links">
       <a href="#">Privacy Policy</a>
       <a href="#">Terms of Service</a>
-      <a href="#">Help & Support</a>
+      <a href="#">Compliance Portal</a>
     </div>
     <p>&copy; 2026 Shramik Sathi Private Limited. All rights reserved.</p>
   </footer>
 
-  <script>
-    // Initialize Lucide Icons
-    lucide.createIcons();
-
-    // Mobile nav toggle (from main script)
-    const hamburger = document.getElementById('hamburger');
-    const navLinks = document.getElementById('navLinks');
-    if (hamburger) {
-      hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('open');
-        hamburger.setAttribute('aria-expanded', navLinks.classList.contains('open'));
-      });
-    }
-
-    // Adjust grid for responsiveness
-    function adjustGrid() {
-      const grid = document.querySelector('.dashboard-grid');
-      if (window.innerWidth >= 992) {
-        grid.style.gridTemplateColumns = '2fr 1fr';
-      } else {
-        grid.style.gridTemplateColumns = '1fr';
-      }
-    }
-    window.addEventListener('resize', adjustGrid);
-    adjustGrid();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
