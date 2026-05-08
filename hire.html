@@ -113,15 +113,26 @@
     <div id="compliancePanel" class="w-full max-w-[1200px] hidden flex-col mt-4">
       
       <!-- Top Actions -->
-      <div class="flex items-center justify-between bg-white border border-slate-300 p-3 mb-4 shadow-sm">
+      <div class="flex items-center justify-between bg-white border border-slate-300 p-3 shadow-sm border-b-0">
         <h1 class="text-xl font-bold text-[#0055a5]">Contract Labour Management System (CLMS)</h1>
-        <button class="back-to-dash text-sm text-slate-600 hover:text-slate-900 font-semibold border border-slate-300 px-3 py-1 bg-slate-100">
+        <button class="back-to-dash text-sm text-slate-600 hover:text-slate-900 font-semibold border border-slate-300 px-3 py-1 bg-slate-100 hover:bg-slate-200">
           Return to Dashboard
         </button>
       </div>
 
+      <!-- CLMS Navigation Tabs -->
+      <div class="bg-[#0055a5] flex text-white text-xs font-bold uppercase tracking-wider mb-4 border border-[#003d7a] overflow-x-auto whitespace-nowrap">
+        <button class="px-4 py-2.5 bg-[#003d7a] border-r border-[#004080] hover:bg-[#003d7a]">Employee Master</button>
+        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Gate Pass Mgmt.</button>
+        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">PF / ESI Challans</button>
+        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Wage Register</button>
+        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Medical Clearances</button>
+        <button class="px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">B-Pass / C-Pass</button>
+        <button class="px-4 py-2.5 hover:bg-[#003d7a]">Compliance Reports</button>
+      </div>
+
       <!-- Search & Filters Container (CLMS Style) -->
-      <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4">
+      <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Company Name</label>
