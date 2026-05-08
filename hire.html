@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employer Portal | Shramik Sathi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            primary: '#1e293b', // Deep Trust Blue
+            secondary: '#f59e0b', // Safety Orange
+            emerald: { 50: '#ecfdf5', 600: '#059669', 700: '#047857' },
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col">
+
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center gap-2">
+          <a href="index.html" class="flex items-center">
+            <!-- Using an icon for the logo placeholder to ensure it always loads cleanly -->
+            <i data-lucide="shield-check" class="text-secondary w-8 h-8 mr-2"></i>
+            <span class="font-bold text-xl text-primary">Shramik Sathi</span>
+          </a>
+          <span class="ml-4 px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full border border-slate-200">Employer Portal</span>
+        </div>
+        <div id="navUser" class="hidden flex items-center gap-4">
+          <span class="text-sm font-medium text-slate-600">Tata Steel Ltd.</span>
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+            TS
+          </div>
+          <button id="logoutBtn" class="text-sm text-red-600 hover:text-red-700 font-medium">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow flex flex-col items-center p-4 sm:p-8 relative">
+
+    <!-- 1. LOGIN / REGISTRATION VIEW -->
+    <div id="loginView" class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8 mt-10">
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold text-primary">Company Login</h1>
+        <p class="text-slate-500 text-sm mt-2">Access your compliance and hiring dashboard.</p>
+      </div>
+
+      <form id="loginForm" class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Company Email</label>
+          <input type="email" value="admin@tatasteel.com" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+          <input type="password" value="password123" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
+        </div>
+        <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-slate-800 transition shadow-md flex justify-center items-center gap-2">
+          Sign In <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+      
+      <div class="mt-6 text-center">
+        <p class="text-sm text-slate-500">New industry partner? <a href="#" class="text-secondary font-semibold hover:underline">Register Company</a></p>
+      </div>
+    </div>
+
+
+    <!-- 2. EMPLOYER DASHBOARD VIEW -->
+    <div id="dashboardView" class="w-full max-w-5xl hidden flex-col gap-8">
+      
+      <div class="text-center sm:text-left mb-2 mt-4">
+        <h1 class="text-3xl font-bold text-primary">Welcome back, Tata Steel Ltd.</h1>
+        <p class="text-slate-500 mt-2 text-lg">Manage your workforce and compliance from one unified hub.</p>
+      </div>
+
+      <!-- Main Services Cards -->
+      <div class="grid md:grid-cols-2 gap-6">
+        
+        <!-- Compliance Management Card -->
+        <button id="complianceBtn" class="group bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-left hover:shadow-lg hover:border-blue-200 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+          <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <i data-lucide="shield-check" class="w-7 h-7"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-primary mb-3">Compliance Management</h2>
+          <p class="text-slate-500 leading-relaxed">Manage your active workforce, track statutory compliances (PF/ESI), and ensure 100% regulatory adherence. Add new or existing workers here.</p>
+        </button>
+
+        <!-- Find an Employee Card -->
+        <button id="findEmployeeBtn" class="group bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-left hover:shadow-lg hover:border-secondary transition-all focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2">
+          <div class="w-14 h-14 rounded-xl bg-orange-50 text-secondary flex items-center justify-center mb-6 group-hover:bg-secondary group-hover:text-white transition-colors">
+            <i data-lucide="users" class="w-7 h-7"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-primary mb-3">Find an Employee</h2>
+          <p class="text-slate-500 leading-relaxed">Search our database of pre-verified, KYC-compliant Shramik Sathi workers. Instantly onboard skilled labor directly to your site.</p>
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- 3. COMPLIANCE MANAGEMENT PANEL -->
+    <div id="compliancePanel" class="w-full max-w-5xl hidden flex-col gap-6 mt-4">
+      
+      <div class="flex items-center gap-4 mb-4">
+        <button class="back-to-dash text-slate-500 hover:text-primary transition flex items-center gap-1 font-medium">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+        </button>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-primary flex items-center gap-2">
+            <i data-lucide="shield-check" class="text-blue-600"></i> Compliance Management
+          </h1>
+          <p class="text-slate-500">Track and manage your active workforce.</p>
+        </div>
+        <button id="addEmployeeBtn" class="bg-primary text-white font-semibold py-2.5 px-5 rounded-lg hover:bg-slate-800 transition shadow-sm flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5"></i> Add Employee
+        </button>
+      </div>
+
+      <!-- Worker Table -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-sm text-slate-500 font-semibold uppercase tracking-wider">
+                <th class="p-4">Worker Name</th>
+                <th class="p-4">Role</th>
+                <th class="p-4">Origin</th>
+                <th class="p-4">UAN Status</th>
+                <th class="p-4">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-sm">
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-4 font-medium text-primary">Virat Singh</td>
+                <td class="p-4 text-slate-600">Fitter</td>
+                <td class="p-4"><span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-md font-medium text-xs border border-emerald-100">Shramik Sathi</span></td>
+                <td class="p-4"><span class="text-emerald-600 font-semibold flex items-center gap-1"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Verified</span></td>
+                <td class="p-4"><button class="text-blue-600 hover:underline font-medium">View</button></td>
+              </tr>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="p-4 font-medium text-primary">Amit Kumar</td>
+                <td class="p-4 text-slate-600">Helper</td>
+                <td class="p-4"><span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md font-medium text-xs border border-slate-200">Manual Entry</span></td>
+                <td class="p-4"><span class="text-amber-600 font-semibold flex items-center gap-1"><i data-lucide="clock" class="w-4 h-4"></i> Pending</span></td>
+                <td class="p-4"><button class="text-blue-600 hover:underline font-medium">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. FIND AN EMPLOYEE PANEL -->
+    <div id="findPanel" class="w-full max-w-5xl hidden flex-col gap-6 mt-4">
+      
+      <div class="flex items-center gap-4 mb-4">
+        <button class="back-to-dash text-slate-500 hover:text-primary transition flex items-center gap-1 font-medium">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+        </button>
+      </div>
+
+      <div>
+        <h1 class="text-2xl font-bold text-primary flex items-center gap-2">
+          <i data-lucide="users" class="text-secondary"></i> Find an Employee
+        </h1>
+        <p class="text-slate-500">Discover pre-verified Shramik Sathi workers ready to deploy.</p>
+      </div>
+
+      <div class="flex gap-4 mb-2">
+        <div class="relative flex-grow">
+          <div class="absolute left-3 top-3 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></div>
+          <input type="text" placeholder="Search by role, skills, or location..." class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+        </div>
+        <button class="bg-white border border-slate-300 text-slate-700 px-4 py-3 rounded-lg hover:bg-slate-50 transition font-medium flex items-center gap-2 shadow-sm">
+          <i data-lucide="filter" class="w-5 h-5"></i> Filter
+        </button>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Candidate Card -->
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">RS</div>
+            <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs font-bold border border-emerald-100">Verified</span>
+          </div>
+          <h3 class="font-bold text-lg text-primary">Rahul Sharma</h3>
+          <p class="text-sm text-slate-500 mb-4">Senior Welder • 5 Yrs Exp.</p>
+          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">
+            Onboard Instantly
+          </button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">DK</div>
+            <span class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded text-xs font-bold border border-emerald-100">Verified</span>
+          </div>
+          <h3 class="font-bold text-lg text-primary">Deepak Kumar</h3>
+          <p class="text-sm text-slate-500 mb-4">Heavy Machinery Operator • 3 Yrs Exp.</p>
+          <button class="w-full bg-white border border-primary text-primary hover:bg-primary hover:text-white transition font-semibold py-2 rounded-lg text-sm onboard-candidate-btn">
+            Onboard Instantly
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ADD EMPLOYEE MODAL (Hidden by default) -->
+    <div id="addEmployeeModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 opacity-0 transition-all duration-200" id="modalContent">
+        
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <h2 class="text-xl font-bold text-primary">Add Employee to Compliance</h2>
+          <button id="closeModalBtn" class="text-slate-400 hover:text-slate-700 transition">
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+        <div class="p-8 space-y-4">
+          <p class="text-slate-500 mb-6 text-sm">Choose how you want to add this employee to your compliance management system.</p>
+          
+          <!-- Option 1: Shramik Sathi (Seamless) -->
+          <button class="w-full flex items-center p-4 border-2 border-emerald-100 bg-emerald-50 rounded-xl hover:border-emerald-500 hover:bg-emerald-100 transition-all group text-left">
+            <div class="w-12 h-12 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center mr-4 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+              <i data-lucide="zap" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-emerald-900 text-lg">Onboard via Shramik Sathi</h3>
+              <p class="text-emerald-700/80 text-sm">Seamlessly import pre-verified KYC, PF, and ESI data.</p>
+            </div>
+          </button>
+
+          <!-- Option 2: Manual (Non-Shramik) -->
+          <a href="manual-compliance.html" class="w-full flex items-center p-4 border border-slate-200 bg-white rounded-xl hover:border-primary hover:shadow-md transition-all group text-left">
+            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mr-4 group-hover:bg-primary group-hover:text-white transition-colors">
+              <i data-lucide="file-edit" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-primary text-lg">Add Non-Shramik Employee</h3>
+              <p class="text-slate-500 text-sm">Manually enter details for external workers (Multi-step form).</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // DOM Elements
+    const loginView = document.getElementById('loginView');
+    const loginForm = document.getElementById('loginForm');
+    const dashboardView = document.getElementById('dashboardView');
+    const navUser = document.getElementById('navUser');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    const complianceBtn = document.getElementById('complianceBtn');
+    const findEmployeeBtn = document.getElementById('findEmployeeBtn');
+    
+    const compliancePanel = document.getElementById('compliancePanel');
+    const findPanel = document.getElementById('findPanel');
+    const backToDashBtns = document.querySelectorAll('.back-to-dash');
+
+    const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+    const addEmployeeModal = document.getElementById('addEmployeeModal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const onboardCandidateBtns = document.querySelectorAll('.onboard-candidate-btn');
+
+    // Navigation Logic
+    function showView(viewElement) {
+      // Hide all main views/panels
+      loginView.classList.add('hidden');
+      dashboardView.classList.add('hidden');
+      dashboardView.classList.remove('flex');
+      compliancePanel.classList.add('hidden');
+      compliancePanel.classList.remove('flex');
+      findPanel.classList.add('hidden');
+      findPanel.classList.remove('flex');
+
+      // Show requested view
+      viewElement.classList.remove('hidden');
+      if (viewElement !== loginView) {
+        viewElement.classList.add('flex');
+      }
+    }
+
+    // Login Flow
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = loginForm.querySelector('button');
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Authenticating...`;
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        btn.innerHTML = `Sign In <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+        lucide.createIcons();
+        navUser.classList.remove('hidden');
+        showView(dashboardView);
+      }, 800);
+    });
+
+    // Logout Flow
+    logoutBtn.addEventListener('click', () => {
+      navUser.classList.add('hidden');
+      showView(loginView);
+    });
+
+    // Dashboard Navigation
+    complianceBtn.addEventListener('click', () => showView(compliancePanel));
+    findEmployeeBtn.addEventListener('click', () => showView(findPanel));
+    
+    backToDashBtns.forEach(btn => {
+      btn.addEventListener('click', () => showView(dashboardView));
+    });
+
+    // Modal Logic
+    function openModal() {
+      addEmployeeModal.classList.remove('hidden');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+      }, 10);
+    }
+
+    function closeModal() {
+      modalContent.classList.remove('scale-100', 'opacity-100');
+      modalContent.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => {
+        addEmployeeModal.classList.add('hidden');
+      }, 200);
+    }
+
+    addEmployeeBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    addEmployeeModal.addEventListener('click', (e) => {
+      if (e.target === addEmployeeModal) closeModal();
+    });
+
+    // Onboard Candidate Logic
+    onboardCandidateBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.innerHTML = `<i data-lucide="check" class="w-4 h-4 inline"></i> Onboarded & Added to Compliance!`;
+        this.classList.remove('bg-white', 'text-primary', 'border-primary');
+        this.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
+        lucide.createIcons();
+        this.disabled = true;
+      });
+    });
+
+  </script>
+</body>
+</html>
