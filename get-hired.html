@@ -218,6 +218,29 @@
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
+
+    // Bottom Navigation Logic
+    const navButtons = document.querySelectorAll('nav.absolute.bottom-0 a');
+    
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent default anchor jump
+        
+        // Remove active state from all buttons
+        navButtons.forEach(nav => {
+          nav.classList.remove('text-emerald-600');
+          nav.classList.add('text-gray-400', 'hover:text-gray-600');
+          nav.querySelector('span').classList.remove('font-bold');
+          nav.querySelector('span').classList.add('font-semibold');
+        });
+
+        // Add active state to clicked button
+        btn.classList.remove('text-gray-400', 'hover:text-gray-600');
+        btn.classList.add('text-emerald-600');
+        btn.querySelector('span').classList.remove('font-semibold');
+        btn.querySelector('span').classList.add('font-bold');
+      });
+    });
   </script>
 </body>
 </html>
