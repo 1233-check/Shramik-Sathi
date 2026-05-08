@@ -2,188 +2,225 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#ffffff">
-  <title>Shramik Sathi App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+  <meta name="theme-color" content="#1e293b">
+  <title>Get Hired | Employee Portal</title>
+  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="employee-app.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
+<body class="bg-gray-50">
 
-  <main class="app-container">
-
-    <!-- Top App Bar -->
-    <header class="top-bar flex items-center justify-between px-4">
-      <div class="flex items-center gap-3">
-        <div class="avatar">
-          <span>VS</span>
+  <!-- STANDARD NAV (from index) -->
+  <nav class="nav" role="navigation" aria-label="Main Navigation">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" aria-label="Shramik Sathi Home">
+        <img src="logo.png" alt="Shramik Sathi Private Limited" class="nav-logo-img">
+      </a>
+      <ul class="nav-links" id="navLinks" role="menubar">
+        <li role="none"><a href="index.html#services" role="menuitem">Services</a></li>
+        <li role="none"><a href="index.html#compliance" role="menuitem">Compliance</a></li>
+        <li role="none"><a href="index.html#about" role="menuitem">About Us</a></li>
+        <li role="none"><a href="index.html#contact" role="menuitem">Contact</a></li>
+      </ul>
+      <div class="flex items-center gap-4">
+        <div class="portal-user-info desktop-only">
+          <span class="text-sm font-semibold">Hello, Virat (ID: 15937)</span>
         </div>
-        <div>
-          <h1 class="font-semibold text-lg" style="margin-bottom: -4px;">Hello, Virat</h1>
-          <span class="text-xs text-muted">ID: 15937</span>
-        </div>
-      </div>
-      <div class="flex gap-2">
-        <button class="icon-btn" aria-label="Change Language">
-          <i data-lucide="languages"></i>
-        </button>
-        <button class="icon-btn" aria-label="Notifications">
+        <button class="icon-btn" aria-label="Notifications" style="color: var(--primary);">
           <i data-lucide="bell"></i>
         </button>
+        <button class="hamburger" id="hamburger" aria-label="Toggle Navigation" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-    </header>
+    </div>
+  </nav>
 
-    <!-- Scrollable Content Area -->
-    <div class="content-scroll">
+  <!-- PAGE HEADER -->
+  <header class="page-header" style="padding-top: 8rem; padding-bottom: 3rem;">
+    <div class="container text-center">
+      <h1>Employee Portal</h1>
+      <p>Find jobs, mark attendance, and track your verification status.</p>
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD CONTENT -->
+  <main class="container py-8" style="max-width: 1200px; margin: 0 auto; padding: 3rem 1.5rem;">
+    
+    <div class="dashboard-grid" style="display: grid; gap: 2rem; grid-template-columns: 1fr; @media(min-width: 992px) { grid-template-columns: 2fr 1fr; }">
       
-      <!-- Core Action Banner (Job Hub) -->
-      <section class="search-hub p-4">
-        <h2 class="text-xl font-semibold mb-4">Find Verified Jobs</h2>
+      <!-- LEFT COLUMN -->
+      <div class="dashboard-left flex-col gap-6" style="display: flex; flex-direction: column; gap: 2rem;">
         
-        <div class="search-input-wrapper mb-4">
-          <i data-lucide="search" class="search-icon"></i>
-          <input type="text" class="search-input" placeholder="Search for jobs (e.g. Fitter, Welder)">
-          <button class="mic-btn touch-target" aria-label="Voice Search">
-            <i data-lucide="mic"></i>
-          </button>
-        </div>
-
-        <div class="flex gap-3">
-          <button class="quick-action-btn rounded-lg touch-target">
-            <i data-lucide="sliders-horizontal" style="width: 18px; height: 18px;"></i>
-            Filters
-          </button>
-          <button class="quick-action-btn rounded-lg touch-target text-emerald" style="border-color: var(--emerald-600); background: var(--emerald-50);">
-            <i data-lucide="file-up" style="width: 18px; height: 18px;"></i>
-            Upload Profile
-          </button>
-        </div>
-      </section>
-
-      <!-- My Work & Money Grid -->
-      <section class="p-4">
-        <h3 class="font-semibold text-lg mb-4 text-muted">My Work & Money</h3>
-        <div class="tools-grid">
+        <!-- Job Search Hub -->
+        <section class="search-hub bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+            <i data-lucide="briefcase" class="text-blue"></i> Find Verified Jobs
+          </h2>
           
-          <button class="tool-card touch-target">
-            <div class="tool-icon-wrapper bg-emerald-light">
-              <i data-lucide="map-pin"></i>
-            </div>
-            <span class="text-xs font-medium">Mark<br>Attendance</span>
-          </button>
+          <div class="search-input-wrapper mb-4 border border-gray-300 rounded-lg overflow-hidden flex bg-gray-50">
+            <div class="p-3 text-muted"><i data-lucide="search"></i></div>
+            <input type="text" class="search-input w-full bg-transparent border-none p-3 text-lg outline-none" placeholder="Search by role (e.g., Fitter, Welder)">
+            <button class="p-3 text-blue hover:bg-blue-50 transition" aria-label="Voice Search">
+              <i data-lucide="mic"></i>
+            </button>
+          </div>
 
-          <button class="tool-card touch-target">
-            <div class="tool-icon-wrapper bg-blue-light">
-              <i data-lucide="calendar-days"></i>
-            </div>
-            <span class="text-xs font-medium">Apply<br>Leave</span>
-          </button>
+          <div class="flex gap-4">
+            <button class="btn-outline flex items-center justify-center gap-2 flex-1 py-3 text-lg">
+              <i data-lucide="sliders-horizontal"></i> Filters
+            </button>
+            <button class="btn-solid flex items-center justify-center gap-2 flex-1 py-3 text-lg bg-emerald hover:bg-emerald-700" style="background-color: var(--emerald-600); border-color: var(--emerald-600);">
+              <i data-lucide="file-up"></i> Upload Profile
+            </button>
+          </div>
+        </section>
 
-          <button class="tool-card touch-target">
-            <div class="tool-icon-wrapper bg-amber-light">
-              <i data-lucide="indian-rupee"></i>
-            </div>
-            <span class="text-xs font-medium">Advance<br>Salary</span>
-          </button>
+        <!-- Tools Grid -->
+        <section class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+            <i data-lucide="layout-grid" class="text-blue"></i> My Work & Money
+          </h2>
+          <div class="tools-grid-desktop" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1.5rem;">
+            
+            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
+              <div class="tool-icon-wrapper bg-emerald-light mb-3" style="width: 64px; height: 64px;">
+                <i data-lucide="map-pin" style="width: 32px; height: 32px;"></i>
+              </div>
+              <span class="text-sm font-semibold">Mark Attendance</span>
+            </button>
 
-          <button class="tool-card touch-target">
-            <div class="tool-icon-wrapper bg-blue-light">
-              <i data-lucide="calculator"></i>
-            </div>
-            <span class="text-xs font-medium">Income<br>Calculator</span>
-          </button>
+            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
+              <div class="tool-icon-wrapper bg-blue-light mb-3" style="width: 64px; height: 64px;">
+                <i data-lucide="calendar-days" style="width: 32px; height: 32px;"></i>
+              </div>
+              <span class="text-sm font-semibold">Apply Leave</span>
+            </button>
 
-          <button class="tool-card touch-target">
-            <div class="tool-icon-wrapper bg-emerald-light">
-              <i data-lucide="hard-hat"></i>
-            </div>
-            <span class="text-xs font-medium">Safety<br>Training</span>
-          </button>
+            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
+              <div class="tool-icon-wrapper bg-amber-light mb-3" style="width: 64px; height: 64px;">
+                <i data-lucide="indian-rupee" style="width: 32px; height: 32px;"></i>
+              </div>
+              <span class="text-sm font-semibold">Advance Salary</span>
+            </button>
 
-          <button class="tool-card touch-target">
-            <div class="tool-icon-wrapper bg-amber-light">
-              <i data-lucide="star"></i>
-            </div>
-            <span class="text-xs font-medium">Rate<br>Employer</span>
-          </button>
+            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
+              <div class="tool-icon-wrapper bg-blue-light mb-3" style="width: 64px; height: 64px;">
+                <i data-lucide="calculator" style="width: 32px; height: 32px;"></i>
+              </div>
+              <span class="text-sm font-semibold">Income Calculator</span>
+            </button>
 
-        </div>
-      </section>
+            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
+              <div class="tool-icon-wrapper bg-emerald-light mb-3" style="width: 64px; height: 64px;">
+                <i data-lucide="hard-hat" style="width: 32px; height: 32px;"></i>
+              </div>
+              <span class="text-sm font-semibold">Safety Training</span>
+            </button>
 
-      <!-- Trust Profile Section -->
-      <section class="p-4 pt-0">
-        <h3 class="font-semibold text-lg mb-4 text-muted">My Trust Profile</h3>
-        <div class="trust-list">
+            <button class="tool-card touch-target hover:shadow-md transition bg-gray-50 border border-gray-200">
+              <div class="tool-icon-wrapper bg-amber-light mb-3" style="width: 64px; height: 64px;">
+                <i data-lucide="star" style="width: 32px; height: 32px;"></i>
+              </div>
+              <span class="text-sm font-semibold">Rate Employer</span>
+            </button>
+
+          </div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="dashboard-right">
+        
+        <section class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 sticky" style="top: 100px;">
+          <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+            <i data-lucide="shield-check" class="text-emerald"></i> Trust Profile
+          </h2>
           
-          <div class="trust-card">
-            <div class="trust-icon bg-emerald-light">
-              <i data-lucide="check-circle-2"></i>
+          <div class="trust-list flex-col gap-4">
+            
+            <div class="trust-card border border-emerald-200 bg-emerald-50 p-4 rounded-lg flex items-center gap-4">
+              <div class="trust-icon bg-white text-emerald flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="check-circle-2"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-lg text-gray-900">UAN / PF Status</h4>
+                <p class="text-sm text-emerald font-medium">Verified & Active</p>
+              </div>
             </div>
-            <div class="flex-1">
-              <h4 class="font-semibold">UAN / PF Status</h4>
-              <p class="text-xs text-muted">Verified & Active</p>
+
+            <div class="trust-card border border-amber-200 bg-amber-50 p-4 rounded-lg flex items-center gap-4">
+              <div class="trust-icon bg-white text-amber flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="clock"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-lg text-gray-900">ESIC Number</h4>
+                <p class="text-sm text-amber font-medium">Pending Verification</p>
+              </div>
             </div>
+
+            <div class="trust-card border border-blue-200 bg-blue-50 p-4 rounded-lg flex items-center gap-4">
+              <div class="trust-icon bg-white text-blue flex-shrink-0 shadow-sm" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="info"></i>
+              </div>
+              <div>
+                <h4 class="font-semibold text-lg text-gray-900">Police Verification</h4>
+                <p class="text-sm text-blue font-medium">Submitted (20/10)</p>
+              </div>
+            </div>
+
           </div>
 
-          <div class="trust-card">
-            <div class="trust-icon bg-amber-light">
-              <i data-lucide="clock"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="font-semibold">ESIC Number</h4>
-              <p class="text-xs text-muted">Pending Verification</p>
-            </div>
+          <div class="mt-8 pt-6 border-t border-gray-200">
+            <h3 class="font-semibold mb-3">Support</h3>
+            <button class="btn-outline w-full flex items-center justify-center gap-2">
+              <i data-lucide="phone"></i> Contact Helpdesk
+            </button>
           </div>
+        </section>
 
-          <div class="trust-card">
-            <div class="trust-icon bg-blue-light">
-              <i data-lucide="shield-check"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="font-semibold">Police Verification</h4>
-              <p class="text-xs text-muted">Submitted (20/10/2024)</p>
-            </div>
-          </div>
-
-        </div>
-      </section>
+      </div>
 
     </div>
-
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-      <a href="#" class="nav-item touch-target active">
-        <i data-lucide="home"></i>
-        <span class="text-xs font-medium">Home</span>
-      </a>
-      <a href="#" class="nav-item touch-target">
-        <i data-lucide="briefcase"></i>
-        <span class="text-xs font-medium">Jobs</span>
-      </a>
-      <a href="#" class="nav-item touch-target">
-        <i data-lucide="newspaper"></i>
-        <span class="text-xs font-medium">News</span>
-      </a>
-      <a href="#" class="nav-item touch-target">
-        <i data-lucide="user"></i>
-        <span class="text-xs font-medium">Profile</span>
-      </a>
-    </nav>
-
   </main>
+
+  <!-- FOOTER -->
+  <footer class="footer mt-auto">
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Help & Support</a>
+    </div>
+    <p>&copy; 2026 Shramik Sathi Private Limited. All rights reserved.</p>
+  </footer>
 
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
 
-    // Simple active state toggle for bottom nav
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.bottom-nav .nav-item').forEach(nav => nav.classList.remove('active'));
-        item.classList.add('active');
+    // Mobile nav toggle (from main script)
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    if (hamburger) {
+      hamburger.addEventListener('click', () => {
+        navLinks.classList.toggle('open');
+        hamburger.setAttribute('aria-expanded', navLinks.classList.contains('open'));
       });
-    });
+    }
+
+    // Adjust grid for responsiveness
+    function adjustGrid() {
+      const grid = document.querySelector('.dashboard-grid');
+      if (window.innerWidth >= 992) {
+        grid.style.gridTemplateColumns = '2fr 1fr';
+      } else {
+        grid.style.gridTemplateColumns = '1fr';
+      }
+    }
+    window.addEventListener('resize', adjustGrid);
+    adjustGrid();
   </script>
 </body>
 </html>
