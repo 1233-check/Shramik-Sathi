@@ -2,194 +2,222 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#1e293b">
-  <title>Get Hired | Worker Portal</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body class="dashboard-bg">
-
-  <!-- NAV -->
-  <nav class="nav" role="navigation" aria-label="Main Navigation">
-    <div class="nav-inner">
-      <a href="index.html" class="nav-logo" aria-label="Shramik Sathi Home"><img src="logo.png" alt="Shramik Sathi Private Limited" class="nav-logo-img"></a>
-      <ul class="nav-links" id="navLinks" role="menubar">
-        <li role="none"><a href="index.html#services" role="menuitem">Services</a></li>
-        <li role="none"><a href="index.html#compliance" role="menuitem">Compliance</a></li>
-        <li role="none"><a href="index.html#about" role="menuitem">About Us</a></li>
-        <li role="none"><a href="index.html#contact" role="menuitem">Contact</a></li>
-      </ul>
-      <a href="hire.html" class="nav-cta" aria-label="Hire Workers">Hire Workers</a>
-      <button class="hamburger" id="hamburger" aria-label="Toggle Navigation" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- DASHBOARD HEADER -->
-  <header class="dash-header">
-    <div class="dash-header-inner">
-      <div class="dash-title">
-        <h1>Worker Portal</h1>
-        <p>Find jobs, mark attendance, and track your compliance.</p>
-      </div>
-      <div class="user-badge">
-        <div class="user-avatar">VS</div>
-        <div class="user-info">
-          <span class="user-name">Virat Singh</span>
-          <span class="user-id">ID: 15937</span>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- DASHBOARD CONTENT -->
-  <main class="dash-container">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Employee Portal | Shramik Sathi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            emerald: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857' },
+            blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb' },
+            amber: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 600: '#d97706' },
+            gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 800: '#1f2937', 900: '#111827' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #cbd5e1; /* slate-300 background for desktop to highlight the mobile app frame */ }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    <!-- LEFT COLUMN -->
-    <div class="dash-main">
-      
-      <!-- Job Search Card -->
-      <div class="dash-card">
-        <h2 class="dash-card-title">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-          Find Verified Jobs
-        </h2>
-        
-        <div class="job-search-wrapper">
-          <div class="search-icon-box">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </div>
-          <input type="text" class="job-search-input" placeholder="Search by role (e.g. Fitter, Welder, Helper)">
-          <button class="job-search-btn">Search Jobs</button>
+    /* Touch target enforcement */
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .touch-target { min-height: 48px; min-width: 48px; }
+  </style>
+</head>
+<body class="text-gray-900 antialiased font-sans flex justify-center">
+
+  <!-- Mobile App Frame -->
+  <main class="w-full max-w-md bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-hidden border-x border-gray-200">
+    
+    <!-- 1. Top App Bar (Sticky Header) -->
+    <header class="sticky top-0 z-50 bg-white shadow-sm px-4 py-3 flex items-center justify-between touch-target">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+          VS
         </div>
-        
-        <div style="display: flex; gap: 1rem;">
-          <button class="btn-outline" style="flex: 1; padding: 0.85rem;">Advanced Filters</button>
-          <button class="btn-solid" style="flex: 1; padding: 0.85rem;">Upload CV</button>
+        <div class="flex flex-col">
+          <span class="font-semibold text-gray-900 leading-tight">Hello, Virat</span>
+          <span class="text-xs text-gray-500 font-medium">ID: 15937</span>
         </div>
       </div>
-
-      <!-- Tools Grid Card -->
-      <div class="dash-card">
-        <h2 class="dash-card-title">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          My Daily Tools
-        </h2>
-        
-        <div class="action-grid">
-          
-          <div class="action-btn">
-            <div class="action-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            </div>
-            Mark Attendance
-          </div>
-
-          <div class="action-btn">
-            <div class="action-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            </div>
-            Apply Leave
-          </div>
-
-          <div class="action-btn">
-            <div class="action-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 3h12M6 8h12M14 8a4 4 0 010 8H6m8 0l-4 5"></path></svg>
-            </div>
-            Advance Salary
-          </div>
-
-          <div class="action-btn">
-            <div class="action-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="16" y1="18" x2="16" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="8" y1="18" x2="8" y2="18"></line></svg>
-            </div>
-            Income Calculator
-          </div>
-
-          <div class="action-btn">
-            <div class="action-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            </div>
-            Safety Training
-          </div>
-
-          <div class="action-btn">
-            <div class="action-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            </div>
-            Rate Employer
-          </div>
-
-        </div>
+      <div class="flex items-center gap-1">
+        <button class="touch-target flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors active:bg-gray-200" aria-label="Language">
+          <i data-lucide="languages" class="w-6 h-6"></i>
+        </button>
+        <button class="touch-target flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors active:bg-gray-200 relative" aria-label="Notifications">
+          <i data-lucide="bell" class="w-6 h-6"></i>
+          <span class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 border-white"></span>
+        </button>
       </div>
-    </div>
+    </header>
 
-    <!-- RIGHT COLUMN -->
-    <div class="dash-sidebar">
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto no-scrollbar pb-24">
       
-      <div class="dash-card">
-        <h2 class="dash-card-title">
-          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          Trust Profile
-        </h2>
-        
-        <div class="status-list">
+      <!-- 2. Core Action Banner (The "Find Jobs" Hub) -->
+      <section class="p-4 pt-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+          <h2 class="text-[1.4rem] font-bold text-gray-900 mb-5 tracking-tight leading-tight">Find Verified Jobs</h2>
           
-          <div class="status-item">
-            <div class="status-icon verified">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <div class="relative flex items-center mb-5">
+            <div class="absolute left-4 text-gray-400">
+              <i data-lucide="search" class="w-5 h-5"></i>
             </div>
-            <div class="status-text">
-              <h4>UAN / PF Status</h4>
-              <p class="verified">Verified & Active</p>
-            </div>
+            <input type="text" placeholder="Search jobs (e.g. Fitter)" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-11 pr-14 text-[15px] font-medium outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all touch-target placeholder-gray-400">
+            <button class="absolute right-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg touch-target flex items-center justify-center active:bg-blue-200 transition-colors" style="min-width: 40px; min-height: 40px;" aria-label="Voice Search">
+              <i data-lucide="mic" class="w-5 h-5"></i>
+            </button>
           </div>
 
-          <div class="status-item">
-            <div class="status-icon pending">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            </div>
-            <div class="status-text">
-              <h4>ESIC Number</h4>
-              <p class="pending">Pending Verification</p>
-            </div>
+          <div class="grid grid-cols-2 gap-3">
+            <button class="flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl touch-target text-gray-700 font-semibold text-sm active:bg-gray-50 transition-colors">
+              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+              <span>Filters</span>
+            </button>
+            <button class="flex items-center justify-center gap-2 bg-emerald-600 border border-emerald-600 text-white rounded-xl touch-target font-semibold text-sm active:bg-emerald-700 transition-colors shadow-sm">
+              <i data-lucide="file-up" class="w-4 h-4"></i>
+              <span>Upload CV</span>
+            </button>
           </div>
-
-          <div class="status-item">
-            <div class="status-icon info">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-            </div>
-            <div class="status-text">
-              <h4>Police Verification</h4>
-              <p class="info">Submitted (20/10/2024)</p>
-            </div>
-          </div>
-
         </div>
+      </section>
 
-        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
-          <h4 style="font-size: 1rem; color: var(--primary); margin-bottom: 1rem; font-weight: 600;">Support</h4>
-          <button class="btn-outline" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 0.85rem;">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            Contact Helpdesk
+      <!-- 3. "My Work & Money" Grid -->
+      <section class="px-4 py-2">
+        <h3 class="text-[1.1rem] font-bold text-gray-800 mb-4 px-1">My Work & Money</h3>
+        <div class="grid grid-cols-2 gap-3">
+          
+          <!-- Attendance (Green for Go/Action) -->
+          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+            <div class="w-[52px] h-[52px] rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="map-pin" class="w-6 h-6"></i>
+            </div>
+            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Mark<br>Attendance</span>
           </button>
+
+          <!-- Leave (Red/Amber for Stop/Pause) -->
+          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+            <div class="w-[52px] h-[52px] rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+              <i data-lucide="calendar" class="w-6 h-6"></i>
+            </div>
+            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Apply<br>Leave</span>
+          </button>
+
+          <!-- Salary (Green/Emerald for Money) -->
+          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+            <div class="w-[52px] h-[52px] rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="indian-rupee" class="w-6 h-6"></i>
+            </div>
+            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Advance<br>Salary</span>
+          </button>
+
+          <!-- Calculator (Blue for Info/Tool) -->
+          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+            <div class="w-[52px] h-[52px] rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i data-lucide="calculator" class="w-6 h-6"></i>
+            </div>
+            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Income<br>Calculator</span>
+          </button>
+
+          <!-- Safety (Blue for Info/Tool) -->
+          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+            <div class="w-[52px] h-[52px] rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+              <i data-lucide="hard-hat" class="w-6 h-6"></i>
+            </div>
+            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Safety<br>Training</span>
+          </button>
+
+          <!-- Rate (Amber for Rating) -->
+          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+            <div class="w-[52px] h-[52px] rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
+              <i data-lucide="star" class="w-6 h-6"></i>
+            </div>
+            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Rate<br>Employer</span>
+          </button>
+
         </div>
-      </div>
+      </section>
+
+      <!-- 4. "My Trust Profile" Section -->
+      <section class="px-4 py-6">
+        <h3 class="text-[1.1rem] font-bold text-gray-800 mb-4 px-1">My Trust Profile</h3>
+        <div class="flex flex-col gap-3">
+          
+          <!-- UAN / PF -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-900 text-[15px]">UAN (PF) Status</h4>
+              <p class="text-emerald-600 text-sm font-semibold mt-0.5">Verified & Active</p>
+            </div>
+          </div>
+
+          <!-- ESIC -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="clock" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-900 text-[15px]">ESIC Number</h4>
+              <p class="text-amber-600 text-sm font-semibold mt-0.5">Pending Verification</p>
+            </div>
+          </div>
+
+          <!-- Police Verification -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="shield-check" class="w-6 h-6"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-900 text-[15px]">Police Verification</h4>
+              <p class="text-blue-600 text-sm font-semibold mt-0.5">Submitted</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
       
     </div>
+
+    <!-- 5. Bottom Navigation Bar (Sticky Footer) -->
+    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px]">
+      
+      <a href="#" class="flex-1 flex flex-col items-center justify-center touch-target text-emerald-600 h-full">
+        <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i>
+        <span class="text-[11px] font-bold">Home</span>
+      </a>
+      
+      <a href="#" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="briefcase" class="w-[22px] h-[22px] mb-1"></i>
+        <span class="text-[11px] font-semibold">Jobs</span>
+      </a>
+      
+      <a href="#" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="newspaper" class="w-[22px] h-[22px] mb-1"></i>
+        <span class="text-[11px] font-semibold">News</span>
+      </a>
+      
+      <a href="#" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="user" class="w-[22px] h-[22px] mb-1"></i>
+        <span class="text-[11px] font-semibold">Profile</span>
+      </a>
+
+    </nav>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-links">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Compliance Portal</a>
-    </div>
-    <p>&copy; 2026 Shramik Sathi Private Limited. All rights reserved.</p>
-  </footer>
-
-  <script src="script.js"></script>
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
 </body>
 </html>
