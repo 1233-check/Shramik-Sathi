@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
   <title>Employer Portal | Shramik Sathi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -21,6 +21,20 @@
       }
     }
   </script>
+  <style>
+    /* Scrollbar hide for horizontal tab scrolling on mobile */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    /* iOS safe area support */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      body { padding-bottom: env(safe-area-inset-bottom); }
+    }
+    /* Touch-friendly table cells on mobile */
+    @media (max-width: 640px) {
+      table td, table th { font-size: 11px; padding: 6px 4px !important; }
+      .tab-panel table { min-width: 600px; }
+    }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col">
 
@@ -34,11 +48,11 @@
             <i data-lucide="shield-check" class="text-secondary w-8 h-8 mr-2"></i>
             <span class="font-bold text-xl text-primary">Shramik Sathi</span>
           </a>
-          <span class="ml-4 px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full border border-slate-200">Employer Portal</span>
+          <span class="hidden sm:inline-block ml-4 px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full border border-slate-200">Employer Portal</span>
         </div>
-        <div id="navUser" class="hidden flex items-center gap-4">
-          <span class="text-sm font-medium text-slate-600">Tata Steel Ltd.</span>
-          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+        <div id="navUser" class="hidden flex items-center gap-2 sm:gap-4">
+          <span class="text-sm font-medium text-slate-600 hidden sm:inline truncate max-w-[140px]">Tata Steel Ltd.</span>
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
             TS
           </div>
           <button id="logoutBtn" class="text-sm text-red-600 hover:text-red-700 font-medium">Logout</button>
@@ -79,13 +93,13 @@
     <!-- 2. EMPLOYER DASHBOARD VIEW -->
     <div id="dashboardView" class="w-full max-w-5xl hidden flex-col gap-8">
       
-      <div class="text-center sm:text-left mb-2 mt-4">
-        <h1 class="text-3xl font-bold text-primary">Welcome back, Tata Steel Ltd.</h1>
-        <p class="text-slate-500 mt-2 text-lg">Manage your workforce and compliance from one unified hub.</p>
+      <div class="text-center sm:text-left mb-2 mt-4 px-1">
+        <h1 class="text-2xl sm:text-3xl font-bold text-primary">Welcome back, Tata Steel Ltd.</h1>
+        <p class="text-slate-500 mt-2 text-base sm:text-lg">Manage your workforce and compliance from one unified hub.</p>
       </div>
 
       <!-- Main Services Cards -->
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         
         <!-- Compliance Management Card -->
         <button id="complianceBtn" class="group bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-left hover:shadow-lg hover:border-blue-200 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
@@ -113,29 +127,29 @@
     <div id="compliancePanel" class="w-full max-w-[1200px] hidden flex-col mt-4">
       
       <!-- Top Actions -->
-      <div class="flex items-center justify-between bg-white border border-slate-300 p-3 shadow-sm border-b-0">
-        <h1 class="text-xl font-bold text-[#0055a5]">Contract Labour Management System (CLMS)</h1>
-        <button class="back-to-dash text-sm text-slate-600 hover:text-slate-900 font-semibold border border-slate-300 px-3 py-1 bg-slate-100 hover:bg-slate-200">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white border border-slate-300 p-3 shadow-sm border-b-0 gap-2">
+        <h1 class="text-base sm:text-xl font-bold text-[#0055a5]">Contract Labour Management System (CLMS)</h1>
+        <button class="back-to-dash text-sm text-slate-600 hover:text-slate-900 font-semibold border border-slate-300 px-3 py-1 bg-slate-100 hover:bg-slate-200 flex-shrink-0">
           Return to Dashboard
         </button>
       </div>
 
       <!-- CLMS Navigation Tabs -->
-      <div id="clmsTabs" class="bg-[#0055a5] flex text-white text-xs font-bold uppercase tracking-wider mb-4 border border-[#003d7a] overflow-x-auto whitespace-nowrap">
-        <button data-tab="empMaster" class="clms-tab px-4 py-2.5 bg-[#003d7a] border-r border-[#004080] hover:bg-[#003d7a]">Employee Master</button>
-        <button data-tab="gatePass" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Gate Pass Mgmt.</button>
-        <button data-tab="pfEsi" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">PF / ESI Challans</button>
-        <button data-tab="wageReg" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Wage Register</button>
-        <button data-tab="medical" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">Medical Clearances</button>
-        <button data-tab="bpass" class="clms-tab px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a]">B-Pass / C-Pass</button>
-        <button data-tab="reports" class="clms-tab px-4 py-2.5 hover:bg-[#003d7a]">Compliance Reports</button>
+      <div id="clmsTabs" class="bg-[#0055a5] flex text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-4 border border-[#003d7a] overflow-x-auto whitespace-nowrap -mx-4 sm:mx-0 scrollbar-hide" style="-webkit-overflow-scrolling: touch;">
+        <button data-tab="empMaster" class="clms-tab px-3 sm:px-4 py-2.5 bg-[#003d7a] border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Employee Master</button>
+        <button data-tab="gatePass" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Gate Pass Mgmt.</button>
+        <button data-tab="pfEsi" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">PF / ESI Challans</button>
+        <button data-tab="wageReg" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Wage Register</button>
+        <button data-tab="medical" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Medical Clearances</button>
+        <button data-tab="bpass" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">B-Pass / C-Pass</button>
+        <button data-tab="reports" class="clms-tab px-3 sm:px-4 py-2.5 hover:bg-[#003d7a] flex-shrink-0">Compliance Reports</button>
       </div>
 
       <!-- TAB: Employee Master -->
       <div data-tab-content="empMaster" class="tab-panel">
       <!-- Search & Filters Container (CLMS Style) -->
       <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Company Name</label>
             <select class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
@@ -314,7 +328,7 @@
       <!-- TAB: Gate Pass Management -->
       <div data-tab-content="gatePass" class="tab-panel hidden">
         <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 items-end">
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Employee Name / ID</label><input type="text" class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]" placeholder="Search..."></div>
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Pass Status</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option>-- ALL --</option><option>Valid</option><option>Expired</option><option>Under Process</option></select></div>
             <div><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Search</button></div>
@@ -341,7 +355,7 @@
       <!-- TAB: PF / ESI Challans -->
       <div data-tab-content="pfEsi" class="tab-panel hidden">
         <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 items-end">
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Financial Year</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option selected>2026-2027</option><option>2025-2026</option><option>2024-2025</option></select></div>
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Month</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option>-- ALL --</option><option>April</option><option selected>May</option><option>June</option><option>July</option></select></div>
             <div><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">View Challans</button></div>
@@ -366,7 +380,7 @@
       <!-- TAB: Wage Register -->
       <div data-tab-content="wageReg" class="tab-panel hidden">
         <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 items-end">
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Wage Month</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option selected>May 2026</option><option>April 2026</option><option>March 2026</option></select></div>
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Employee</label><input type="text" class="w-full border border-slate-300 p-1.5 text-sm" placeholder="Search by name..."></div>
             <div class="flex gap-2"><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Generate</button><button class="bg-white text-slate-700 px-4 py-1.5 text-sm font-bold hover:bg-slate-100 border border-slate-300">Export PDF</button></div>
@@ -393,7 +407,7 @@
       <!-- TAB: Medical Clearances -->
       <div data-tab-content="medical" class="tab-panel hidden">
         <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 items-end">
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Fitness Status</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option>-- ALL --</option><option>Fit</option><option>Conditionally Fit</option><option>Due for Renewal</option><option>Unfit</option></select></div>
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Employee Name</label><input type="text" class="w-full border border-slate-300 p-1.5 text-sm" placeholder="Search..."></div>
             <div><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Search</button></div>
@@ -420,7 +434,7 @@
       <!-- TAB: B-Pass / C-Pass -->
       <div data-tab-content="bpass" class="tab-panel hidden">
         <div class="bg-[#f5f5f5] border border-slate-300 p-4 mb-4 shadow-sm">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 items-end">
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Pass Type</label><select class="w-full border border-slate-300 p-1.5 text-sm"><option>-- ALL --</option><option>B-Pass (Building)</option><option>C-Pass (Contractor)</option></select></div>
             <div><label class="block text-xs font-bold text-slate-700 mb-1">Contractor Name</label><input type="text" class="w-full border border-slate-300 p-1.5 text-sm" placeholder="Search..."></div>
             <div><button class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a]">Search</button></div>
@@ -443,7 +457,7 @@
 
       <!-- TAB: Compliance Reports -->
       <div data-tab-content="reports" class="tab-panel hidden">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div class="bg-white border border-slate-300 p-4 shadow-sm text-center"><div class="text-3xl font-bold text-[#0055a5]">47</div><div class="text-xs font-bold text-slate-600 mt-1 uppercase">Total Workforce</div></div>
           <div class="bg-white border border-slate-300 p-4 shadow-sm text-center"><div class="text-3xl font-bold text-green-600">39</div><div class="text-xs font-bold text-slate-600 mt-1 uppercase">Active Gate Passes</div></div>
           <div class="bg-white border border-slate-300 p-4 shadow-sm text-center"><div class="text-3xl font-bold text-amber-600">6</div><div class="text-xs font-bold text-slate-600 mt-1 uppercase">Pending Actions</div></div>
@@ -472,7 +486,7 @@
     </div>
 
     <!-- 4. FIND AN EMPLOYEE PANEL -->
-    <div id="findPanel" class="w-full max-w-5xl hidden flex-col gap-6 mt-4">
+    <div id="findPanel" class="w-full max-w-5xl hidden flex-col gap-4 sm:gap-6 mt-4">
       
       <div class="flex items-center gap-4 mb-4">
         <button class="back-to-dash text-slate-500 hover:text-primary transition flex items-center gap-1 font-medium">
@@ -487,7 +501,7 @@
         <p class="text-slate-500">Discover pre-verified Shramik Sathi workers ready to deploy.</p>
       </div>
 
-      <div class="flex gap-4 mb-2">
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-2">
         <div class="relative flex-grow">
           <div class="absolute left-3 top-3 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></div>
           <input type="text" placeholder="Search by role, skills, or location..." class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none">
@@ -497,7 +511,7 @@
         </button>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
           <div class="flex justify-between items-start mb-4">
             <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">AK</div>
