@@ -152,11 +152,20 @@
       doc.setTextColor(255); doc.setFontSize(5);
       doc.text(`Gate Pass: ${emp.gate_pass_no || 'Pending'} | Valid: ${emp.gate_pass_valid_upto ? new Date(emp.gate_pass_valid_upto).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}`, w/2, 49, { align: 'center' });
 
-      // QR placeholder (right side)
-      doc.setFillColor(240); doc.setDrawColor(200);
-      doc.rect(66, 17, 16, 16, 'FD');
-      doc.setFontSize(4); doc.setTextColor(150);
-      doc.text('QR CODE', 74, 26, { align: 'center' });
+      // Real QR code (right side)
+      try {
+        const qrUrl = `${window.location.origin}/worker-profile.html?id=${emp.emp_id}`;
+        const qr = qrcode(0, 'M');
+        qr.addData(qrUrl);
+        qr.make();
+        const qrDataUrl = qr.createDataURL(4, 0);
+        doc.addImage(qrDataUrl, 'GIF', 66, 17, 16, 16);
+      } catch (e) {
+        doc.setFillColor(240); doc.setDrawColor(200);
+        doc.rect(66, 17, 16, 16, 'FD');
+        doc.setFontSize(4); doc.setTextColor(150);
+        doc.text('QR CODE', 74, 26, { align: 'center' });
+      }
 
       doc.save(`ID_Card_${emp.emp_id}_${emp.full_name.replace(/\s/g,'_')}.pdf`);
     },
@@ -344,6 +353,196 @@
       doc.text('Computer generated wage slip from Shramik Sathi CLMS. | Code on Wages, 2019 compliant.', w/2, 285, { align: 'center' });
 
       doc.save(`Wage_Slip_${emp.emp_id}_${wage.wage_month.replace(/\s/g,'_')}.pdf`);
+    },
+
+    // ============================================
+    // PROMOTION LETTER
+    // ============================================
+    promotionLetter(emp, newDesignation, newWage, effectiveDate) {
+      const doc = getJsPDF(); if (!doc) return;
+      const w = doc.internal.pageSize.getWidth();
+      const m = 20;
+
+      // Header
+      doc.setFillColor(0, 85, 165);
+      doc.rect(0, 0, w, 35, 'F');
+      doc.setTextColor(255); doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+      doc.text('SHRAMIK SATHI PVT. LTD.', w/2, 16, { align: 'center' });
+      doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+      doc.text('Sakchi, Jamshedpur, Jharkhand 831001 | CIN: U74999JH2020PTC012345', w/2, 24, { align: 'center' });
+      doc.text('Phone: +91 8317585795 | Email: greencircletechnolegal@gmail.com', w/2, 30, { align: 'center' });
+
+      doc.setTextColor(0); doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+      doc.text('PROMOTION LETTER', w/2, 50, { align: 'center' });
+      doc.setDrawColor(0, 85, 165); doc.setLineWidth(0.8);
+      doc.line(w/2 - 35, 52, w/2 + 35, 52);
+
+      const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+      doc.text(`Ref: SS/PROMO/${emp.emp_id}/${new Date().getFullYear()}`, m, 65);
+      doc.text(`Date: ${today}`, w - m, 65, { align: 'right' });
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('To,', m, 78); doc.text(emp.full_name, m, 85);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Emp ID: ${emp.emp_id}`, m, 91);
+
+      let y = 105;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Subject: Letter of Promotion', m, y);
+      y += 12;
+
+      const effDate = effectiveDate || today;
+      const body = [
+        `Dear ${emp.full_name},`,
+        '',
+        `We are pleased to inform you that, based on your performance and contribution, the management has decided to promote you from the position of "${emp.designation || 'Current Designation'}" to "${newDesignation || 'New Designation'}", effective from ${effDate}.`,
+        '',
+        `Your revised basic wage shall be ₹${newWage || emp.basic_wage || 0}/day, plus applicable DA and other allowances as per company policy and Jharkhand State Minimum Wages notification.`,
+        '',
+        'All other terms and conditions of your original appointment letter shall remain unchanged unless specifically modified herein.',
+        '',
+        'We congratulate you on this well-deserved promotion and look forward to your continued excellent performance.',
+      ];
+
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+      body.forEach(line => {
+        if (y > 270) { doc.addPage(); y = 20; }
+        const lines = doc.splitTextToSize(line, w - 2*m);
+        doc.text(lines, m, y); y += lines.length * 5 + 1;
+      });
+
+      y += 15;
+      doc.setFont('helvetica', 'bold');
+      doc.text('For Shramik Sathi Pvt. Ltd.', m, y);
+      y += 20;
+      doc.text('________________________', m, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Authorized Signatory', m, y + 6);
+
+      doc.setFontSize(7); doc.setTextColor(128);
+      doc.text('System-generated document from Shramik Sathi CLMS.', w/2, 290, { align: 'center' });
+      doc.save(`Promotion_Letter_${emp.emp_id}_${emp.full_name.replace(/\s/g,'_')}.pdf`);
+    },
+
+    // ============================================
+    // FULL & FINAL SETTLEMENT
+    // ============================================
+    fullFinalSettlement(emp, settlement) {
+      const doc = getJsPDF(); if (!doc) return;
+      const w = doc.internal.pageSize.getWidth();
+      const m = 15;
+
+      // settlement = { lastWorkingDay, daysWorked, basicDue, daDue, hraDue, otDue, leaveEncash, bonusDue, gratuityDue, pfDue, esiDue, advanceRecovery, otherDeductions, noticePay }
+
+      // Header
+      doc.setFillColor(0, 85, 165);
+      doc.rect(0, 0, w, 28, 'F');
+      doc.setTextColor(255); doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+      doc.text('SHRAMIK SATHI PVT. LTD.', w/2, 12, { align: 'center' });
+      doc.setFontSize(10);
+      doc.text('FULL & FINAL SETTLEMENT STATEMENT', w/2, 22, { align: 'center' });
+
+      const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+      let y = 38;
+      doc.setTextColor(0); doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+      doc.text(`Date: ${today}`, w - m, y, { align: 'right' });
+      doc.text(`Ref: SS/FNF/${emp.emp_id}/${new Date().getFullYear()}`, m, y);
+
+      y += 12;
+      const info = [
+        ['Employee Name', emp.full_name || '—', 'Emp ID', emp.emp_id || '—'],
+        ['Designation', emp.designation || '—', 'Category', emp.category || '—'],
+        ['Date of Joining', emp.date_of_joining ? new Date(emp.date_of_joining).toLocaleDateString('en-GB') : '—', 'Last Working Day', settlement.lastWorkingDay || today],
+        ['UAN', emp.uan_no || '—', 'ESI', emp.esi_no || '—'],
+      ];
+      info.forEach(row => {
+        doc.setFont('helvetica', 'bold'); doc.text(row[0] + ':', m, y);
+        doc.setFont('helvetica', 'normal'); doc.text(row[1], m + 35, y);
+        doc.setFont('helvetica', 'bold'); doc.text(row[2] + ':', w/2 + 5, y);
+        doc.setFont('helvetica', 'normal'); doc.text(row[3], w/2 + 42, y);
+        y += 7;
+      });
+
+      const s = settlement;
+      const fmt = n => '₹ ' + Number(n || 0).toLocaleString('en-IN');
+
+      // Earnings section
+      y += 8;
+      doc.setFillColor(240, 249, 255);
+      doc.rect(m, y - 4, w - 2*m, 10, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(0, 85, 165);
+      doc.text('A. EARNINGS / DUES', m + 2, y + 2); y += 12;
+
+      doc.setTextColor(0); doc.setFontSize(9);
+      const earnings = [
+        ['Basic Wages Due (last period)', fmt(s.basicDue)],
+        ['DA Due', fmt(s.daDue)],
+        ['HRA Due', fmt(s.hraDue)],
+        ['Overtime Pay', fmt(s.otDue)],
+        ['Leave Encashment (unavailed leave)', fmt(s.leaveEncash)],
+        ['Bonus (proportionate)', fmt(s.bonusDue)],
+        ['Gratuity (if ≥5 years)', fmt(s.gratuityDue)],
+        ['Notice Period Pay (if applicable)', fmt(s.noticePay)],
+      ];
+
+      earnings.forEach(row => {
+        doc.setFont('helvetica', 'normal'); doc.text(row[0], m + 2, y);
+        doc.text(row[1], w - m, y, { align: 'right' }); y += 6;
+      });
+
+      const totalEarnings = [s.basicDue, s.daDue, s.hraDue, s.otDue, s.leaveEncash, s.bonusDue, s.gratuityDue, s.noticePay]
+        .reduce((a, b) => a + Number(b || 0), 0);
+      y += 2;
+      doc.setFont('helvetica', 'bold');
+      doc.text('TOTAL EARNINGS:', m + 2, y);
+      doc.text(fmt(totalEarnings), w - m, y, { align: 'right' }); y += 10;
+
+      // Deductions section
+      doc.setFillColor(255, 245, 245);
+      doc.rect(m, y - 4, w - 2*m, 10, 'F');
+      doc.setTextColor(180, 30, 30);
+      doc.text('B. DEDUCTIONS / RECOVERIES', m + 2, y + 2); y += 12;
+
+      doc.setTextColor(0);
+      const deductions = [
+        ['PF Employee Contribution (final)', fmt(s.pfDue)],
+        ['ESI Deduction (final)', fmt(s.esiDue)],
+        ['Advance Recovery', fmt(s.advanceRecovery)],
+        ['Other Deductions', fmt(s.otherDeductions)],
+      ];
+      deductions.forEach(row => {
+        doc.setFont('helvetica', 'normal'); doc.text(row[0], m + 2, y);
+        doc.text(row[1], w - m, y, { align: 'right' }); y += 6;
+      });
+
+      const totalDed = [s.pfDue, s.esiDue, s.advanceRecovery, s.otherDeductions]
+        .reduce((a, b) => a + Number(b || 0), 0);
+      y += 2;
+      doc.setFont('helvetica', 'bold');
+      doc.text('TOTAL DEDUCTIONS:', m + 2, y);
+      doc.text(fmt(totalDed), w - m, y, { align: 'right' }); y += 14;
+
+      // Net settlement
+      const net = totalEarnings - totalDed;
+      doc.setFillColor(236, 253, 245);
+      doc.rect(m, y - 5, w - 2*m, 16, 'F');
+      doc.setFontSize(13); doc.setTextColor(4, 120, 87);
+      doc.text(`NET SETTLEMENT PAYABLE: ${fmt(net)}`, w/2, y + 5, { align: 'center' });
+
+      // Signatures
+      y += 28;
+      doc.setTextColor(0); doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+      doc.text('________________________', m, y);
+      doc.text('Authorized Signatory', m, y + 6);
+      doc.text('________________________', w/2, y, { align: 'center' });
+      doc.text('HR / Accounts Dept.', w/2, y + 6, { align: 'center' });
+      doc.text('________________________', w - m - 40, y);
+      doc.text(`${emp.full_name}`, w - m - 40, y + 6);
+
+      doc.setFontSize(7); doc.setTextColor(128);
+      doc.text('Full & Final Settlement as per Code on Wages, 2019 and Payment of Gratuity Act, 1972.', w/2, 290, { align: 'center' });
+      doc.save(`FnF_Settlement_${emp.emp_id}_${emp.full_name.replace(/\s/g,'_')}.pdf`);
     }
 
   }; // end SSPdf

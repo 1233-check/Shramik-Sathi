@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workmen Register | Shramik Sathi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }</script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { font-size: 10px; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body class="bg-[#eef1f5] font-sans text-slate-800 min-h-screen">
+
+  <!-- Header -->
+  <nav class="bg-[#0055a5] text-white px-6 py-3 flex items-center justify-between no-print">
+    <div class="flex items-center gap-3">
+      <i data-lucide="shield-check" class="w-6 h-6 text-amber-400"></i>
+      <span class="text-lg font-bold">Shramik Sathi</span>
+      <span class="text-xs bg-white/20 px-2 py-0.5 rounded">Workmen Register</span>
+    </div>
+    <a href="hire.html" class="text-sm bg-white/10 px-3 py-1.5 rounded hover:bg-white/20 transition flex items-center gap-1">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Portal
+    </a>
+  </nav>
+
+  <div class="max-w-[1400px] mx-auto p-4 sm:p-6">
+    <!-- Title + Stats -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">Master Workmen Register</h1>
+        <p class="text-sm text-slate-500">Per Contract Labour (R&A) Act, 1970 — Form XIII</p>
+      </div>
+      <div class="flex gap-2 no-print">
+        <button onclick="window.print()" class="flex items-center gap-1 bg-[#0055a5] text-white px-4 py-2 rounded text-sm font-semibold hover:bg-[#003d7a] transition">
+          <i data-lucide="printer" class="w-4 h-4"></i> Print
+        </button>
+        <button id="exportBtn" class="flex items-center gap-1 bg-emerald-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-emerald-700 transition">
+          <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white border border-slate-300 p-3 mb-4 flex flex-wrap gap-3 items-end no-print">
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1">Status</label>
+        <select id="filterStatus" class="border border-slate-300 rounded px-3 py-1.5 text-sm">
+          <option value="">All</option>
+          <option value="Active">Active</option>
+          <option value="Pending">Pending</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1">Category</label>
+        <select id="filterCategory" class="border border-slate-300 rounded px-3 py-1.5 text-sm">
+          <option value="">All</option>
+          <option>Unskilled</option><option>Semi-skilled</option>
+          <option>Skilled</option><option>Highly Skilled</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1">Search</label>
+        <input id="filterSearch" type="text" placeholder="Name, ID, Aadhar..." class="border border-slate-300 rounded px-3 py-1.5 text-sm w-48">
+      </div>
+      <button id="applyFilters" class="bg-[#0055a5] text-white px-4 py-1.5 rounded text-sm font-semibold hover:bg-[#003d7a]">Filter</button>
+    </div>
+
+    <!-- Register Table -->
+    <div class="bg-white border border-slate-300 overflow-x-auto">
+      <table class="w-full text-left text-sm border-collapse whitespace-nowrap" id="registerTable">
+        <thead>
+          <tr class="bg-[#0055a5] text-white text-[11px] font-bold uppercase border-b border-[#003d7a]">
+            <th class="p-2 border-r border-[#003d7a]">SL</th>
+            <th class="p-2 border-r border-[#003d7a]">Emp ID</th>
+            <th class="p-2 border-r border-[#003d7a]">Name</th>
+            <th class="p-2 border-r border-[#003d7a]">Father's Name</th>
+            <th class="p-2 border-r border-[#003d7a]">Aadhar</th>
+            <th class="p-2 border-r border-[#003d7a]">DOB</th>
+            <th class="p-2 border-r border-[#003d7a]">Gender</th>
+            <th class="p-2 border-r border-[#003d7a]">Designation</th>
+            <th class="p-2 border-r border-[#003d7a]">Category</th>
+            <th class="p-2 border-r border-[#003d7a]">DOJ</th>
+            <th class="p-2 border-r border-[#003d7a]">Basic (₹)</th>
+            <th class="p-2 border-r border-[#003d7a]">DA (₹)</th>
+            <th class="p-2 border-r border-[#003d7a]">UAN</th>
+            <th class="p-2 border-r border-[#003d7a]">ESI</th>
+            <th class="p-2 border-r border-[#003d7a]">Mobile</th>
+            <th class="p-2 border-r border-[#003d7a]">State</th>
+            <th class="p-2">Status</th>
+          </tr>
+        </thead>
+        <tbody id="registerTbody" class="text-[12px] text-slate-800"></tbody>
+      </table>
+      <div class="bg-[#f5f5f5] p-2 text-xs text-slate-600 border-t border-slate-300">
+        <span id="registerCount">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Individual Register (click a row) -->
+    <div id="individualPanel" class="mt-6 bg-white border border-slate-300 hidden">
+      <div class="bg-[#0055a5] text-white p-3 flex items-center justify-between">
+        <h2 class="font-bold text-sm">Individual Workmen Register</h2>
+        <button onclick="document.getElementById('individualPanel').classList.add('hidden')" class="text-white/70 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="individualContent" class="p-4 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm"></div>
+      <div id="individualQR" class="p-4 border-t flex items-center gap-4"></div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    const sb = getSupabaseClient();
+    let allEmployees = [];
+
+    async function loadRegister() {
+      const { data } = await sb.from('employees').select('*').order('emp_id');
+      if (!data) return;
+      allEmployees = data;
+      renderTable(data);
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('registerTbody');
+      const fmtD = d => d ? new Date(d).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+      const fmtN = n => n ? Number(n).toLocaleString('en-IN') : '—';
+
+      tbody.innerHTML = data.map((e, i) => {
+        const sc = e.status === 'Active' ? 'bg-green-100 text-green-800 border-green-300'
+          : e.status === 'Pending' ? 'bg-amber-100 text-amber-800 border-amber-300'
+          : 'bg-red-100 text-red-800 border-red-300';
+        const bg = i % 2 === 1 ? 'bg-[#f9f9f9]' : '';
+
+        return `<tr class="${bg} border-b border-slate-200 hover:bg-blue-50 cursor-pointer" onclick="showIndividual('${e.emp_id}')">
+          <td class="p-1.5 border-r border-slate-200 text-center">${i+1}</td>
+          <td class="p-1.5 border-r border-slate-200 font-semibold">${e.emp_id}</td>
+          <td class="p-1.5 border-r border-slate-200 font-bold">${e.full_name}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.father_name || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.aadhar_no || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${fmtD(e.dob)}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.gender || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.designation || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.category || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${fmtD(e.date_of_joining)}</td>
+          <td class="p-1.5 border-r border-slate-200 text-right">${fmtN(e.basic_wage)}</td>
+          <td class="p-1.5 border-r border-slate-200 text-right">${fmtN(e.da_allowance)}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.uan_no || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.esi_no || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.mobile || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${e.state || '—'}</td>
+          <td class="p-1.5 text-center"><span class="${sc} px-1.5 py-0.5 rounded text-[10px] border">${e.status}</span></td>
+        </tr>`;
+      }).join('');
+      document.getElementById('registerCount').textContent = `Total: ${data.length} workmen registered`;
+    }
+
+    // Filters
+    document.getElementById('applyFilters').addEventListener('click', () => {
+      let filtered = [...allEmployees];
+      const status = document.getElementById('filterStatus').value;
+      const category = document.getElementById('filterCategory').value;
+      const search = document.getElementById('filterSearch').value.toLowerCase();
+      if (status) filtered = filtered.filter(e => e.status === status);
+      if (category) filtered = filtered.filter(e => e.category === category);
+      if (search) filtered = filtered.filter(e =>
+        (e.full_name||'').toLowerCase().includes(search) ||
+        (e.emp_id||'').includes(search) ||
+        (e.aadhar_no||'').includes(search)
+      );
+      renderTable(filtered);
+    });
+
+    // Individual register
+    async function showIndividual(empId) {
+      const emp = allEmployees.find(e => e.emp_id === empId);
+      if (!emp) return;
+      const panel = document.getElementById('individualPanel');
+      const content = document.getElementById('individualContent');
+      const qrDiv = document.getElementById('individualQR');
+      panel.classList.remove('hidden');
+
+      const field = (label, val) => `<div><div class="text-[10px] font-bold text-slate-500 uppercase">${label}</div><div class="font-semibold">${val || '—'}</div></div>`;
+      const fmtD = d => d ? new Date(d).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : '—';
+
+      content.innerHTML = [
+        field('Employee ID', emp.emp_id), field('Full Name', emp.full_name), field('Father\'s Name', emp.father_name),
+        field('Aadhar No.', emp.aadhar_no), field('Date of Birth', fmtD(emp.dob)), field('Gender', emp.gender),
+        field('Blood Group', emp.blood_group), field('Identity Mark', emp.identity_mark), field('Designation', emp.designation),
+        field('Category', emp.category), field('Employee Type', emp.employee_type), field('Department', emp.department),
+        field('Date of Joining', fmtD(emp.date_of_joining)), field('Basic Wage (₹/day)', emp.basic_wage), field('DA (₹/day)', emp.da_allowance),
+        field('UAN (PF)', emp.uan_no), field('ESI No.', emp.esi_no), field('Bank', emp.bank_name),
+        field('A/C No.', emp.account_no), field('IFSC', emp.ifsc_code), field('Mobile', emp.mobile),
+        field('Emergency Contact', emp.emergency_contact), field('Address', emp.address), field('State / PIN', `${emp.state || '—'} / ${emp.pin_code || '—'}`),
+        field('Gate Pass', emp.gate_pass_no || 'Pending'), field('Gate Pass Valid', fmtD(emp.gate_pass_valid_upto)), field('Medical Fitness', emp.medical_fitness),
+        field('Status', `<span class="px-2 py-0.5 rounded text-xs ${emp.status==='Active'?'bg-green-100 text-green-800':'bg-amber-100 text-amber-800'}">${emp.status}</span>`),
+      ].join('');
+
+      // QR code
+      try {
+        const qrUrl = `${window.location.origin}/worker-profile.html?id=${emp.emp_id}`;
+        const qr = qrcode(0, 'M');
+        qr.addData(qrUrl);
+        qr.make();
+        const img = document.createElement('div');
+        img.innerHTML = qr.createImgTag(3, 8);
+        qrDiv.innerHTML = '';
+        qrDiv.appendChild(img);
+        qrDiv.insertAdjacentHTML('beforeend', `<div class="text-xs text-slate-500">Scan to view worker profile<br><span class="font-mono text-[10px]">${qrUrl}</span></div>`);
+      } catch(e) {
+        qrDiv.innerHTML = '<span class="text-red-500 text-xs">QR generation failed: ' + e.message + '</span>';
+      }
+
+      panel.scrollIntoView({ behavior: 'smooth' });
+      lucide.createIcons();
+    }
+    window.showIndividual = showIndividual;
+
+    // CSV Export
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const headers = ['Emp ID','Name','Father Name','Aadhar','DOB','Gender','Designation','Category','DOJ','Basic Wage','DA','UAN','ESI','Mobile','State','Status'];
+      const rows = allEmployees.map(e => [
+        e.emp_id, e.full_name, e.father_name, e.aadhar_no, e.dob, e.gender, e.designation, e.category,
+        e.date_of_joining, e.basic_wage, e.da_allowance, e.uan_no, e.esi_no, e.mobile, e.state, e.status
+      ]);
+      const csv = [headers, ...rows].map(r => r.map(v => `"${v||''}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Workmen_Register_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    });
+
+    loadRegister();
+  </script>
+</body>
+</html>

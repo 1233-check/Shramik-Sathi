@@ -6,6 +6,8 @@
   <title>Employee Portal | Shramik Sathi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -241,6 +243,18 @@
         btn.querySelector('span').classList.add('font-bold');
       });
     });
+  </script>
+  <script>
+    // Auth guard — redirect to worker-login if not authenticated
+    (async () => {
+      try {
+        const sb = getSupabaseClient();
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.href = 'worker-login.html'; }
+      } catch (e) {
+        // Supabase not available — allow access (offline mode)
+      }
+    })();
   </script>
 </body>
 </html>
