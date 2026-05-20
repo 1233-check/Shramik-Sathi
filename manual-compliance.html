@@ -9,6 +9,8 @@
   <meta name="theme-color" content="#1e293b">
   <title>Hire & Onboard | Shramik Sathi</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
 </head>
 <body class="bg-alt">
 
@@ -76,23 +78,23 @@
           <div class="form-grid">
             <div class="form-group">
               <label>Aadhar Card No. <span class="required">*</span></label>
-              <input type="text" placeholder="12-digit Aadhar Number" required pattern="[0-9]{12}">
+              <input type="text" id="inp_aadhar" placeholder="12-digit Aadhar Number" required pattern="[0-9]{12}">
             </div>
             <div class="form-group">
               <label>Full Name (As per Aadhar) <span class="required">*</span></label>
-              <input type="text" placeholder="Enter full name" required>
+              <input type="text" id="inp_name" placeholder="Enter full name" required>
             </div>
             <div class="form-group">
               <label>Father/Spouse Name <span class="required">*</span></label>
-              <input type="text" placeholder="Enter father or spouse name" required>
+              <input type="text" id="inp_father" placeholder="Enter father or spouse name" required>
             </div>
             <div class="form-group">
               <label>Date of Birth <span class="required">*</span></label>
-              <input type="date" required>
+              <input type="date" id="inp_dob" required>
             </div>
             <div class="form-group">
               <label>Gender <span class="required">*</span></label>
-              <select required>
+              <select id="inp_gender" required>
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -101,7 +103,7 @@
             </div>
             <div class="form-group">
               <label>Blood Group</label>
-              <select>
+              <select id="inp_blood">
                 <option value="">Select Blood Group</option>
                 <option>A+</option><option>A-</option>
                 <option>B+</option><option>B-</option>
@@ -111,11 +113,11 @@
             </div>
             <div class="form-group">
               <label>Voter ID / DL No.</label>
-              <input type="text" placeholder="Optional alternative ID">
+              <input type="text" id="inp_voter" placeholder="Optional alternative ID">
             </div>
             <div class="form-group">
               <label>Identity Mark</label>
-              <input type="text" placeholder="Visible physical mark">
+              <input type="text" id="inp_mark" placeholder="Visible physical mark">
             </div>
           </div>
           <div class="form-actions right">
@@ -132,23 +134,23 @@
           <div class="form-grid">
             <div class="form-group">
               <label>Vendor Code / Name <span class="required">*</span></label>
-              <input type="text" placeholder="e.g., VEND-15937" required>
+              <input type="text" id="inp_vendor" placeholder="e.g., VEND-15937" required>
             </div>
             <div class="form-group">
               <label>Work Order No. <span class="required">*</span></label>
-              <input type="text" placeholder="Specific project contract" required>
+              <input type="text" id="inp_workorder" placeholder="Specific project contract" required>
             </div>
             <div class="form-group">
               <label>Department / Location</label>
-              <input type="text" placeholder="Work location">
+              <input type="text" id="inp_dept" placeholder="Work location">
             </div>
             <div class="form-group">
               <label>Date of Joining <span class="required">*</span></label>
-              <input type="date" required>
+              <input type="date" id="inp_doj" required>
             </div>
             <div class="form-group">
               <label>Category <span class="required">*</span></label>
-              <select required>
+              <select id="inp_category" required>
                 <option value="">Select Category</option>
                 <option>Unskilled</option>
                 <option>Semi-skilled</option>
@@ -158,18 +160,18 @@
             </div>
             <div class="form-group">
               <label>Designation / Nature of Work</label>
-              <input type="text" placeholder="e.g., Electrician, Helper">
+              <input type="text" id="inp_designation" placeholder="e.g., Electrician, Helper">
             </div>
             <div class="form-group">
               <label>Employee Type</label>
-              <select>
+              <select id="inp_emptype">
                 <option>Contractual</option>
                 <option>Permanent</option>
               </select>
             </div>
             <div class="form-group">
               <label>Shift Duty?</label>
-              <select>
+              <select id="inp_shift">
                 <option>Yes</option>
                 <option>No</option>
               </select>
@@ -190,24 +192,24 @@
           <div class="form-grid">
             <div class="form-group">
               <label>UAN No. (For PF) <span class="required">*</span></label>
-              <input type="text" placeholder="12-digit UAN" required pattern="[0-9]{12}">
+              <input type="text" id="inp_uan" placeholder="12-digit UAN" required pattern="[0-9]{12}">
             </div>
             <div class="form-group">
               <label>E.S.I. No. / Insurance No. <span class="required">*</span></label>
-              <input type="text" placeholder="ESI Number" required>
+              <input type="text" id="inp_esi" placeholder="ESI Number" required>
             </div>
             <div class="form-group">
               <label>Basic Wage (Per Day) <span class="required">*</span></label>
               <div class="input-with-icon">
                 <span class="icon">₹</span>
-                <input type="number" placeholder="0.00" required>
+                <input type="number" id="inp_basic" placeholder="0.00" required>
               </div>
             </div>
             <div class="form-group">
               <label>DA & Allowances</label>
               <div class="input-with-icon">
                 <span class="icon">₹</span>
-                <input type="number" placeholder="0.00">
+                <input type="number" id="inp_da" placeholder="0.00">
               </div>
             </div>
             <div class="form-group full-width">
@@ -215,15 +217,15 @@
             </div>
             <div class="form-group">
               <label>Bank Name <span class="required">*</span></label>
-              <input type="text" placeholder="e.g., State Bank of India" required>
+              <input type="text" id="inp_bank" placeholder="e.g., State Bank of India" required>
             </div>
             <div class="form-group">
               <label>Account Number <span class="required">*</span></label>
-              <input type="text" placeholder="Account Number" required>
+              <input type="text" id="inp_accno" placeholder="Account Number" required>
             </div>
             <div class="form-group">
               <label>IFSC Code <span class="required">*</span></label>
-              <input type="text" placeholder="11-character IFSC" required pattern="[A-Za-z]{4}0[A-Z0-9a-z]{6}">
+              <input type="text" id="inp_ifsc" placeholder="11-character IFSC" required pattern="[A-Za-z]{4}0[A-Z0-9a-z]{6}">
             </div>
           </div>
           <div class="form-actions split">
@@ -241,23 +243,23 @@
           <div class="form-grid">
             <div class="form-group">
               <label>Mobile No. <span class="required">*</span></label>
-              <input type="tel" placeholder="10-digit number" required pattern="[0-9]{10}">
+              <input type="tel" id="inp_mobile" placeholder="10-digit number" required pattern="[0-9]{10}">
             </div>
             <div class="form-group">
               <label>Emergency Contact No. <span class="required">*</span></label>
-              <input type="tel" placeholder="10-digit number" required>
+              <input type="tel" id="inp_emergency" placeholder="10-digit number" required>
             </div>
             <div class="form-group full-width">
               <label>Permanent Address <span class="required">*</span></label>
-              <textarea rows="2" placeholder="Full address" required></textarea>
+              <textarea id="inp_address" rows="2" placeholder="Full address" required></textarea>
             </div>
             <div class="form-group">
               <label>State <span class="required">*</span></label>
-              <input type="text" placeholder="e.g., Jharkhand" required>
+              <input type="text" id="inp_state" placeholder="e.g., Jharkhand" required>
             </div>
             <div class="form-group">
               <label>PIN Code <span class="required">*</span></label>
-              <input type="text" placeholder="6-digit PIN" required pattern="[0-9]{6}">
+              <input type="text" id="inp_pin" placeholder="6-digit PIN" required pattern="[0-9]{6}">
             </div>
             
             <div class="form-group full-width mt-2">

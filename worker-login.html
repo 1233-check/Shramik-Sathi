@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Shramik Sathi | Worker Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --emerald: #059669; --emerald-light: #10b981; --emerald-glow: #34d399;
+      --dark: #0f172a; --darker: #020617; --card: rgba(255,255,255,0.06);
+      --glass: rgba(255,255,255,0.08); --border: rgba(255,255,255,0.1);
+      --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
+      --amber: #f59e0b; --blue: #3b82f6;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif; background: var(--darker);
+      color: var(--text); min-height: 100dvh; display: flex;
+      justify-content: center; overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* === MOBILE FRAME === */
+    .app-frame {
+      width: 100%; max-width: 430px; min-height: 100dvh; position: relative;
+      display: flex; flex-direction: column; overflow: hidden;
+      background: linear-gradient(170deg, #0f172a 0%, #020617 40%, #041c2c 70%, #020617 100%);
+    }
+
+    /* === ANIMATED BACKGROUND === */
+    .bg-effects { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3;
+      animation: orbFloat 8s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 300px; height: 300px; background: var(--emerald); top: -80px; right: -60px; animation-delay: 0s; }
+    .orb-2 { width: 250px; height: 250px; background: var(--blue); bottom: 10%; left: -80px; animation-delay: -3s; opacity: 0.2; }
+    .orb-3 { width: 180px; height: 180px; background: var(--amber); top: 40%; right: -40px; animation-delay: -5s; opacity: 0.15; }
+
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(20px, -30px) scale(1.15); }
+    }
+
+    /* Grid pattern overlay */
+    .grid-pattern {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                         linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px; opacity: 0.3;
+      mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+    }
+
+    /* === CONTENT === */
+    .content { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; padding: 0 24px; }
+
+    /* === HERO BRANDING === */
+    .hero { padding: 56px 0 32px; text-align: center; }
+
+    .logo-mark {
+      width: 72px; height: 72px; border-radius: 20px; margin: 0 auto 20px;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 40px rgba(16,185,129,0.3), 0 8px 32px rgba(0,0,0,0.4);
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+    @keyframes logoPulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(16,185,129,0.3), 0 8px 32px rgba(0,0,0,0.4); }
+      50% { box-shadow: 0 0 60px rgba(16,185,129,0.5), 0 8px 32px rgba(0,0,0,0.4); }
+    }
+
+    .hero h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 8px; }
+    .hero h1 span { background: linear-gradient(135deg, var(--emerald-glow), var(--emerald-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: 14px; color: var(--text-dim); line-height: 1.5; max-width: 280px; margin: 0 auto; }
+
+    /* === TAB SWITCHER === */
+    .tab-bar {
+      display: flex; background: var(--glass); border-radius: 14px; padding: 4px;
+      border: 1px solid var(--border); margin-bottom: 28px; position: relative;
+    }
+    .tab-bar::before {
+      content: ''; position: absolute; top: 4px; left: 4px; width: calc(50% - 4px); height: calc(100% - 8px);
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      border-radius: 11px; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 12px rgba(16,185,129,0.4);
+    }
+    .tab-bar.register::before { transform: translateX(100%); }
+
+    .tab-btn {
+      flex: 1; padding: 12px; border: none; background: none; cursor: pointer;
+      font-family: inherit; font-size: 14px; font-weight: 700; color: var(--text-muted);
+      position: relative; z-index: 1; transition: color 0.3s; border-radius: 11px;
+    }
+    .tab-btn.active { color: white; }
+
+    /* === FORM CARDS === */
+    .form-container { flex: 1; position: relative; }
+
+    .form-card {
+      position: absolute; inset: 0; display: flex; flex-direction: column; gap: 16px;
+      transition: opacity 0.35s, transform 0.35s; opacity: 0; transform: translateX(20px); pointer-events: none;
+    }
+    .form-card.active { opacity: 1; transform: translateX(0); pointer-events: all; position: relative; }
+
+    .input-group { position: relative; }
+    .input-group label {
+      display: block; font-size: 12px; font-weight: 600; color: var(--text-dim);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .input-wrapper {
+      display: flex; align-items: center; background: var(--glass); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .input-wrapper:focus-within {
+      border-color: var(--emerald); box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+    }
+    .input-icon { padding: 0 14px; color: var(--text-muted); display: flex; flex-shrink: 0; }
+    .input-wrapper input, .input-wrapper select {
+      flex: 1; padding: 14px 14px 14px 0; border: none; background: none; color: var(--text);
+      font-family: inherit; font-size: 15px; font-weight: 500; outline: none; min-height: 48px;
+    }
+    .input-wrapper input::placeholder { color: var(--text-muted); }
+    .input-wrapper select { appearance: none; cursor: pointer; }
+    .input-wrapper select option { background: var(--dark); color: var(--text); }
+
+    .country-code {
+      padding: 14px 8px 14px 14px; color: var(--text); font-weight: 600;
+      font-size: 15px; border-right: 1px solid var(--border); white-space: nowrap;
+    }
+
+    /* === PRIMARY BUTTON === */
+    .btn-primary {
+      width: 100%; padding: 16px; border: none; border-radius: 14px; cursor: pointer;
+      font-family: inherit; font-size: 16px; font-weight: 700; color: white;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      box-shadow: 0 4px 20px rgba(16,185,129,0.4);
+      transition: transform 0.2s, box-shadow 0.2s; min-height: 52px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 8px; position: relative; overflow: hidden;
+    }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-primary:hover::after { opacity: 1; }
+
+    .btn-primary.loading { pointer-events: none; opacity: 0.8; }
+    .btn-primary .spinner {
+      width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* === DIVIDER === */
+    .divider {
+      display: flex; align-items: center; gap: 12px; margin: 4px 0;
+      font-size: 12px; color: var(--text-muted); font-weight: 500;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* === SOCIAL BUTTONS === */
+    .social-row { display: flex; gap: 12px; }
+    .btn-social {
+      flex: 1; padding: 14px; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--glass); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 8px; color: var(--text); font-family: inherit;
+      font-size: 13px; font-weight: 600; transition: background 0.3s, border-color 0.3s;
+      min-height: 48px;
+    }
+    .btn-social:active { background: rgba(255,255,255,0.12); }
+
+    /* === OTP SCREEN === */
+    .otp-screen { display: none; flex-direction: column; align-items: center; text-align: center; gap: 24px; padding-top: 20px; }
+    .otp-screen.active { display: flex; }
+    .otp-screen h2 { font-size: 22px; font-weight: 800; }
+    .otp-screen p { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
+    .otp-screen .phone-display { color: var(--emerald-glow); font-weight: 700; }
+
+    .otp-inputs { display: flex; gap: 10px; justify-content: center; }
+    .otp-input {
+      width: 52px; height: 60px; text-align: center; font-size: 24px; font-weight: 700;
+      background: var(--glass); border: 2px solid var(--border); border-radius: 14px;
+      color: var(--text); outline: none; font-family: inherit;
+      transition: border-color 0.3s, box-shadow 0.3s; caret-color: var(--emerald-glow);
+    }
+    .otp-input:focus { border-color: var(--emerald); box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
+
+    .resend-row { font-size: 13px; color: var(--text-muted); }
+    .resend-row a { color: var(--emerald-glow); font-weight: 600; text-decoration: none; cursor: pointer; }
+
+    /* === TRUST BADGES === */
+    .trust-footer {
+      padding: 28px 0 36px; display: flex; justify-content: center; gap: 24px;
+      font-size: 11px; color: var(--text-muted); font-weight: 500;
+    }
+    .trust-item { display: flex; align-items: center; gap: 5px; }
+
+    /* === SUCCESS ANIMATION === */
+    .success-screen { display: none; flex-direction: column; align-items: center; text-align: center; gap: 16px; padding-top: 40px; }
+    .success-screen.active { display: flex; }
+    .success-check {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 60px rgba(16,185,129,0.4);
+      animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes successPop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    .success-screen h2 { font-size: 24px; font-weight: 800; }
+    .success-screen p { font-size: 14px; color: var(--text-dim); max-width: 260px; }
+
+    /* === UTILITIES === */
+    .hidden { display: none !important; }
+
+    @media (min-width: 431px) {
+      body { background: #0a0a0a; padding: 0; }
+      .app-frame { min-height: 100vh; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-frame">
+  <div class="bg-effects">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-pattern"></div>
+  </div>
+
+  <div class="content">
+    <!-- HERO -->
+    <div class="hero" id="heroBrand">
+      <div class="logo-mark"><i data-lucide="hard-hat" style="width:36px;height:36px;color:white"></i></div>
+      <h1>Welcome to<br><span>Shramik Sathi</span></h1>
+      <p>Your trusted partner for verified jobs, fair wages, and a safer workplace.</p>
+    </div>
+
+    <!-- TAB SWITCHER -->
+    <div class="tab-bar" id="tabBar">
+      <button class="tab-btn active" data-tab="login" id="loginTab">Sign In</button>
+      <button class="tab-btn" data-tab="register" id="registerTab">Register</button>
+    </div>
+
+    <!-- FORMS -->
+    <div class="form-container" id="formContainer">
+
+      <!-- LOGIN FORM -->
+      <div class="form-card active" id="loginForm">
+        <div class="input-group">
+          <label>Phone Number</label>
+          <div class="input-wrapper">
+            <span class="country-code">+91</span>
+            <input type="tel" id="loginPhone" placeholder="Enter mobile number" maxlength="10" inputmode="numeric" autocomplete="tel">
+          </div>
+        </div>
+
+        <button class="btn-primary" id="loginBtn">
+          Send OTP <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
+        </button>
+
+        <div class="divider">or continue with</div>
+
+        <div class="social-row">
+          <button class="btn-social">
+            <i data-lucide="scan-line" style="width:18px;height:18px;color:#10b981"></i> QR Code
+          </button>
+          <button class="btn-social">
+            <i data-lucide="languages" style="width:18px;height:18px;color:#f59e0b"></i> हिन्दी
+          </button>
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div class="form-card" id="registerForm">
+        <div class="input-group">
+          <label>Full Name (as per Aadhar)</label>
+          <div class="input-wrapper">
+            <div class="input-icon"><i data-lucide="user" style="width:18px;height:18px"></i></div>
+            <input type="text" id="regName" placeholder="Enter your full name" autocomplete="name">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Phone Number</label>
+          <div class="input-wrapper">
+            <span class="country-code">+91</span>
+            <input type="tel" id="regPhone" placeholder="Enter mobile number" maxlength="10" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Skill / Trade</label>
+          <div class="input-wrapper">
+            <div class="input-icon"><i data-lucide="wrench" style="width:18px;height:18px"></i></div>
+            <select id="regSkill">
+              <option value="">Select your trade</option>
+              <option>Fitter</option><option>Welder (MIG/TIG)</option>
+              <option>Electrician</option><option>Crane Operator</option>
+              <option>Rigger</option><option>Scaffolder</option>
+              <option>Plumber</option><option>General Helper</option>
+              <option>Safety Steward</option><option>Mason</option>
+              <option>Painter</option><option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="registerBtn">
+          Create Account <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- OTP VERIFICATION SCREEN -->
+    <div class="otp-screen" id="otpScreen">
+      <div style="width:56px;height:56px;border-radius:16px;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center">
+        <i data-lucide="smartphone" style="width:28px;height:28px;color:#34d399"></i>
+      </div>
+      <div>
+        <h2>Verify OTP</h2>
+        <p>Enter the 4-digit code sent to<br><span class="phone-display" id="otpPhoneDisplay">+91 XXXXX XXXXX</span></p>
+      </div>
+      <div class="otp-inputs">
+        <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" autofocus>
+        <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
+        <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
+        <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
+      </div>
+      <button class="btn-primary" id="verifyOtpBtn" style="max-width:280px">
+        Verify & Enter <i data-lucide="check" style="width:18px;height:18px"></i>
+      </button>
+      <div class="resend-row">Didn't receive? <a id="resendOtp">Resend in <span id="timer">30</span>s</a></div>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-check"><i data-lucide="check" style="width:40px;height:40px;color:white;stroke-width:3"></i></div>
+      <h2>Welcome, Shramik!</h2>
+      <p>Your account is verified. Redirecting to your dashboard...</p>
+    </div>
+
+    <!-- TRUST BADGES -->
+    <div class="trust-footer" id="trustFooter">
+      <div class="trust-item"><i data-lucide="shield-check" style="width:14px;height:14px;color:#10b981"></i> Verified Jobs</div>
+      <div class="trust-item"><i data-lucide="lock" style="width:14px;height:14px;color:#3b82f6"></i> Secure</div>
+      <div class="trust-item"><i data-lucide="building-2" style="width:14px;height:14px;color:#f59e0b"></i> 50+ Sites</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  // DOM
+  const tabBar = document.getElementById('tabBar');
+  const loginTab = document.getElementById('loginTab');
+  const registerTab = document.getElementById('registerTab');
+  const loginForm = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const otpScreen = document.getElementById('otpScreen');
+  const successScreen = document.getElementById('successScreen');
+  const formContainer = document.getElementById('formContainer');
+  const heroBrand = document.getElementById('heroBrand');
+  const trustFooter = document.getElementById('trustFooter');
+
+  // Tab switching
+  [loginTab, registerTab].forEach(tab => {
+    tab.addEventListener('click', () => {
+      const isRegister = tab.dataset.tab === 'register';
+      tabBar.classList.toggle('register', isRegister);
+      loginTab.classList.toggle('active', !isRegister);
+      registerTab.classList.toggle('active', isRegister);
+      loginForm.classList.toggle('active', !isRegister);
+      registerForm.classList.toggle('active', isRegister);
+    });
+  });
+
+  // Send OTP (Login)
+  document.getElementById('loginBtn').addEventListener('click', () => {
+    const phone = document.getElementById('loginPhone').value.trim();
+    if (phone.length !== 10) { shakeInput(document.getElementById('loginPhone')); return; }
+    showOtpScreen(phone);
+  });
+
+  // Send OTP (Register)
+  document.getElementById('registerBtn').addEventListener('click', () => {
+    const name = document.getElementById('regName').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    if (!name) { shakeInput(document.getElementById('regName')); return; }
+    if (phone.length !== 10) { shakeInput(document.getElementById('regPhone')); return; }
+    showOtpScreen(phone);
+  });
+
+  function showOtpScreen(phone) {
+    const formatted = phone.replace(/(\d{5})(\d{5})/, '$1 $2');
+    document.getElementById('otpPhoneDisplay').textContent = '+91 ' + formatted;
+
+    // Animate out
+    formContainer.style.display = 'none';
+    tabBar.style.display = 'none';
+    heroBrand.querySelector('h1').innerHTML = 'Almost<br><span>There</span>';
+    heroBrand.querySelector('p').textContent = 'One last step to access your portal.';
+
+    otpScreen.classList.add('active');
+    otpScreen.querySelector('.otp-input').focus();
+    startTimer();
+    lucide.createIcons();
+  }
+
+  // OTP input auto-advance
+  document.querySelectorAll('.otp-input').forEach((inp, i, all) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/\D/g, '');
+      if (inp.value && i < all.length - 1) all[i + 1].focus();
+    });
+    inp.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !inp.value && i > 0) all[i - 1].focus();
+    });
+  });
+
+  // Verify OTP
+  document.getElementById('verifyOtpBtn').addEventListener('click', () => {
+    const otp = [...document.querySelectorAll('.otp-input')].map(i => i.value).join('');
+    if (otp.length < 4) return;
+
+    const btn = document.getElementById('verifyOtpBtn');
+    btn.classList.add('loading');
+    btn.innerHTML = '<div class="spinner"></div> Verifying...';
+
+    setTimeout(() => {
+      otpScreen.classList.remove('active');
+      otpScreen.style.display = 'none';
+      heroBrand.style.display = 'none';
+      trustFooter.style.display = 'none';
+      successScreen.classList.add('active');
+      lucide.createIcons();
+
+      setTimeout(() => { window.location.href = 'get-hired.html'; }, 2000);
+    }, 1200);
+  });
+
+  // Timer
+  function startTimer() {
+    let t = 30;
+    const el = document.getElementById('timer');
+    const link = document.getElementById('resendOtp');
+    const iv = setInterval(() => {
+      t--;
+      el.textContent = t;
+      if (t <= 0) { clearInterval(iv); link.innerHTML = '<a href="#" style="color:#34d399;font-weight:700">Resend OTP</a>'; }
+    }, 1000);
+  }
+
+  // Shake animation for validation
+  function shakeInput(el) {
+    const wrapper = el.closest('.input-wrapper');
+    wrapper.style.borderColor = '#ef4444';
+    wrapper.style.animation = 'shake 0.4s ease';
+    setTimeout(() => { wrapper.style.borderColor = ''; wrapper.style.animation = ''; }, 500);
+  }
+
+  // Add shake keyframes
+  const style = document.createElement('style');
+  style.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}';
+  document.head.appendChild(style);
+</script>
+</body>
+</html>
