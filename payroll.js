@@ -115,8 +115,8 @@ window.SSPayroll = (function () {
         .from('attendance')
         .select('status, overtime_hours')
         .eq('employee_id', emp.id)
-        .gte('date', startDate)
-        .lte('date', endDate);
+        .gte('attendance_date', startDate)
+        .lte('attendance_date', endDate);
 
       if (attErr) {
         console.error('[SSPayroll] Attendance fetch error:', attErr);
@@ -134,7 +134,7 @@ window.SSPayroll = (function () {
         const s = (rec.status || '').trim();
         if (s === 'Present') {
           presentDays += 1;
-        } else if (s === 'Half-Day') {
+        } else if (s === 'Half Day' || s === 'Half-Day') {
           halfDays += 1;
         }
         totalOTHours += parseFloat(rec.overtime_hours) || 0;
@@ -168,7 +168,8 @@ window.SSPayroll = (function () {
       // Advance & fine deductions — fetch from existing wage_records if previously saved, else 0
       let advanceDeduction = 0;
       let fineDeduction    = 0;
-      const wageMonth = `${year}-${String(month).padStart(2, '0')}`;
+      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const wageMonth = `${monthNames[month - 1]} ${year}`;
 
       const { data: existingRec } = await sb
         .from('wage_records')
@@ -188,7 +189,20 @@ window.SSPayroll = (function () {
       console.log(`[SSPayroll] Deductions — PF: ₹${pfDeduction}, ESI: ₹${esiDeduction}, Advance: ₹${advanceDeduction}, Fine: ₹${fineDeduction}`);
       console.log(`[SSPayroll] Net Pay: ₹${netPay}`);
 
-      /* ── 6. Build wage record ── */
+      /* ── 6. Compute leave balance ── */
+      const leaveYear = year;
+      const LEAVE_QUOTA = { Casual: 12, Sick: 6, Earned: 15 };
+      let leaveBalance = 0;
+      try {
+        const { data: leavesTaken } = await sb.from('leave_requests')
+          .select('leave_type, days').eq('employee_id', emp.id)
+          .eq('status', 'Approved').gte('from_date', `${leaveYear}-01-01`);
+        const used = { Casual: 0, Sick: 0, Earned: 0 };
+        (leavesTaken || []).forEach(l => { if (used[l.leave_type] !== undefined) used[l.leave_type] += (l.days || 0); });
+        leaveBalance = (LEAVE_QUOTA.Casual - used.Casual) + (LEAVE_QUOTA.Sick - used.Sick) + (LEAVE_QUOTA.Earned - used.Earned);
+      } catch (e) { console.warn('[SSPayroll] Leave balance calc skipped:', e.message); }
+
+      /* ── 7. Build wage record ── */
       const wageRecord = {
         employee_id:       emp.id,
         wage_month:        wageMonth,
@@ -204,6 +218,7 @@ window.SSPayroll = (function () {
         advance_deduction: advanceDeduction,
         fine_deduction:    fineDeduction,
         net_pay:           netPay,
+        leave_balance:     leaveBalance,
       };
 
       // Attach useful metadata for caller (not stored in DB)
@@ -351,7 +366,8 @@ window.SSPayroll = (function () {
     console.log(`[SSPayroll] getPayrollSummary — period: ${month}/${year}`);
 
     try {
-      const wageMonth = `${year}-${String(month).padStart(2, '0')}`;
+      const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const wageMonth = `${monthNames[month - 1]} ${year}`;
 
       const { data: records, error: fetchErr } = await sb
         .from('wage_records')

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leave & Advance Management | Shramik Sathi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } } }</script>
+  <style>
+    @media print { .no-print { display: none !important; } body { background: white; } }
+    .tab-active { border-bottom: 3px solid #0055a5; color: #0055a5; font-weight: 700; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#0055a5] text-white no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i data-lucide="hard-hat" class="w-7 h-7"></i>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">Shramik Sathi</h1>
+          <span class="text-xs text-white/70">Leave & Advance Management</span>
+        </div>
+      </div>
+      <a href="hire.html" class="text-white/80 hover:text-white text-sm flex items-center gap-1">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Portal
+      </a>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="bg-white border-b no-print shadow-sm sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 flex gap-0 text-sm">
+      <button class="lm-tab tab-active px-5 py-3 whitespace-nowrap" data-tab="pending">Pending Requests</button>
+      <button class="lm-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="approved">Approved</button>
+      <button class="lm-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="advances">Advance Requests</button>
+      <button class="lm-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="balance">Leave Balance</button>
+      <button class="lm-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="unavailed">Unavailed Leave Register</button>
+    </div>
+  </nav>
+
+  <!-- Stats -->
+  <div class="max-w-7xl mx-auto px-4 py-3 no-print">
+    <div class="grid grid-cols-4 gap-3">
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-amber-600" id="statPending">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Pending</p>
+      </div>
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-green-600" id="statApproved">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Approved (Month)</p>
+      </div>
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-red-600" id="statRejected">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Rejected</p>
+      </div>
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-blue-600" id="statAdvances">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Advance Pending</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Panels -->
+  <main class="max-w-7xl mx-auto px-4 pb-8">
+
+    <!-- Pending Requests -->
+    <section id="panel-pending" class="lm-panel bg-white rounded-lg shadow border">
+      <table class="w-full text-xs text-left">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">Emp ID</th><th class="p-2">Name</th><th class="p-2">Type</th>
+            <th class="p-2">From</th><th class="p-2">To</th><th class="p-2 text-center">Days</th>
+            <th class="p-2">Reason</th><th class="p-2 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-pending"></tbody>
+      </table>
+    </section>
+
+    <!-- Approved -->
+    <section id="panel-approved" class="lm-panel bg-white rounded-lg shadow border hidden">
+      <table class="w-full text-xs text-left">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">Emp ID</th><th class="p-2">Name</th><th class="p-2">Type</th>
+            <th class="p-2">From</th><th class="p-2">To</th><th class="p-2 text-center">Days</th>
+            <th class="p-2 text-center">Status</th><th class="p-2">Approved On</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-approved"></tbody>
+      </table>
+    </section>
+
+    <!-- Advance Requests -->
+    <section id="panel-advances" class="lm-panel bg-white rounded-lg shadow border hidden">
+      <table class="w-full text-xs text-left">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">Emp ID</th><th class="p-2">Name</th><th class="p-2">Details</th>
+            <th class="p-2 text-center">Status</th><th class="p-2 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-advances"></tbody>
+      </table>
+    </section>
+
+    <!-- Leave Balance -->
+    <section id="panel-balance" class="lm-panel bg-white rounded-lg shadow border hidden">
+      <table class="w-full text-xs text-left">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">Emp ID</th><th class="p-2">Name</th><th class="p-2">Designation</th>
+            <th class="p-2 text-center">CL Used</th><th class="p-2 text-center">CL Bal.</th>
+            <th class="p-2 text-center">SL Used</th><th class="p-2 text-center">SL Bal.</th>
+            <th class="p-2 text-center">EL Used</th><th class="p-2 text-center">EL Bal.</th>
+            <th class="p-2 text-center">Total Available</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-balance"></tbody>
+      </table>
+    </section>
+
+    <!-- Unavailed Leave Register -->
+    <section id="panel-unavailed" class="lm-panel bg-white rounded-lg shadow border hidden">
+      <div class="p-3 border-b flex justify-between items-center no-print">
+        <h3 class="font-bold text-sm text-slate-700">Register for Payment of Unavailed Leave (Statutory)</h3>
+        <div class="flex gap-2">
+          <button onclick="exportUnavailedCSV()" class="px-3 py-1 bg-emerald-600 text-white text-xs rounded font-bold">Export CSV</button>
+          <button onclick="window.print()" class="px-3 py-1 bg-slate-600 text-white text-xs rounded font-bold">Print</button>
+        </div>
+      </div>
+      <table class="w-full text-xs text-left" id="unavailedTable">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">SL</th><th class="p-2">Emp ID</th><th class="p-2">Name</th>
+            <th class="p-2">DOJ</th><th class="p-2 text-center">EL Entitled</th>
+            <th class="p-2 text-center">EL Taken</th><th class="p-2 text-center">Unavailed</th>
+            <th class="p-2 text-right">Daily Wage</th><th class="p-2 text-right">Encashment (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-unavailed"></tbody>
+        <tfoot class="bg-slate-100 font-bold text-xs">
+          <tr><td colspan="8" class="p-2">TOTAL ENCASHMENT</td><td class="p-2 text-right" id="totalEncash">₹0</td></tr>
+        </tfoot>
+      </table>
+    </section>
+  </main>
+
+<script>
+  lucide.createIcons();
+  const sb = getSupabaseClient();
+  const LEAVE_QUOTA = { Casual: 12, Sick: 6, Earned: 15 };
+
+  // Tab switching
+  document.querySelectorAll('.lm-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.lm-tab').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-slate-500'); });
+      tab.classList.add('tab-active'); tab.classList.remove('text-slate-500');
+      document.querySelectorAll('.lm-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById('panel-' + tab.dataset.tab).classList.remove('hidden');
+    });
+  });
+
+  function fmtDate(d) { return d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'; }
+
+  async function loadAll() {
+    await Promise.all([loadPending(), loadApproved(), loadAdvances(), loadBalance(), loadUnavailed(), loadStats()]);
+  }
+  loadAll();
+
+  // ============ PENDING ============
+  async function loadPending() {
+    const { data } = await sb.from('leave_requests')
+      .select('*, employees!inner(emp_id, full_name)').eq('status', 'Pending')
+      .neq('leave_type', 'Advance')
+      .order('created_at', { ascending: false });
+
+    document.getElementById('tbody-pending').innerHTML = (data || []).map((l, i) => {
+      const bg = i % 2 ? 'bg-slate-50' : '';
+      return `<tr class="${bg} border-b hover:bg-slate-100">
+        <td class="p-2">${l.employees.emp_id}</td>
+        <td class="p-2 font-bold">${l.employees.full_name}</td>
+        <td class="p-2"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">${l.leave_type}</span></td>
+        <td class="p-2">${fmtDate(l.from_date)}</td>
+        <td class="p-2">${fmtDate(l.to_date)}</td>
+        <td class="p-2 text-center font-semibold">${l.days}</td>
+        <td class="p-2 max-w-[200px] truncate">${l.reason || '—'}</td>
+        <td class="p-2 text-center whitespace-nowrap">
+          <button class="approve-btn px-2 py-1 bg-green-600 text-white text-[10px] rounded font-bold hover:bg-green-700 mr-1" data-id="${l.id}">✓ Approve</button>
+          <button class="reject-btn px-2 py-1 bg-red-500 text-white text-[10px] rounded font-bold hover:bg-red-600" data-id="${l.id}">✗ Reject</button>
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="8" class="p-4 text-center text-slate-400">No pending requests</td></tr>';
+
+    // Wire approve/reject
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await sb.from('leave_requests').update({ status: 'Approved' }).eq('id', btn.dataset.id);
+        loadAll();
+      });
+    });
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await sb.from('leave_requests').update({ status: 'Rejected' }).eq('id', btn.dataset.id);
+        loadAll();
+      });
+    });
+  }
+
+  // ============ APPROVED ============
+  async function loadApproved() {
+    const { data } = await sb.from('leave_requests')
+      .select('*, employees!inner(emp_id, full_name)')
+      .in('status', ['Approved', 'Rejected'])
+      .neq('leave_type', 'Advance')
+      .order('created_at', { ascending: false }).limit(50);
+
+    document.getElementById('tbody-approved').innerHTML = (data || []).map((l, i) => {
+      const bg = i % 2 ? 'bg-slate-50' : '';
+      const sc = l.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-300' : 'bg-red-100 text-red-700 border-red-300';
+      return `<tr class="${bg} border-b">
+        <td class="p-2">${l.employees.emp_id}</td>
+        <td class="p-2 font-bold">${l.employees.full_name}</td>
+        <td class="p-2">${l.leave_type}</td>
+        <td class="p-2">${fmtDate(l.from_date)}</td>
+        <td class="p-2">${fmtDate(l.to_date)}</td>
+        <td class="p-2 text-center">${l.days}</td>
+        <td class="p-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${sc}">${l.status}</span></td>
+        <td class="p-2">${fmtDate(l.created_at)}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="8" class="p-4 text-center text-slate-400">No records</td></tr>';
+  }
+
+  // ============ ADVANCES ============
+  async function loadAdvances() {
+    const { data } = await sb.from('leave_requests')
+      .select('*, employees!inner(emp_id, full_name)')
+      .eq('leave_type', 'Advance')
+      .order('created_at', { ascending: false });
+
+    document.getElementById('tbody-advances').innerHTML = (data || []).map((l, i) => {
+      const bg = i % 2 ? 'bg-slate-50' : '';
+      const sc = l.status === 'Approved' ? 'bg-green-100 text-green-700' : l.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
+      return `<tr class="${bg} border-b hover:bg-slate-100">
+        <td class="p-2">${l.employees.emp_id}</td>
+        <td class="p-2 font-bold">${l.employees.full_name}</td>
+        <td class="p-2">${l.reason || '—'}</td>
+        <td class="p-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${l.status}</span></td>
+        <td class="p-2 text-center whitespace-nowrap">${l.status === 'Pending' ? `
+          <button class="adv-approve px-2 py-1 bg-green-600 text-white text-[10px] rounded font-bold mr-1" data-id="${l.id}">✓</button>
+          <button class="adv-reject px-2 py-1 bg-red-500 text-white text-[10px] rounded font-bold" data-id="${l.id}">✗</button>
+        ` : '—'}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="5" class="p-4 text-center text-slate-400">No advance requests</td></tr>';
+
+    document.querySelectorAll('.adv-approve').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await sb.from('leave_requests').update({ status: 'Approved' }).eq('id', btn.dataset.id);
+        loadAll();
+      });
+    });
+    document.querySelectorAll('.adv-reject').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await sb.from('leave_requests').update({ status: 'Rejected' }).eq('id', btn.dataset.id);
+        loadAll();
+      });
+    });
+  }
+
+  // ============ LEAVE BALANCE ============
+  async function loadBalance() {
+    const { data: emps } = await sb.from('employees').select('id, emp_id, full_name, designation').eq('status', 'Active').order('emp_id');
+    if (!emps) return;
+
+    const year = new Date().getFullYear();
+    const { data: allLeaves } = await sb.from('leave_requests')
+      .select('employee_id, leave_type, days, status')
+      .in('status', ['Approved'])
+      .neq('leave_type', 'Advance')
+      .gte('from_date', `${year}-01-01`);
+
+    // Build used map
+    const usedMap = {};
+    (allLeaves || []).forEach(l => {
+      if (!usedMap[l.employee_id]) usedMap[l.employee_id] = { Casual: 0, Sick: 0, Earned: 0 };
+      if (usedMap[l.employee_id][l.leave_type] !== undefined) usedMap[l.employee_id][l.leave_type] += (l.days || 0);
+    });
+
+    document.getElementById('tbody-balance').innerHTML = emps.map((e, i) => {
+      const u = usedMap[e.id] || { Casual: 0, Sick: 0, Earned: 0 };
+      const clBal = LEAVE_QUOTA.Casual - u.Casual;
+      const slBal = LEAVE_QUOTA.Sick - u.Sick;
+      const elBal = LEAVE_QUOTA.Earned - u.Earned;
+      const total = clBal + slBal + elBal;
+      const bg = i % 2 ? 'bg-slate-50' : '';
+      return `<tr class="${bg} border-b">
+        <td class="p-2">${e.emp_id}</td>
+        <td class="p-2 font-bold">${e.full_name}</td>
+        <td class="p-2">${e.designation || '—'}</td>
+        <td class="p-2 text-center text-red-600">${u.Casual}</td>
+        <td class="p-2 text-center font-semibold ${clBal <= 2 ? 'text-red-600' : 'text-green-700'}">${clBal}</td>
+        <td class="p-2 text-center text-red-600">${u.Sick}</td>
+        <td class="p-2 text-center font-semibold ${slBal <= 1 ? 'text-red-600' : 'text-green-700'}">${slBal}</td>
+        <td class="p-2 text-center text-red-600">${u.Earned}</td>
+        <td class="p-2 text-center font-semibold ${elBal <= 3 ? 'text-amber-600' : 'text-green-700'}">${elBal}</td>
+        <td class="p-2 text-center font-bold text-[#0055a5]">${total}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ============ UNAVAILED LEAVE REGISTER ============
+  async function loadUnavailed() {
+    const { data: emps } = await sb.from('employees').select('id, emp_id, full_name, date_of_joining, basic_wage, da_allowance').eq('status', 'Active').order('emp_id');
+    if (!emps) return;
+
+    const year = new Date().getFullYear();
+    const { data: allLeaves } = await sb.from('leave_requests')
+      .select('employee_id, leave_type, days')
+      .eq('status', 'Approved').eq('leave_type', 'Earned')
+      .gte('from_date', `${year}-01-01`);
+
+    const elUsedMap = {};
+    (allLeaves || []).forEach(l => { elUsedMap[l.employee_id] = (elUsedMap[l.employee_id] || 0) + (l.days || 0); });
+
+    let totalEncash = 0;
+    document.getElementById('tbody-unavailed').innerHTML = emps.map((e, i) => {
+      const elUsed = elUsedMap[e.id] || 0;
+      const unavailed = LEAVE_QUOTA.Earned - elUsed;
+      const dailyWage = (Number(e.basic_wage) || 0) + (Number(e.da_allowance) || 0);
+      const encashment = Math.max(0, unavailed) * dailyWage;
+      totalEncash += encashment;
+      const bg = i % 2 ? 'bg-slate-50' : '';
+      return `<tr class="${bg} border-b">
+        <td class="p-2">${i + 1}</td>
+        <td class="p-2">${e.emp_id}</td>
+        <td class="p-2 font-bold">${e.full_name}</td>
+        <td class="p-2">${fmtDate(e.date_of_joining)}</td>
+        <td class="p-2 text-center">${LEAVE_QUOTA.Earned}</td>
+        <td class="p-2 text-center">${elUsed}</td>
+        <td class="p-2 text-center font-semibold ${unavailed > 0 ? 'text-amber-600' : 'text-green-700'}">${unavailed}</td>
+        <td class="p-2 text-right">₹${dailyWage.toLocaleString('en-IN')}</td>
+        <td class="p-2 text-right font-bold ${encashment > 0 ? 'text-[#0055a5]' : ''}">₹${encashment.toLocaleString('en-IN')}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('totalEncash').textContent = '₹' + totalEncash.toLocaleString('en-IN');
+  }
+
+  // ============ STATS ============
+  async function loadStats() {
+    const { data } = await sb.from('leave_requests').select('status, leave_type');
+    if (!data) return;
+    const pending = data.filter(l => l.status === 'Pending' && l.leave_type !== 'Advance').length;
+    const approved = data.filter(l => l.status === 'Approved' && l.leave_type !== 'Advance').length;
+    const rejected = data.filter(l => l.status === 'Rejected' && l.leave_type !== 'Advance').length;
+    const advances = data.filter(l => l.leave_type === 'Advance' && l.status === 'Pending').length;
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statApproved').textContent = approved;
+    document.getElementById('statRejected').textContent = rejected;
+    document.getElementById('statAdvances').textContent = advances;
+  }
+
+  function exportUnavailedCSV() {
+    const table = document.getElementById('unavailedTable');
+    const rows = [...table.querySelectorAll('tr')];
+    const csv = rows.map(r => [...r.querySelectorAll('th,td')].map(c => '"'+c.textContent.trim().replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `unavailed_leave_register_${new Date().getFullYear()}.csv`; a.click();
+  }
+</script>
+</body>
+</html>

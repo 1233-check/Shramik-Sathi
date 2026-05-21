@@ -106,7 +106,7 @@
           </button>
 
           <!-- Leave (Red/Amber for Stop/Pause) -->
-          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+          <button id="applyLeaveBtn" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
             <div class="w-[52px] h-[52px] rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
               <i data-lucide="calendar" class="w-6 h-6"></i>
             </div>
@@ -114,7 +114,7 @@
           </button>
 
           <!-- Salary (Green/Emerald for Money) -->
-          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+          <button id="advanceSalaryBtn" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
             <div class="w-[52px] h-[52px] rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <i data-lucide="indian-rupee" class="w-6 h-6"></i>
             </div>
@@ -398,6 +398,316 @@
     document.getElementById('attendanceModal')?.addEventListener('click', (e) => {
       if (e.target.id === 'attendanceModal') e.target.style.display = 'none';
     });
+  </script>
+
+  <!-- ============================================ -->
+  <!-- LEAVE APPLICATION MODAL -->
+  <!-- ============================================ -->
+  <div id="leaveModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-4" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="bg-amber-500 text-white p-4 text-center">
+        <i data-lucide="calendar-off" class="w-8 h-8 mx-auto mb-1"></i>
+        <h3 class="font-bold text-lg">Apply Leave</h3>
+      </div>
+      <div class="p-5" id="leaveContent">
+        <!-- Balance Cards -->
+        <div class="grid grid-cols-4 gap-2 mb-4" id="leaveBalanceCards">
+          <div class="bg-blue-50 rounded-lg p-2 text-center">
+            <p class="text-[10px] font-bold text-blue-500 uppercase">Casual</p>
+            <p class="text-lg font-bold text-blue-700" id="balCL">--</p>
+          </div>
+          <div class="bg-green-50 rounded-lg p-2 text-center">
+            <p class="text-[10px] font-bold text-green-500 uppercase">Sick</p>
+            <p class="text-lg font-bold text-green-700" id="balSL">--</p>
+          </div>
+          <div class="bg-purple-50 rounded-lg p-2 text-center">
+            <p class="text-[10px] font-bold text-purple-500 uppercase">Earned</p>
+            <p class="text-lg font-bold text-purple-700" id="balEL">--</p>
+          </div>
+          <div class="bg-teal-50 rounded-lg p-2 text-center">
+            <p class="text-[10px] font-bold text-teal-500 uppercase">Comp.</p>
+            <p class="text-lg font-bold text-teal-700" id="balCO">--</p>
+          </div>
+        </div>
+
+        <form id="leaveForm" class="space-y-3">
+          <div>
+            <label class="text-xs font-bold text-gray-600 block mb-1">Leave Type</label>
+            <select id="leaveType" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+              <option value="Casual">Casual Leave (CL)</option>
+              <option value="Sick">Sick Leave (SL)</option>
+              <option value="Earned">Earned Leave (EL)</option>
+              <option value="Compensatory">Compensatory Off</option>
+              <option value="Unpaid">Leave Without Pay</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-bold text-gray-600 block mb-1">From</label>
+              <input type="date" id="leaveFrom" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-gray-600 block mb-1">To</label>
+              <input type="date" id="leaveTo" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
+            </div>
+          </div>
+          <div class="text-xs text-amber-600 font-semibold" id="leaveDaysCount"></div>
+          <div>
+            <label class="text-xs font-bold text-gray-600 block mb-1">Reason</label>
+            <textarea id="leaveReason" rows="2" required placeholder="Brief reason..." class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none"></textarea>
+          </div>
+          <button type="submit" class="w-full py-3 bg-amber-500 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">
+            Submit Leave Request
+          </button>
+          <button type="button" onclick="document.getElementById('leaveModal').style.display='none'" class="w-full py-2 text-gray-500 text-sm font-semibold">Cancel</button>
+        </form>
+
+        <!-- Leave History -->
+        <div class="mt-4 border-t pt-3">
+          <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">Recent Requests</h4>
+          <div id="leaveHistory" class="space-y-2 text-xs max-h-32 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ADVANCE REQUEST MODAL -->
+  <!-- ============================================ -->
+  <div id="advanceModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-4" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+      <div class="bg-emerald-600 text-white p-4 text-center">
+        <i data-lucide="banknote" class="w-8 h-8 mx-auto mb-1"></i>
+        <h3 class="font-bold text-lg">Request Advance</h3>
+      </div>
+      <div class="p-5">
+        <form id="advanceForm" class="space-y-3">
+          <div>
+            <label class="text-xs font-bold text-gray-600 block mb-1">Amount (₹)</label>
+            <input type="number" id="advanceAmount" required min="500" step="100" placeholder="e.g. 5000" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-600 block mb-1">Purpose</label>
+            <select id="advancePurpose" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+              <option value="Medical Emergency">Medical Emergency</option>
+              <option value="Family Emergency">Family Emergency</option>
+              <option value="Education">Education</option>
+              <option value="Festival / Marriage">Festival / Marriage</option>
+              <option value="Housing">Housing</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-600 block mb-1">Repayment Plan</label>
+            <select id="advanceRepay" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
+              <option value="1">Deduct in 1 month</option>
+              <option value="2">Deduct over 2 months</option>
+              <option value="3" selected>Deduct over 3 months</option>
+              <option value="6">Deduct over 6 months</option>
+            </select>
+          </div>
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-700" id="advancePreview">
+            Monthly deduction: ₹--
+          </div>
+          <button type="submit" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">
+            Submit Request
+          </button>
+          <button type="button" onclick="document.getElementById('advanceModal').style.display='none'" class="w-full py-2 text-gray-500 text-sm font-semibold">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ============================================
+  // LEAVE APPLICATION LOGIC
+  // ============================================
+  (async () => {
+    const sb = getSupabaseClient();
+    let _empId = null; // employee UUID
+
+    // Resolve current user to employee
+    async function getEmpId() {
+      if (_empId) return _empId;
+      try {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return null;
+        const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', user.id).single();
+        _empId = emp?.id;
+        return _empId;
+      } catch { return null; }
+    }
+
+    // Leave balance defaults (per year: CL=12, SL=6, EL=15, Comp=0 earned)
+    const LEAVE_QUOTA = { Casual: 12, Sick: 6, Earned: 15, Compensatory: 0 };
+
+    async function loadLeaveBalance() {
+      const empId = await getEmpId();
+      if (!empId) return;
+      const year = new Date().getFullYear();
+      const { data: taken } = await sb.from('leave_requests')
+        .select('leave_type, days').eq('employee_id', empId)
+        .in('status', ['Approved', 'Pending'])
+        .gte('from_date', `${year}-01-01`);
+
+      const used = { Casual: 0, Sick: 0, Earned: 0, Compensatory: 0 };
+      (taken || []).forEach(l => { if (used[l.leave_type] !== undefined) used[l.leave_type] += (l.days || 0); });
+
+      document.getElementById('balCL').textContent = LEAVE_QUOTA.Casual - used.Casual;
+      document.getElementById('balSL').textContent = LEAVE_QUOTA.Sick - used.Sick;
+      document.getElementById('balEL').textContent = LEAVE_QUOTA.Earned - used.Earned;
+      document.getElementById('balCO').textContent = used.Compensatory * -1 || 0; // Comp is earned, not fixed
+    }
+
+    async function loadLeaveHistory() {
+      const empId = await getEmpId();
+      if (!empId) return;
+      const { data } = await sb.from('leave_requests').select('*').eq('employee_id', empId)
+        .order('created_at', { ascending: false }).limit(5);
+      const el = document.getElementById('leaveHistory');
+      el.innerHTML = (data || []).map(l => {
+        const sc = l.status === 'Approved' ? 'bg-green-100 text-green-700' : l.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
+        const fd = new Date(l.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        const td = new Date(l.to_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2">
+          <div><span class="font-semibold">${l.leave_type}</span> · ${fd}–${td} (${l.days}d)</div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${l.status}</span>
+        </div>`;
+      }).join('') || '<p class="text-gray-400">No requests yet</p>';
+    }
+
+    // Days count
+    const calcDays = () => {
+      const from = document.getElementById('leaveFrom')?.value;
+      const to = document.getElementById('leaveTo')?.value;
+      if (from && to) {
+        const days = Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1;
+        document.getElementById('leaveDaysCount').textContent = days > 0 ? `${days} day(s) selected` : '';
+      }
+    };
+    document.getElementById('leaveFrom')?.addEventListener('change', calcDays);
+    document.getElementById('leaveTo')?.addEventListener('change', calcDays);
+
+    // Open modal
+    document.getElementById('applyLeaveBtn')?.addEventListener('click', () => {
+      document.getElementById('leaveModal').style.display = 'flex';
+      document.getElementById('leaveFrom').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('leaveTo').value = new Date().toISOString().slice(0, 10);
+      calcDays();
+      loadLeaveBalance();
+      loadLeaveHistory();
+      lucide.createIcons();
+    });
+
+    // Submit leave
+    document.getElementById('leaveForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const empId = await getEmpId();
+      if (!empId) { alert('Not authenticated'); return; }
+
+      const from = document.getElementById('leaveFrom').value;
+      const to = document.getElementById('leaveTo').value;
+      const days = Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1;
+      if (days < 1) { alert('Invalid date range'); return; }
+
+      const btn = e.target.querySelector('button[type=submit]');
+      btn.innerHTML = 'Submitting...'; btn.disabled = true;
+
+      const { error } = await sb.from('leave_requests').insert({
+        employee_id: empId,
+        leave_type: document.getElementById('leaveType').value,
+        from_date: from,
+        to_date: to,
+        days: days,
+        reason: document.getElementById('leaveReason').value,
+        status: 'Pending'
+      });
+
+      if (!error) {
+        btn.innerHTML = '✓ Submitted!';
+        btn.classList.replace('bg-amber-500', 'bg-green-500');
+        loadLeaveBalance();
+        loadLeaveHistory();
+        setTimeout(() => {
+          document.getElementById('leaveModal').style.display = 'none';
+          btn.innerHTML = 'Submit Leave Request';
+          btn.classList.replace('bg-green-500', 'bg-amber-500');
+          btn.disabled = false;
+          document.getElementById('leaveForm').reset();
+        }, 1500);
+      } else {
+        btn.innerHTML = 'Error: ' + error.message;
+        btn.classList.replace('bg-amber-500', 'bg-red-500');
+        btn.disabled = false;
+        setTimeout(() => { btn.innerHTML = 'Submit Leave Request'; btn.classList.replace('bg-red-500', 'bg-amber-500'); }, 2000);
+      }
+    });
+
+    // ============================================
+    // ADVANCE REQUEST LOGIC
+    // ============================================
+    const updateAdvPreview = () => {
+      const amt = parseFloat(document.getElementById('advanceAmount')?.value) || 0;
+      const months = parseInt(document.getElementById('advanceRepay')?.value) || 1;
+      document.getElementById('advancePreview').textContent = `Monthly deduction: ₹${Math.ceil(amt / months).toLocaleString('en-IN')} × ${months} months`;
+    };
+    document.getElementById('advanceAmount')?.addEventListener('input', updateAdvPreview);
+    document.getElementById('advanceRepay')?.addEventListener('change', updateAdvPreview);
+
+    document.getElementById('advanceSalaryBtn')?.addEventListener('click', () => {
+      document.getElementById('advanceModal').style.display = 'flex';
+      updateAdvPreview();
+      lucide.createIcons();
+    });
+
+    document.getElementById('advanceForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const empId = await getEmpId();
+      if (!empId) { alert('Not authenticated'); return; }
+
+      const btn = e.target.querySelector('button[type=submit]');
+      btn.innerHTML = 'Submitting...'; btn.disabled = true;
+
+      const amount = parseFloat(document.getElementById('advanceAmount').value);
+      const months = parseInt(document.getElementById('advanceRepay').value);
+      const purpose = document.getElementById('advancePurpose').value;
+
+      // Store advance request as a leave_request with type metadata (reusing leave_requests table)
+      // OR use wage_records.advance_deduction — for now, log to leave_requests with a custom type
+      const { error } = await sb.from('leave_requests').insert({
+        employee_id: empId,
+        leave_type: 'Advance',
+        from_date: new Date().toISOString().slice(0, 10),
+        to_date: new Date().toISOString().slice(0, 10),
+        days: months,
+        reason: `₹${amount.toLocaleString('en-IN')} — ${purpose} (Repay: ${months} months, ₹${Math.ceil(amount/months)}/mo)`,
+        status: 'Pending'
+      });
+
+      if (!error) {
+        btn.innerHTML = '✓ Request Submitted!';
+        btn.classList.replace('bg-emerald-600', 'bg-green-500');
+        setTimeout(() => {
+          document.getElementById('advanceModal').style.display = 'none';
+          btn.innerHTML = 'Submit Request';
+          btn.classList.replace('bg-green-500', 'bg-emerald-600');
+          btn.disabled = false;
+          document.getElementById('advanceForm').reset();
+        }, 1500);
+      } else {
+        btn.innerHTML = 'Error';
+        btn.disabled = false;
+        setTimeout(() => { btn.innerHTML = 'Submit Request'; }, 2000);
+      }
+    });
+  })();
+
+  // Close modals on backdrop click
+  ['leaveModal', 'advanceModal'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', (e) => {
+      if (e.target.id === id) e.target.style.display = 'none';
+    });
+  });
   </script>
 </body>
 </html>
