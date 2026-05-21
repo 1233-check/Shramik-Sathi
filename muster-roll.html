@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wages Cum Muster Roll | Shramik Sathi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="payroll.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } } }</script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; font-size: 9px; }
+      @page { size: A3 landscape; margin: 10mm; }
+      table { font-size: 9px; }
+      .print-show { display: block !important; }
+    }
+    table td, table th { white-space: nowrap; }
+    .sticky-col { position: sticky; background: inherit; z-index: 1; }
+    .sticky-col-1 { left: 0; }
+    .sticky-col-2 { left: 42px; }
+    .sticky-col-3 { left: 110px; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#0055a5] text-white no-print">
+    <div class="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i data-lucide="hard-hat" class="w-7 h-7"></i>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">Wages Cum Muster Roll</h1>
+          <span class="text-xs text-white/70">Form XIX — Code on Wages, 2019 | Rule 27</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="hire.html" class="text-white/80 hover:text-white text-sm flex items-center gap-1">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Portal
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Company Header (print-friendly) -->
+  <div class="max-w-[1400px] mx-auto px-4 pt-4">
+    <div class="bg-white rounded-lg border p-4 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+      <div>
+        <label class="text-[10px] font-bold text-slate-500 uppercase block">Establishment</label>
+        <p class="font-semibold text-slate-800">Shramik Sathi Pvt. Ltd.</p>
+      </div>
+      <div>
+        <label class="text-[10px] font-bold text-slate-500 uppercase block">Nature of Work</label>
+        <p class="font-semibold text-slate-800">Industrial Manpower Supply</p>
+      </div>
+      <div>
+        <label class="text-[10px] font-bold text-slate-500 uppercase block">CLRA License No.</label>
+        <p class="font-semibold text-slate-800">JH/CLRA/2024/001</p>
+      </div>
+      <div class="no-print">
+        <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Wage Period</label>
+        <div class="flex gap-2">
+          <select id="mMonth" class="border border-slate-300 rounded px-2 py-1 text-xs">
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <select id="mYear" class="border border-slate-300 rounded px-2 py-1 text-xs">
+            <option>2025</option><option selected>2026</option><option>2027</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="max-w-[1400px] mx-auto px-4 py-3 flex justify-between items-center no-print">
+    <div class="flex gap-2">
+      <button id="genPayrollBtn" class="px-4 py-2 bg-[#0055a5] text-white text-xs font-bold rounded hover:bg-[#003d7a] flex items-center gap-1">
+        <i data-lucide="calculator" class="w-3.5 h-3.5"></i> Generate Payroll
+      </button>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="exportCSV()" class="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded hover:bg-emerald-700 flex items-center gap-1">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV
+      </button>
+      <button onclick="window.print()" class="px-3 py-1.5 bg-slate-600 text-white text-xs font-bold rounded hover:bg-slate-700 flex items-center gap-1">
+        <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print
+      </button>
+    </div>
+  </div>
+
+  <!-- Muster Roll Table -->
+  <div class="max-w-[1400px] mx-auto px-4 pb-4">
+    <div class="bg-white rounded-lg shadow border overflow-x-auto">
+      <table class="w-full text-[11px] text-left border-collapse" id="musterTable">
+        <thead class="bg-[#0055a5] text-white text-[9px] uppercase">
+          <tr>
+            <th class="p-1.5 border-r border-blue-400 sticky-col sticky-col-1 bg-[#0055a5]">SL</th>
+            <th class="p-1.5 border-r border-blue-400 sticky-col sticky-col-2 bg-[#0055a5]">Emp ID</th>
+            <th class="p-1.5 border-r border-blue-400 sticky-col sticky-col-3 bg-[#0055a5] min-w-[120px]">Name</th>
+            <th class="p-1.5 border-r border-blue-400">Father's Name</th>
+            <th class="p-1.5 border-r border-blue-400">Desig.</th>
+            <th class="p-1.5 border-r border-blue-400">Cat.</th>
+            <th class="p-1.5 border-r border-blue-400 text-center">Days</th>
+            <th class="p-1.5 border-r border-blue-400 text-center">OT Hrs</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">Basic</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">DA</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">HRA</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">OT Pay</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">Bonus</th>
+            <th class="p-1.5 border-r border-blue-400 text-right font-bold">Gross</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">PF</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">ESI</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">Adv.</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">Fine</th>
+            <th class="p-1.5 border-r border-blue-400 text-right">Tot. Ded.</th>
+            <th class="p-1.5 border-r border-blue-400 text-right font-bold">Net Pay</th>
+            <th class="p-1.5 text-center">Sign.</th>
+          </tr>
+        </thead>
+        <tbody id="musterBody"></tbody>
+        <tfoot class="bg-slate-100 font-bold text-[11px]" id="musterFoot"></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Certification Footer -->
+  <div class="max-w-[1400px] mx-auto px-4 pb-8">
+    <div class="bg-white rounded-lg border p-4 text-xs text-slate-600 mt-2">
+      <p class="mb-4">I certify that the wages shown above have been paid to the workmen concerned in my presence on
+        <input type="date" class="border-b border-slate-400 px-1 text-slate-800 font-semibold no-print" value="">
+        <span class="print-show hidden font-semibold">_______________</span>
+      </p>
+      <div class="grid grid-cols-3 gap-8 mt-6 pt-4 border-t">
+        <div class="text-center">
+          <div class="border-b border-slate-400 mb-1 h-8"></div>
+          <p class="font-bold text-slate-700">Contractor's Signature</p>
+        </div>
+        <div class="text-center">
+          <div class="border-b border-slate-400 mb-1 h-8"></div>
+          <p class="font-bold text-slate-700">Principal Employer</p>
+        </div>
+        <div class="text-center">
+          <div class="border-b border-slate-400 mb-1 h-8"></div>
+          <p class="font-bold text-slate-700">Inspector's Signature</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  lucide.createIcons();
+  const sb = getSupabaseClient();
+
+  document.getElementById('mMonth').value = new Date().getMonth() + 1;
+  document.getElementById('mMonth').addEventListener('change', loadMuster);
+  document.getElementById('mYear').addEventListener('change', loadMuster);
+
+  function getMonthStr() {
+    const m = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return `${m[document.getElementById('mMonth').value - 1]} ${document.getElementById('mYear').value}`;
+  }
+  function fmt(n) { return n ? Number(n).toLocaleString('en-IN') : '0'; }
+
+  async function loadMuster() {
+    const monthStr = getMonthStr();
+    const { data } = await sb.from('wage_records')
+      .select('*, employees!inner(emp_id, full_name, father_name, designation, category)')
+      .eq('wage_month', monthStr)
+      .order('employees(emp_id)');
+
+    const body = document.getElementById('musterBody');
+    const foot = document.getElementById('musterFoot');
+
+    if (!data || data.length === 0) {
+      body.innerHTML = `<tr><td colspan="21" class="p-6 text-center text-slate-400">
+        No wage records for ${monthStr}. Use "Generate Payroll" to compute.
+      </td></tr>`;
+      foot.innerHTML = '';
+      return;
+    }
+
+    let tDays=0,tOT=0,tBasic=0,tDA=0,tHRA=0,tOTPay=0,tBonus=0,tGross=0,tPF=0,tESI=0,tAdv=0,tFine=0,tDed=0,tNet=0;
+
+    body.innerHTML = data.map((w, i) => {
+      const pf=N(w.pf_deduction), esi=N(w.esi_deduction), adv=N(w.advance_deduction), fine=N(w.fine_deduction);
+      const totalDed = pf+esi+adv+fine;
+      tDays+=N(w.days_worked); tOT+=N(w.overtime_pay?1:0); tBasic+=N(w.basic); tDA+=N(w.da);
+      tHRA+=N(w.hra); tOTPay+=N(w.overtime_pay); tBonus+=N(w.bonus); tGross+=N(w.gross);
+      tPF+=pf; tESI+=esi; tAdv+=adv; tFine+=fine; tDed+=totalDed; tNet+=N(w.net_pay);
+
+      const bg = i%2 ? 'bg-slate-50' : 'bg-white';
+      return `<tr class="${bg} border-b border-slate-200 hover:bg-slate-100">
+        <td class="p-1.5 border-r sticky-col sticky-col-1 ${bg}">${i+1}</td>
+        <td class="p-1.5 border-r sticky-col sticky-col-2 ${bg}">${w.employees.emp_id}</td>
+        <td class="p-1.5 border-r font-bold sticky-col sticky-col-3 ${bg}">${w.employees.full_name}</td>
+        <td class="p-1.5 border-r">${w.employees.father_name||'—'}</td>
+        <td class="p-1.5 border-r">${(w.employees.designation||'').substring(0,10)}</td>
+        <td class="p-1.5 border-r">${(w.employees.category||'').substring(0,6)}</td>
+        <td class="p-1.5 border-r text-center">${w.days_worked}</td>
+        <td class="p-1.5 border-r text-center">${N(w.overtime_pay)>0?'✓':'—'}</td>
+        <td class="p-1.5 border-r text-right">${fmt(w.basic)}</td>
+        <td class="p-1.5 border-r text-right">${fmt(w.da)}</td>
+        <td class="p-1.5 border-r text-right">${fmt(w.hra)}</td>
+        <td class="p-1.5 border-r text-right">${fmt(w.overtime_pay)}</td>
+        <td class="p-1.5 border-r text-right">${fmt(w.bonus)}</td>
+        <td class="p-1.5 border-r text-right font-bold">${fmt(w.gross)}</td>
+        <td class="p-1.5 border-r text-right text-red-600">${fmt(pf)}</td>
+        <td class="p-1.5 border-r text-right text-red-600">${fmt(esi)}</td>
+        <td class="p-1.5 border-r text-right text-red-600">${fmt(adv)}</td>
+        <td class="p-1.5 border-r text-right text-red-600">${fmt(fine)}</td>
+        <td class="p-1.5 border-r text-right text-red-700 font-semibold">${fmt(totalDed)}</td>
+        <td class="p-1.5 border-r text-right font-bold text-emerald-700">${fmt(w.net_pay)}</td>
+        <td class="p-1.5 text-center text-slate-300">___</td>
+      </tr>`;
+    }).join('');
+
+    foot.innerHTML = `<tr>
+      <td colspan="3" class="p-1.5 border-r sticky-col sticky-col-1 bg-slate-100">TOTAL (${data.length} workers)</td>
+      <td class="p-1.5 border-r"></td><td class="p-1.5 border-r"></td><td class="p-1.5 border-r"></td>
+      <td class="p-1.5 border-r text-center">${tDays}</td><td class="p-1.5 border-r"></td>
+      <td class="p-1.5 border-r text-right">${fmt(tBasic)}</td>
+      <td class="p-1.5 border-r text-right">${fmt(tDA)}</td>
+      <td class="p-1.5 border-r text-right">${fmt(tHRA)}</td>
+      <td class="p-1.5 border-r text-right">${fmt(tOTPay)}</td>
+      <td class="p-1.5 border-r text-right">${fmt(tBonus)}</td>
+      <td class="p-1.5 border-r text-right font-bold">${fmt(tGross)}</td>
+      <td class="p-1.5 border-r text-right text-red-600">${fmt(tPF)}</td>
+      <td class="p-1.5 border-r text-right text-red-600">${fmt(tESI)}</td>
+      <td class="p-1.5 border-r text-right text-red-600">${fmt(tAdv)}</td>
+      <td class="p-1.5 border-r text-right text-red-600">${fmt(tFine)}</td>
+      <td class="p-1.5 border-r text-right text-red-700">${fmt(tDed)}</td>
+      <td class="p-1.5 border-r text-right font-bold text-emerald-700">${fmt(tNet)}</td>
+      <td class="p-1.5"></td>
+    </tr>`;
+  }
+
+  function N(v) { return Number(v) || 0; }
+  loadMuster();
+
+  // Generate Payroll
+  document.getElementById('genPayrollBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('genPayrollBtn');
+    btn.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full inline-block mr-1"></div> Calculating...';
+    btn.disabled = true;
+
+    const month = parseInt(document.getElementById('mMonth').value);
+    const year = parseInt(document.getElementById('mYear').value);
+
+    if (window.SSPayroll) {
+      const result = await SSPayroll.generateMonthlyPayroll(month, year);
+      if (result.success) {
+        btn.innerHTML = `✓ ${result.summary.employee_count} records generated`;
+        btn.classList.replace('bg-[#0055a5]', 'bg-emerald-600');
+        setTimeout(() => { loadMuster(); btn.innerHTML = '<i data-lucide="calculator" class="w-3.5 h-3.5"></i> Generate Payroll'; btn.classList.replace('bg-emerald-600', 'bg-[#0055a5]'); btn.disabled = false; lucide.createIcons(); }, 2000);
+      } else {
+        btn.innerHTML = 'Error: ' + (result.error || 'Failed');
+        btn.classList.replace('bg-[#0055a5]', 'bg-red-600');
+        setTimeout(() => { btn.innerHTML = '<i data-lucide="calculator" class="w-3.5 h-3.5"></i> Generate Payroll'; btn.classList.replace('bg-red-600', 'bg-[#0055a5]'); btn.disabled = false; lucide.createIcons(); }, 3000);
+      }
+    }
+  });
+
+  // CSV Export
+  function exportCSV() {
+    const table = document.getElementById('musterTable');
+    const rows = [...table.querySelectorAll('tr')];
+    const csv = rows.map(r => [...r.querySelectorAll('th,td')].map(c => '"'+c.textContent.trim().replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `muster_roll_${getMonthStr().replace(' ','_')}.csv`; a.click();
+  }
+</script>
+</body>
+</html>

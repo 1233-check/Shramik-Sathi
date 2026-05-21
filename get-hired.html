@@ -98,7 +98,7 @@
         <div class="grid grid-cols-2 gap-3">
           
           <!-- Attendance (Green for Go/Action) -->
-          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+          <button id="markAttendanceBtn" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
             <div class="w-[52px] h-[52px] rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <i data-lucide="map-pin" class="w-6 h-6"></i>
             </div>
@@ -255,6 +255,149 @@
         // Supabase not available — allow access (offline mode)
       }
     })();
+  </script>
+
+  <!-- Attendance Modal -->
+  <div id="attendanceModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-6" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+      <div class="bg-emerald-600 text-white p-4 text-center">
+        <i data-lucide="map-pin-check" class="w-8 h-8 mx-auto mb-2"></i>
+        <h3 class="font-bold text-lg">Mark Attendance</h3>
+      </div>
+      <div class="p-5" id="attendanceContent">
+        <div class="text-center text-gray-500 py-4">
+          <div class="animate-spin w-8 h-8 border-3 border-emerald-200 border-t-emerald-600 rounded-full mx-auto mb-3"></div>
+          <p class="text-sm">Getting your location...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mark Attendance with Geolocation
+    document.getElementById('markAttendanceBtn')?.addEventListener('click', async () => {
+      const modal = document.getElementById('attendanceModal');
+      const content = document.getElementById('attendanceContent');
+      modal.style.display = 'flex';
+
+      // Get geolocation
+      if (!navigator.geolocation) {
+        content.innerHTML = `<div class="text-center text-red-500 py-4">
+          <i data-lucide="alert-triangle" class="w-10 h-10 mx-auto mb-2"></i>
+          <p class="font-semibold">Location not supported</p>
+          <p class="text-sm text-gray-500 mt-1">Your browser doesn't support geolocation.</p>
+          <button onclick="document.getElementById('attendanceModal').style.display='none'" class="mt-4 px-6 py-2 bg-gray-200 rounded-xl text-sm font-semibold">Close</button>
+        </div>`;
+        lucide.createIcons();
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude.toFixed(6);
+          const lng = pos.coords.longitude.toFixed(6);
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+          content.innerHTML = `
+            <div class="space-y-4">
+              <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center">
+                <p class="text-xs text-emerald-600 font-bold uppercase">Location Captured</p>
+                <p class="text-sm font-mono text-emerald-800 mt-1">${lat}, ${lng}</p>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Date</span>
+                <span class="font-semibold">${dateStr}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Time</span>
+                <span class="font-semibold">${timeStr}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500">Status</span>
+                <span class="font-semibold text-emerald-600">Present</span>
+              </div>
+              <button id="confirmAttendance" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">
+                Confirm Attendance ✓
+              </button>
+              <button onclick="document.getElementById('attendanceModal').style.display='none'" class="w-full py-2 text-gray-500 text-sm font-semibold">Cancel</button>
+            </div>`;
+          lucide.createIcons();
+
+          // Confirm handler
+          document.getElementById('confirmAttendance').addEventListener('click', async () => {
+            const btn = document.getElementById('confirmAttendance');
+            btn.innerHTML = '<div class="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full mx-auto"></div>';
+            btn.disabled = true;
+
+            try {
+              const sb = getSupabaseClient();
+              const { data: { user } } = await sb.auth.getUser();
+              if (!user) throw new Error('Not authenticated');
+
+              // Find employee linked to this user
+              const { data: emp } = await sb.from('employees')
+                .select('id').eq('auth_user_id', user.id).single();
+
+              const today = now.toISOString().slice(0, 10);
+              const checkIn = now.toTimeString().slice(0, 8);
+
+              const record = {
+                employee_id: emp?.id || null,
+                attendance_date: today,
+                status: 'Present',
+                method: 'online',
+                check_in: checkIn,
+                geo_lat: parseFloat(lat),
+                geo_lng: parseFloat(lng)
+              };
+
+              // Upsert (if already marked today, update)
+              if (emp?.id) {
+                const { error } = await sb.from('attendance').upsert(record, {
+                  onConflict: 'employee_id,attendance_date'
+                });
+                if (error) throw error;
+              }
+
+              content.innerHTML = `<div class="text-center py-4">
+                <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <i data-lucide="check-circle" class="w-10 h-10 text-emerald-600"></i>
+                </div>
+                <p class="font-bold text-lg text-gray-900">Attendance Marked!</p>
+                <p class="text-sm text-gray-500 mt-1">${dateStr} at ${timeStr}</p>
+                <button onclick="document.getElementById('attendanceModal').style.display='none'" class="mt-4 px-6 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold">Done</button>
+              </div>`;
+              lucide.createIcons();
+            } catch (e) {
+              btn.innerHTML = 'Error: ' + (e.message || 'Failed');
+              btn.classList.replace('bg-emerald-600', 'bg-red-500');
+              setTimeout(() => {
+                btn.innerHTML = 'Confirm Attendance ✓';
+                btn.classList.replace('bg-red-500', 'bg-emerald-600');
+                btn.disabled = false;
+              }, 2000);
+            }
+          });
+        },
+        (err) => {
+          content.innerHTML = `<div class="text-center py-4">
+            <i data-lucide="map-pin-off" class="w-10 h-10 text-red-400 mx-auto mb-2"></i>
+            <p class="font-semibold text-red-600">Location Access Denied</p>
+            <p class="text-sm text-gray-500 mt-1">Please enable location access in your browser settings to mark attendance.</p>
+            <button onclick="document.getElementById('attendanceModal').style.display='none'" class="mt-4 px-6 py-2 bg-gray-200 rounded-xl text-sm font-semibold">Close</button>
+          </div>`;
+          lucide.createIcons();
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    });
+
+    // Close modal on backdrop click
+    document.getElementById('attendanceModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'attendanceModal') e.target.style.display = 'none';
+    });
   </script>
 </body>
 </html>

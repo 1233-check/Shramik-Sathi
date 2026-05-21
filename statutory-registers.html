@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statutory Registers | Shramik Sathi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } } }</script>
+  <style>
+    @media print { .no-print { display: none !important; } body { background: white; } .print-title { display: block !important; } }
+    .tab-active { border-bottom: 3px solid #0055a5; color: #0055a5; font-weight: 700; }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#0055a5] text-white no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i data-lucide="hard-hat" class="w-7 h-7"></i>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">Shramik Sathi</h1>
+          <span class="text-xs text-white/70">Statutory Registers — Code on Wages, 2019</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 bg-white/10 rounded px-3 py-1.5">
+          <label class="text-xs font-bold">Month:</label>
+          <select id="regMonth" class="bg-transparent text-white text-sm outline-none">
+            <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+            <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+            <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <select id="regYear" class="bg-transparent text-white text-sm outline-none">
+            <option>2025</option><option selected>2026</option><option>2027</option>
+          </select>
+        </div>
+        <a href="hire.html" class="text-white/80 hover:text-white text-sm flex items-center gap-1">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Portal
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="bg-white border-b no-print shadow-sm sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 flex gap-0 overflow-x-auto text-sm">
+      <button class="reg-tab tab-active px-4 py-3 whitespace-nowrap border-b-3" data-tab="overtime">OT Register</button>
+      <button class="reg-tab px-4 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="bonus">Bonus</button>
+      <button class="reg-tab px-4 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="arrearDA">Arrear DA</button>
+      <button class="reg-tab px-4 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="arrearWage">Arrear Wages</button>
+      <button class="reg-tab px-4 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="advance">Advance</button>
+      <button class="reg-tab px-4 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="fine">Fine</button>
+      <button class="reg-tab px-4 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="deduction">Deduction</button>
+    </div>
+  </nav>
+
+  <!-- Actions Bar -->
+  <div class="max-w-7xl mx-auto px-4 py-3 flex justify-end gap-2 no-print">
+    <button onclick="exportCSV()" class="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded hover:bg-emerald-700 flex items-center gap-1">
+      <i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV
+    </button>
+    <button onclick="window.print()" class="px-3 py-1.5 bg-slate-600 text-white text-xs font-bold rounded hover:bg-slate-700 flex items-center gap-1">
+      <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print
+    </button>
+  </div>
+
+  <!-- Tab Content -->
+  <main class="max-w-7xl mx-auto px-4 pb-8">
+    <div class="print-title hidden text-center mb-4"><h2 class="text-xl font-bold" id="printTitle"></h2></div>
+
+    <!-- Overtime Register -->
+    <section id="panel-overtime" class="reg-panel bg-white rounded-lg shadow border overflow-x-auto">
+      <table class="w-full text-xs text-left" id="table-overtime">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">SL</th><th class="p-2">Emp ID</th><th class="p-2">Name</th>
+            <th class="p-2">Designation</th><th class="p-2 text-right">OT Hours</th>
+            <th class="p-2 text-right">Rate (₹/hr)</th><th class="p-2 text-right">OT Pay (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-overtime"></tbody>
+        <tfoot class="bg-slate-100 font-bold text-xs">
+          <tr><td colspan="4" class="p-2">TOTAL</td><td class="p-2 text-right" id="totalOTHours">0</td>
+            <td class="p-2"></td><td class="p-2 text-right" id="totalOTPay">0</td></tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <!-- Bonus Register -->
+    <section id="panel-bonus" class="reg-panel bg-white rounded-lg shadow border overflow-x-auto hidden">
+      <table class="w-full text-xs text-left" id="table-bonus">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">SL</th><th class="p-2">Emp ID</th><th class="p-2">Name</th>
+            <th class="p-2">Designation</th><th class="p-2 text-right">Basic+DA (Annual)</th>
+            <th class="p-2 text-center">Rate %</th><th class="p-2 text-right">Bonus (₹)</th>
+            <th class="p-2 text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-bonus"></tbody>
+        <tfoot class="bg-slate-100 font-bold text-xs">
+          <tr><td colspan="6" class="p-2">TOTAL</td><td class="p-2 text-right" id="totalBonus">0</td><td></td></tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <!-- Arrear DA -->
+    <section id="panel-arrearDA" class="reg-panel bg-white rounded-lg shadow border overflow-x-auto hidden">
+      <table class="w-full text-xs text-left" id="table-arrearDA">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">SL</th><th class="p-2">Emp ID</th><th class="p-2">Name</th>
+            <th class="p-2 text-right">Old DA</th><th class="p-2 text-right">New DA</th>
+            <th class="p-2 text-right">Days</th><th class="p-2 text-right">Arrear (₹)</th>
+            <th class="p-2">Effective Date</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-arrearDA"></tbody>
+      </table>
+    </section>
+
+    <!-- Arrear Wages -->
+    <section id="panel-arrearWage" class="reg-panel bg-white rounded-lg shadow border overflow-x-auto hidden">
+      <table class="w-full text-xs text-left" id="table-arrearWage">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">SL</th><th class="p-2">Emp ID</th><th class="p-2">Name</th>
+            <th class="p-2 text-right">Old Basic</th><th class="p-2 text-right">New Basic</th>
+            <th class="p-2 text-right">Days</th><th class="p-2 text-right">Arrear (₹)</th>
+            <th class="p-2">Effective Date</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-arrearWage"></tbody>
+      </table>
+    </section>
+
+    <!-- Advance Register -->
+    <section id="panel-advance" class="reg-panel bg-white rounded-lg shadow border overflow-x-auto hidden">
+      <div class="p-3 border-b flex justify-between items-center no-print">
+        <h3 class="font-bold text-sm text-slate-700">Advance Register</h3>
+        <button id="addAdvanceBtn" class="px-3 py-1 bg-[#0055a5] text-white text-xs rounded font-bold">+ Record Advance</button>
+      </div>
+      <table class="w-full text-xs text-left" id="table-advance">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">SL</th><th class="p-2">Emp ID</th><th class="p-2">Name</th>
+            <th class="p-2">Month</th><th class="p-2 text-right">Advance Deducted (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-advance"></tbody>
+      </table>
+    </section>
+
+    <!-- Fine Register -->
+    <section id="panel-fine" class="reg-panel bg-white rounded-lg shadow border overflow-x-auto hidden">
+      <div class="p-3 border-b flex justify-between items-center no-print">
+        <h3 class="font-bold text-sm text-slate-700">Fine Register</h3>
+        <button id="addFineBtn" class="px-3 py-1 bg-[#0055a5] text-white text-xs rounded font-bold">+ Record Fine</button>
+      </div>
+      <table class="w-full text-xs text-left" id="table-fine">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">SL</th><th class="p-2">Emp ID</th><th class="p-2">Name</th>
+            <th class="p-2">Month</th><th class="p-2 text-right">Fine Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-fine"></tbody>
+      </table>
+    </section>
+
+    <!-- Deduction Register -->
+    <section id="panel-deduction" class="reg-panel bg-white rounded-lg shadow border overflow-x-auto hidden">
+      <table class="w-full text-xs text-left" id="table-deduction">
+        <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+          <tr>
+            <th class="p-2">SL</th><th class="p-2">Emp ID</th><th class="p-2">Name</th>
+            <th class="p-2 text-right">PF (₹)</th><th class="p-2 text-right">ESI (₹)</th>
+            <th class="p-2 text-right">Advance (₹)</th><th class="p-2 text-right">Fine (₹)</th>
+            <th class="p-2 text-right">Other (₹)</th><th class="p-2 text-right font-bold">Total (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-deduction"></tbody>
+        <tfoot class="bg-slate-100 font-bold text-xs">
+          <tr><td colspan="3" class="p-2">TOTAL</td>
+            <td class="p-2 text-right" id="totPF">0</td><td class="p-2 text-right" id="totESI">0</td>
+            <td class="p-2 text-right" id="totAdv">0</td><td class="p-2 text-right" id="totFine">0</td>
+            <td class="p-2 text-right" id="totOther">0</td><td class="p-2 text-right" id="totDed">0</td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+  </main>
+
+<script>
+  lucide.createIcons();
+  const sb = getSupabaseClient();
+
+  // Tab switching
+  document.querySelectorAll('.reg-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.reg-tab').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-slate-500'); });
+      tab.classList.add('tab-active'); tab.classList.remove('text-slate-500');
+      document.querySelectorAll('.reg-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById('panel-' + tab.dataset.tab).classList.remove('hidden');
+    });
+  });
+
+  // Month/Year change → reload
+  document.getElementById('regMonth').value = new Date().getMonth() + 1;
+  document.getElementById('regMonth').addEventListener('change', loadAll);
+  document.getElementById('regYear').addEventListener('change', loadAll);
+
+  function getMonthStr() {
+    const m = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return `${m[document.getElementById('regMonth').value - 1]} ${document.getElementById('regYear').value}`;
+  }
+  function getMonthYear() {
+    return { month: parseInt(document.getElementById('regMonth').value), year: parseInt(document.getElementById('regYear').value) };
+  }
+  function fmtNum(n) { return n ? Number(n).toLocaleString('en-IN') : '0'; }
+
+  async function loadAll() { await Promise.all([loadOT(), loadBonus(), loadArrearDA(), loadArrearWage(), loadAdvance(), loadFine(), loadDeduction()]); }
+  loadAll();
+
+  // ============ OVERTIME ============
+  async function loadOT() {
+    const { month, year } = getMonthYear();
+    const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
+    const endDate = new Date(year, month, 0).toISOString().slice(0,10);
+
+    const { data } = await sb.from('attendance')
+      .select('employee_id, overtime_hours, employees!inner(emp_id, full_name, designation, basic_wage)')
+      .gte('attendance_date', startDate).lte('attendance_date', endDate)
+      .gt('overtime_hours', 0);
+
+    // Group by employee
+    const grouped = {};
+    (data || []).forEach(a => {
+      if (!grouped[a.employee_id]) grouped[a.employee_id] = { ...a.employees, totalOT: 0 };
+      grouped[a.employee_id].totalOT += Number(a.overtime_hours);
+    });
+
+    const rows = Object.values(grouped);
+    let totH = 0, totP = 0;
+    document.getElementById('tbody-overtime').innerHTML = rows.map((r, i) => {
+      const rate = Math.round((r.basic_wage || 380) / 8 * 2);
+      const pay = Math.round(r.totalOT * rate);
+      totH += r.totalOT; totP += pay;
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${r.emp_id}</td>
+        <td class="p-2 font-bold">${r.full_name}</td><td class="p-2">${r.designation||'—'}</td>
+        <td class="p-2 text-right">${r.totalOT.toFixed(1)}</td><td class="p-2 text-right">₹${rate}</td>
+        <td class="p-2 text-right font-semibold">₹${fmtNum(pay)}</td></tr>`;
+    }).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">No overtime records</td></tr>';
+    document.getElementById('totalOTHours').textContent = totH.toFixed(1);
+    document.getElementById('totalOTPay').textContent = '₹' + fmtNum(totP);
+  }
+
+  // ============ BONUS ============
+  async function loadBonus() {
+    const { data } = await sb.from('employees').select('emp_id, full_name, designation, basic_wage, da_allowance, status').eq('status','Active').order('emp_id');
+    let total = 0;
+    document.getElementById('tbody-bonus').innerHTML = (data||[]).map((e, i) => {
+      const annualBD = ((e.basic_wage||0) + (e.da_allowance||0)) * 312; // 26 days × 12 months
+      const bonusWage = Math.min(annualBD, 7000 * 12);
+      const bonus = Math.round(bonusWage * 0.0833);
+      total += bonus;
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${e.emp_id}</td>
+        <td class="p-2 font-bold">${e.full_name}</td><td class="p-2">${e.designation||'—'}</td>
+        <td class="p-2 text-right">₹${fmtNum(annualBD)}</td><td class="p-2 text-center">8.33%</td>
+        <td class="p-2 text-right font-semibold">₹${fmtNum(bonus)}</td>
+        <td class="p-2 text-center"><span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded border border-amber-300">Pending</span></td></tr>`;
+    }).join('') || '<tr><td colspan="8" class="p-4 text-center text-slate-400">No employees</td></tr>';
+    document.getElementById('totalBonus').textContent = '₹' + fmtNum(total);
+  }
+
+  // ============ ARREAR DA ============
+  async function loadArrearDA() {
+    const { data } = await sb.from('wage_variables_log')
+      .select('*, employees!inner(emp_id, full_name)')
+      .eq('field_changed', 'da_allowance')
+      .order('changed_at', { ascending: false }).limit(50);
+    document.getElementById('tbody-arrearDA').innerHTML = (data||[]).map((t, i) => {
+      const oldDA = parseFloat(t.old_value)||0, newDA = parseFloat(t.new_value)||0;
+      const arrear = Math.round((newDA - oldDA) * 26); // Approx 26 working days
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${t.employees.emp_id}</td>
+        <td class="p-2 font-bold">${t.employees.full_name}</td><td class="p-2 text-right">₹${oldDA}</td>
+        <td class="p-2 text-right font-semibold text-emerald-700">₹${newDA}</td><td class="p-2 text-right">26</td>
+        <td class="p-2 text-right font-semibold">₹${fmtNum(arrear)}</td>
+        <td class="p-2">${t.effective_date ? new Date(t.effective_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td></tr>`;
+    }).join('') || '<tr><td colspan="8" class="p-4 text-center text-slate-400">No DA revisions found</td></tr>';
+  }
+
+  // ============ ARREAR WAGES ============
+  async function loadArrearWage() {
+    const { data } = await sb.from('wage_variables_log')
+      .select('*, employees!inner(emp_id, full_name)')
+      .eq('field_changed', 'basic_wage')
+      .order('changed_at', { ascending: false }).limit(50);
+    document.getElementById('tbody-arrearWage').innerHTML = (data||[]).map((t, i) => {
+      const oldB = parseFloat(t.old_value)||0, newB = parseFloat(t.new_value)||0;
+      const arrear = Math.round((newB - oldB) * 26);
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${t.employees.emp_id}</td>
+        <td class="p-2 font-bold">${t.employees.full_name}</td><td class="p-2 text-right">₹${oldB}</td>
+        <td class="p-2 text-right font-semibold text-emerald-700">₹${newB}</td><td class="p-2 text-right">26</td>
+        <td class="p-2 text-right font-semibold">₹${fmtNum(arrear)}</td>
+        <td class="p-2">${t.effective_date ? new Date(t.effective_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td></tr>`;
+    }).join('') || '<tr><td colspan="8" class="p-4 text-center text-slate-400">No wage revisions found</td></tr>';
+  }
+
+  // ============ ADVANCE ============
+  async function loadAdvance() {
+    const monthStr = getMonthStr();
+    const { data } = await sb.from('wage_records')
+      .select('employee_id, wage_month, advance_deduction, employees!inner(emp_id, full_name)')
+      .eq('wage_month', monthStr).gt('advance_deduction', 0).order('employees(emp_id)');
+    document.getElementById('tbody-advance').innerHTML = (data||[]).map((w, i) =>
+      `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${w.employees.emp_id}</td>
+        <td class="p-2 font-bold">${w.employees.full_name}</td><td class="p-2">${w.wage_month}</td>
+        <td class="p-2 text-right font-semibold text-red-600">₹${fmtNum(w.advance_deduction)}</td></tr>`
+    ).join('') || '<tr><td colspan="5" class="p-4 text-center text-slate-400">No advance deductions this month</td></tr>';
+  }
+
+  // ============ FINE ============
+  async function loadFine() {
+    const monthStr = getMonthStr();
+    const { data } = await sb.from('wage_records')
+      .select('employee_id, wage_month, fine_deduction, employees!inner(emp_id, full_name)')
+      .eq('wage_month', monthStr).gt('fine_deduction', 0).order('employees(emp_id)');
+    document.getElementById('tbody-fine').innerHTML = (data||[]).map((w, i) =>
+      `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${w.employees.emp_id}</td>
+        <td class="p-2 font-bold">${w.employees.full_name}</td><td class="p-2">${w.wage_month}</td>
+        <td class="p-2 text-right font-semibold text-red-600">₹${fmtNum(w.fine_deduction)}</td></tr>`
+    ).join('') || '<tr><td colspan="5" class="p-4 text-center text-slate-400">No fines this month</td></tr>';
+  }
+
+  // ============ DEDUCTION ============
+  async function loadDeduction() {
+    const monthStr = getMonthStr();
+    const { data } = await sb.from('wage_records')
+      .select('*, employees!inner(emp_id, full_name)')
+      .eq('wage_month', monthStr).order('employees(emp_id)');
+    let tPF=0,tESI=0,tAdv=0,tFine=0,tOther=0,tDed=0;
+    document.getElementById('tbody-deduction').innerHTML = (data||[]).map((w, i) => {
+      const pf=Number(w.pf_deduction)||0, esi=Number(w.esi_deduction)||0, adv=Number(w.advance_deduction)||0,
+            fine=Number(w.fine_deduction)||0, other=Number(w.other_deductions)||0;
+      const total = pf+esi+adv+fine+other;
+      tPF+=pf; tESI+=esi; tAdv+=adv; tFine+=fine; tOther+=other; tDed+=total;
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${w.employees.emp_id}</td>
+        <td class="p-2 font-bold">${w.employees.full_name}</td>
+        <td class="p-2 text-right">${fmtNum(pf)}</td><td class="p-2 text-right">${fmtNum(esi)}</td>
+        <td class="p-2 text-right">${fmtNum(adv)}</td><td class="p-2 text-right">${fmtNum(fine)}</td>
+        <td class="p-2 text-right">${fmtNum(other)}</td>
+        <td class="p-2 text-right font-bold text-red-600">${fmtNum(total)}</td></tr>`;
+    }).join('') || '<tr><td colspan="9" class="p-4 text-center text-slate-400">No wage records this month</td></tr>';
+    document.getElementById('totPF').textContent = fmtNum(tPF);
+    document.getElementById('totESI').textContent = fmtNum(tESI);
+    document.getElementById('totAdv').textContent = fmtNum(tAdv);
+    document.getElementById('totFine').textContent = fmtNum(tFine);
+    document.getElementById('totOther').textContent = fmtNum(tOther);
+    document.getElementById('totDed').textContent = fmtNum(tDed);
+  }
+
+  // ============ CSV EXPORT ============
+  function exportCSV() {
+    const activePanel = document.querySelector('.reg-panel:not(.hidden)');
+    const table = activePanel?.querySelector('table');
+    if (!table) return;
+    const rows = [...table.querySelectorAll('tr')];
+    const csv = rows.map(r => [...r.querySelectorAll('th,td')].map(c => '"'+c.textContent.trim().replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `register_${getMonthStr().replace(' ','_')}.csv`; a.click();
+  }
+</script>
+</body>
+</html>

@@ -120,6 +120,8 @@
           <button class="text-blue-600 hover:underline mr-1 doc-btn" data-action="appointment" data-empid="${e.emp_id}" title="Appointment Letter"><i data-lucide="file-text" class="w-3.5 h-3.5"></i></button>
           <button class="text-emerald-600 hover:underline mr-1 doc-btn" data-action="idcard" data-empid="${e.emp_id}" title="ID Card"><i data-lucide="id-card" class="w-3.5 h-3.5"></i></button>
           <button class="text-purple-600 hover:underline mr-1 doc-btn" data-action="experience" data-empid="${e.emp_id}" title="Experience Cert"><i data-lucide="award" class="w-3.5 h-3.5"></i></button>
+          <button class="text-amber-600 hover:underline mr-1 doc-btn" data-action="edit" data-empid="${e.emp_id}" title="Master Update"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+          <button class="text-teal-600 hover:underline mr-1 doc-btn" data-action="wageslip" data-empid="${e.emp_id}" title="Wage Slip"><i data-lucide="indian-rupee" class="w-3.5 h-3.5"></i></button>
           <button class="text-red-600 hover:underline doc-btn" data-action="delete" data-empid="${e.emp_id}" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
         </td>
         <td class="p-2 border-r border-slate-200">${e.emp_id}</td>
@@ -154,6 +156,16 @@
     if (action === 'appointment') SSPdf.appointmentLetter(emp);
     else if (action === 'idcard') SSPdf.idCard(emp);
     else if (action === 'experience') SSPdf.experienceCertificate(emp);
+    else if (action === 'wageslip') {
+      // Fetch latest wage record for this employee
+      sb.from('wage_records').select('*').eq('employee_id', emp.id)
+        .order('created_at', { ascending: false }).limit(1).single()
+        .then(({ data: wage, error }) => {
+          if (wage) SSPdf.wageSlip(emp, wage);
+          else alert('No wage record found. Run payroll first from Wage Register tab.');
+        });
+    }
+    else if (action === 'edit' && window.SSWage) SSWage.showUpdateModal(emp, () => loadAllData());
     else if (action === 'delete') {
       if (confirm(`Delete ${emp.full_name} (${emp.emp_id})?`)) {
         sb.from('employees').delete().eq('id', emp.id).then(() => loadAllData());
@@ -229,13 +241,42 @@
     const tbody = document.getElementById('wageRegTbody');
     if (!tbody) return;
 
+    // Dynamic current month
+    const now = new Date();
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const currentMonth = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+
     const { data } = await sb.from('wage_records')
       .select('*, employees!inner(emp_id, full_name, designation)')
-      .eq('wage_month', 'May 2026')
+      .eq('wage_month', currentMonth)
       .order('employees(emp_id)');
-    if (!data) return;
 
     let totalGross = 0, totalNet = 0;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="12" class="p-4 text-center text-slate-500">
+        No wage records for ${currentMonth}.
+        <button id="runPayrollBtn" class="ml-2 px-3 py-1 bg-[#0055a5] text-white text-xs rounded font-bold hover:bg-[#003d7a]">
+          Run Payroll for ${currentMonth}
+        </button>
+      </td></tr>`;
+
+      document.getElementById('runPayrollBtn')?.addEventListener('click', async (e) => {
+        const btn = e.target;
+        btn.innerHTML = 'Calculating...'; btn.disabled = true;
+        if (window.SSPayroll) {
+          const result = await SSPayroll.generateMonthlyPayroll(now.getMonth() + 1, now.getFullYear());
+          if (result.success) {
+            btn.innerHTML = `✓ ${result.summary.employee_count} records generated`;
+            setTimeout(() => loadWageRegister(), 1000);
+          } else {
+            btn.innerHTML = 'Error: ' + result.error;
+          }
+        }
+      });
+      return;
+    }
+
     tbody.innerHTML = data.map((w, i) => {
       totalGross += Number(w.gross); totalNet += Number(w.net_pay);
       const rowBg = i % 2 === 1 ? 'bg-[#f9f9f9]' : '';
@@ -256,7 +297,7 @@
     }).join('');
 
     const summary = document.getElementById('wageSummary');
-    if (summary) summary.textContent = `Total Gross: ₹${fmtNum(totalGross)} | Total Net: ₹${fmtNum(totalNet)} | Wage period: 01-May to 31-May-2026`;
+    if (summary) summary.textContent = `Total Gross: ₹${fmtNum(totalGross)} | Total Net: ₹${fmtNum(totalNet)} | Wage period: ${currentMonth}`;
   }
 
   // ============================================

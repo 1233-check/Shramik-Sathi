@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+  <title>Attendance Management | Shramik Sathi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; font-size: 11px; }
+      .print-only { display: block !important; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+      thead { display: table-header-group; }
+      .print-title { display: block !important; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+      .print-subtitle { display: block !important; text-align: center; font-size: 13px; margin-bottom: 12px; color: #555; }
+    }
+    @media screen { .print-only { display: none !important; } }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .row-present { background-color: #f0fdf4; }
+    .row-absent { background-color: #fef2f2; }
+    .row-halfday { background-color: #fffbeb; }
+    .row-weeklyoff { background-color: #f8fafc; }
+    .row-leave { background-color: #eff6ff; }
+    .drag-over { border-color: #0055a5 !important; background-color: #eff6ff !important; }
+    .monthly-cell { width: 28px; height: 28px; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; border-radius: 3px; }
+    .cell-P { background: #dcfce7; color: #166534; }
+    .cell-A { background: #fee2e2; color: #991b1b; }
+    .cell-H { background: #fef3c7; color: #92400e; }
+    .cell-W { background: #e2e8f0; color: #475569; }
+    .cell-L { background: #dbeafe; color: #1e40af; }
+    .cell-empty { background: #f8fafc; color: #cbd5e1; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col">
+
+  <!-- Print Header -->
+  <div class="print-only">
+    <div class="print-title">SHRAMIK SATHI — MUSTER ROLL</div>
+    <div class="print-subtitle" id="printSubtitle"></div>
+  </div>
+
+  <!-- ========== 1. HEADER NAV ========== -->
+  <nav class="bg-[#0055a5] shadow-md sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-14 items-center">
+        <div class="flex items-center gap-3">
+          <a href="index.html" class="flex items-center gap-2">
+            <i data-lucide="shield-check" class="text-amber-400 w-7 h-7"></i>
+            <span class="font-bold text-lg text-white">Shramik Sathi</span>
+          </a>
+          <span class="hidden sm:inline-block px-3 py-1 bg-[#003d7a] text-blue-100 text-xs font-semibold rounded-full border border-[#004a8f]">
+            Attendance Management
+          </span>
+        </div>
+        <a href="hire.html" class="text-white text-sm font-medium hover:text-amber-300 flex items-center gap-1 transition">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          Back to Portal
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="flex-grow max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Tab Navigation -->
+    <div class="flex gap-1 mb-6 no-print overflow-x-auto scrollbar-hide">
+      <button data-main-tab="daily" class="main-tab px-5 py-2.5 text-sm font-semibold rounded-t-lg border border-b-0 border-slate-300 bg-[#0055a5] text-white transition">
+        <i data-lucide="clipboard-list" class="w-4 h-4 inline -mt-0.5 mr-1"></i>Daily Attendance
+      </button>
+      <button data-main-tab="monthly" class="main-tab px-5 py-2.5 text-sm font-semibold rounded-t-lg border border-b-0 border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition">
+        <i data-lucide="calendar-days" class="w-4 h-4 inline -mt-0.5 mr-1"></i>Monthly View
+      </button>
+      <button data-main-tab="import" class="main-tab px-5 py-2.5 text-sm font-semibold rounded-t-lg border border-b-0 border-slate-300 bg-white text-slate-600 hover:bg-slate-50 transition">
+        <i data-lucide="upload" class="w-4 h-4 inline -mt-0.5 mr-1"></i>CSV Import
+      </button>
+    </div>
+
+    <!-- ========== TAB: DAILY ATTENDANCE ========== -->
+    <div data-main-tab-content="daily" class="tab-content">
+
+      <!-- 2. DATE SELECTOR + STATS BAR -->
+      <div class="bg-white border border-slate-300 p-4 mb-4 shadow-sm no-print">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-slate-700 uppercase tracking-wide">Date:</label>
+            <input type="date" id="attendanceDate" class="border border-slate-300 px-3 py-1.5 text-sm rounded focus:outline-none focus:border-[#0055a5] focus:ring-1 focus:ring-[#0055a5]">
+            <button id="loadDateBtn" class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a] rounded transition">
+              Load
+            </button>
+          </div>
+          <div class="flex-1"></div>
+          <div class="flex items-center gap-2 text-xs">
+            <button id="prevDayBtn" class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100 rounded" title="Previous Day">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <span id="displayDate" class="font-semibold text-slate-700 text-sm min-w-[120px] text-center"></span>
+            <button id="nextDayBtn" class="px-2 py-1 border border-slate-300 bg-white hover:bg-slate-100 rounded" title="Next Day">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4 no-print">
+        <div class="bg-white border border-slate-300 rounded-lg p-3 shadow-sm text-center">
+          <div class="text-2xl font-bold text-[#0055a5]" id="statTotal">0</div>
+          <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Total Workers</div>
+        </div>
+        <div class="bg-white border-l-4 border-l-green-500 border border-slate-300 rounded-lg p-3 shadow-sm text-center">
+          <div class="text-2xl font-bold text-green-700" id="statPresent">0</div>
+          <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Present</div>
+        </div>
+        <div class="bg-white border-l-4 border-l-red-500 border border-slate-300 rounded-lg p-3 shadow-sm text-center">
+          <div class="text-2xl font-bold text-red-700" id="statAbsent">0</div>
+          <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Absent</div>
+        </div>
+        <div class="bg-white border-l-4 border-l-amber-500 border border-slate-300 rounded-lg p-3 shadow-sm text-center">
+          <div class="text-2xl font-bold text-amber-700" id="statHalfDay">0</div>
+          <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">Half-Day</div>
+        </div>
+        <div class="bg-white border-l-4 border-l-purple-500 border border-slate-300 rounded-lg p-3 shadow-sm text-center">
+          <div class="text-2xl font-bold text-purple-700" id="statOT">0</div>
+          <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">OT Hours</div>
+        </div>
+      </div>
+
+      <!-- 3. ATTENDANCE GRID -->
+      <div class="bg-white border border-slate-300 overflow-x-auto shadow-sm">
+        <table class="w-full text-left text-sm border-collapse" id="attendanceTable">
+          <thead>
+            <tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a] text-center w-12">SL</th>
+              <th class="p-2 border-r border-[#003d7a] w-24">Emp ID</th>
+              <th class="p-2 border-r border-[#003d7a] min-w-[160px]">Name</th>
+              <th class="p-2 border-r border-[#003d7a] min-w-[120px]">Designation</th>
+              <th class="p-2 border-r border-[#003d7a] w-36">Status</th>
+              <th class="p-2 border-r border-[#003d7a] w-32">Shift</th>
+              <th class="p-2 border-r border-[#003d7a] w-20 text-center">OT Hrs</th>
+              <th class="p-2 min-w-[160px]">Remarks</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceTbody" class="text-[13px] text-slate-800">
+            <tr>
+              <td colspan="8" class="p-8 text-center text-slate-400">
+                <i data-lucide="loader-2" class="w-6 h-6 animate-spin inline mr-2"></i>Loading employees...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Save Actions -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 no-print">
+        <div class="text-xs text-slate-500" id="saveStatus"></div>
+        <div class="flex gap-2">
+          <button id="markAllPresent" class="bg-green-600 text-white px-4 py-2 text-sm font-bold hover:bg-green-700 border border-green-700 rounded transition flex items-center gap-1">
+            <i data-lucide="check-check" class="w-4 h-4"></i> Mark All Present
+          </button>
+          <button id="saveAllBtn" class="bg-[#0055a5] text-white px-6 py-2 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a] rounded shadow-md transition flex items-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i> Save All Attendance
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TAB: MONTHLY VIEW ========== -->
+    <div data-main-tab-content="monthly" class="tab-content hidden">
+      <div class="bg-white border border-slate-300 p-4 mb-4 shadow-sm no-print">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-slate-700 uppercase tracking-wide">Month:</label>
+            <input type="month" id="monthlyMonth" class="border border-slate-300 px-3 py-1.5 text-sm rounded focus:outline-none focus:border-[#0055a5]">
+            <button id="loadMonthBtn" class="bg-[#0055a5] text-white px-4 py-1.5 text-sm font-bold hover:bg-[#003d7a] border border-[#003d7a] rounded transition">
+              Load
+            </button>
+          </div>
+          <div class="flex-1"></div>
+          <div class="flex gap-2">
+            <button id="exportCsvBtn" class="bg-white text-slate-700 px-4 py-1.5 text-sm font-bold hover:bg-slate-100 border border-slate-300 rounded flex items-center gap-1 transition">
+              <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+            </button>
+            <button id="printMusterBtn" class="bg-white text-slate-700 px-4 py-1.5 text-sm font-bold hover:bg-slate-100 border border-slate-300 rounded flex items-center gap-1 transition">
+              <i data-lucide="printer" class="w-4 h-4"></i> Print Muster Roll
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="flex flex-wrap items-center gap-3 mb-3 text-xs no-print">
+        <span class="font-semibold text-slate-600">Legend:</span>
+        <span class="flex items-center gap-1"><span class="monthly-cell cell-P">P</span> Present</span>
+        <span class="flex items-center gap-1"><span class="monthly-cell cell-A">A</span> Absent</span>
+        <span class="flex items-center gap-1"><span class="monthly-cell cell-H">H</span> Half-Day</span>
+        <span class="flex items-center gap-1"><span class="monthly-cell cell-W">W</span> Weekly Off</span>
+        <span class="flex items-center gap-1"><span class="monthly-cell cell-L">L</span> Leave</span>
+      </div>
+
+      <!-- Monthly Grid -->
+      <div class="bg-white border border-slate-300 overflow-x-auto shadow-sm">
+        <table class="w-full text-left text-sm border-collapse" id="monthlyTable">
+          <thead id="monthlyThead">
+            <tr class="bg-[#0055a5] text-white text-[10px] font-bold uppercase border-b border-[#003d7a]">
+              <th class="p-2 border-r border-[#003d7a] sticky left-0 bg-[#0055a5] z-10 min-w-[80px]">Emp ID</th>
+              <th class="p-2 border-r border-[#003d7a] sticky left-[80px] bg-[#0055a5] z-10 min-w-[140px]">Name</th>
+              <!-- Date columns dynamically inserted -->
+              <th class="p-2 border-r border-[#003d7a] text-center">Total</th>
+            </tr>
+          </thead>
+          <tbody id="monthlyTbody" class="text-[13px] text-slate-800">
+            <tr>
+              <td colspan="34" class="p-8 text-center text-slate-400">Select a month and click Load</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========== TAB: CSV IMPORT ========== -->
+    <div data-main-tab-content="import" class="tab-content hidden">
+
+      <!-- Drop Zone -->
+      <div id="dropZone" class="bg-white border-2 border-dashed border-slate-300 rounded-lg p-12 text-center mb-4 cursor-pointer hover:border-[#0055a5] hover:bg-blue-50/30 transition">
+        <i data-lucide="upload-cloud" class="w-12 h-12 text-slate-400 mx-auto mb-3"></i>
+        <p class="text-slate-600 font-semibold mb-1">Drag & Drop CSV file here</p>
+        <p class="text-xs text-slate-400 mb-3">or click to browse files</p>
+        <p class="text-[10px] text-slate-400">Expected columns: <code class="bg-slate-100 px-1 py-0.5 rounded">emp_id, date, status, shift, overtime_hours</code></p>
+        <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+      </div>
+
+      <!-- CSV Preview -->
+      <div id="csvPreview" class="hidden">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-bold text-slate-700">
+            <i data-lucide="table" class="w-4 h-4 inline mr-1 -mt-0.5"></i>
+            Preview (<span id="csvRowCount">0</span> rows)
+          </h3>
+          <div class="flex gap-2">
+            <button id="csvCancelBtn" class="bg-white text-slate-600 px-4 py-1.5 text-sm font-bold border border-slate-300 rounded hover:bg-slate-50 transition">
+              Cancel
+            </button>
+            <button id="csvConfirmBtn" class="bg-[#28a745] text-white px-4 py-1.5 text-sm font-bold border border-[#1e7e34] rounded hover:bg-[#218838] transition flex items-center gap-1">
+              <i data-lucide="database" class="w-4 h-4"></i> Confirm Import
+            </button>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 overflow-x-auto shadow-sm">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-[#0055a5] text-white text-xs font-bold uppercase border-b border-[#003d7a]">
+                <th class="p-2 border-r border-[#003d7a] text-center w-12">#</th>
+                <th class="p-2 border-r border-[#003d7a]">Emp ID</th>
+                <th class="p-2 border-r border-[#003d7a]">Date</th>
+                <th class="p-2 border-r border-[#003d7a]">Status</th>
+                <th class="p-2 border-r border-[#003d7a]">Shift</th>
+                <th class="p-2">OT Hours</th>
+              </tr>
+            </thead>
+            <tbody id="csvTbody" class="text-[13px] text-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Import Status -->
+      <div id="importStatus" class="hidden mt-4 p-4 rounded-lg border"></div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-slate-400 text-center py-4 text-xs no-print mt-auto">
+    &copy; 2026 Shramik Sathi — Industrial Workforce Management System
+  </footer>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+  (function() {
+    'use strict';
+
+    const sb = getSupabaseClient();
+    let employees = [];
+    let currentDate = new Date().toISOString().split('T')[0];
+    let parsedCsvData = [];
+
+    // ——— INIT ———
+    document.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      initDatePicker();
+      initTabs();
+      initCSVImport();
+      initActions();
+      await loadEmployees();
+      await loadAttendanceForDate(currentDate);
+    });
+
+    // ——— DATE PICKER ———
+    function initDatePicker() {
+      const dateInput = document.getElementById('attendanceDate');
+      const monthInput = document.getElementById('monthlyMonth');
+      dateInput.value = currentDate;
+      monthInput.value = currentDate.substring(0, 7);
+      updateDisplayDate();
+
+      document.getElementById('loadDateBtn').addEventListener('click', () => {
+        currentDate = dateInput.value;
+        updateDisplayDate();
+        loadAttendanceForDate(currentDate);
+      });
+
+      document.getElementById('prevDayBtn').addEventListener('click', () => {
+        const d = new Date(currentDate);
+        d.setDate(d.getDate() - 1);
+        currentDate = d.toISOString().split('T')[0];
+        dateInput.value = currentDate;
+        updateDisplayDate();
+        loadAttendanceForDate(currentDate);
+      });
+
+      document.getElementById('nextDayBtn').addEventListener('click', () => {
+        const d = new Date(currentDate);
+        d.setDate(d.getDate() + 1);
+        currentDate = d.toISOString().split('T')[0];
+        dateInput.value = currentDate;
+        updateDisplayDate();
+        loadAttendanceForDate(currentDate);
+      });
+
+      document.getElementById('loadMonthBtn').addEventListener('click', () => {
+        loadMonthlyView(monthInput.value);
+      });
+    }
+
+    function updateDisplayDate() {
+      const d = new Date(currentDate + 'T00:00:00');
+      const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+      document.getElementById('displayDate').textContent = d.toLocaleDateString('en-IN', options);
+    }
+
+    // ——— TAB NAVIGATION ———
+    function initTabs() {
+      document.querySelectorAll('.main-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = tab.dataset.mainTab;
+          document.querySelectorAll('.main-tab').forEach(t => {
+            t.classList.remove('bg-[#0055a5]', 'text-white');
+            t.classList.add('bg-white', 'text-slate-600');
+          });
+          tab.classList.remove('bg-white', 'text-slate-600');
+          tab.classList.add('bg-[#0055a5]', 'text-white');
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+          document.querySelector(`[data-main-tab-content="${target}"]`).classList.remove('hidden');
+        });
+      });
+    }
+
+    // ——— LOAD EMPLOYEES ———
+    async function loadEmployees() {
+      const { data, error } = await sb
+        .from('employees')
+        .select('id, emp_id, full_name, designation, category, status')
+        .eq('status', 'Active')
+        .order('emp_id', { ascending: true });
+
+      if (error) {
+        console.error('Error loading employees:', error);
+        showGridError('Failed to load employees: ' + error.message);
+        return;
+      }
+      employees = data || [];
+    }
+
+    // ——— LOAD ATTENDANCE FOR A DATE ———
+    async function loadAttendanceForDate(date) {
+      if (!employees.length) {
+        showGridError('No active employees found.');
+        return;
+      }
+
+      // Fetch existing attendance records for this date
+      const empIds = employees.map(e => e.id);
+      const { data: records, error } = await sb
+        .from('attendance')
+        .select('*')
+        .eq('date', date)
+        .in('employee_id', empIds);
+
+      if (error) {
+        console.error('Error loading attendance:', error);
+        showGridError('Failed to load attendance: ' + error.message);
+        return;
+      }
+
+      const recordMap = {};
+      (records || []).forEach(r => { recordMap[r.employee_id] = r; });
+
+      renderAttendanceGrid(recordMap);
+      updateStats();
+    }
+
+    function showGridError(msg) {
+      document.getElementById('attendanceTbody').innerHTML = `
+        <tr><td colspan="8" class="p-8 text-center text-red-500 text-sm">
+          <i data-lucide="alert-circle" class="w-5 h-5 inline mr-1"></i>${msg}
+        </td></tr>`;
+      lucide.createIcons();
+    }
+
+    // ——— RENDER ATTENDANCE GRID ———
+    function renderAttendanceGrid(recordMap) {
+      const tbody = document.getElementById('attendanceTbody');
+      tbody.innerHTML = '';
+
+      employees.forEach((emp, idx) => {
+        const rec = recordMap[emp.id] || {};
+        const status = rec.status || 'Present';
+        const shift = rec.shift || 'General';
+        const otHours = rec.overtime_hours || 0;
+        const remarks = rec.remarks || '';
+
+        const tr = document.createElement('tr');
+        tr.dataset.employeeId = emp.id;
+        tr.dataset.empId = emp.emp_id;
+        tr.className = `border-b border-slate-200 hover:brightness-95 transition-colors ${getRowClass(status)}`;
+
+        tr.innerHTML = `
+          <td class="p-2 border-r border-slate-200 text-center text-xs text-slate-500">${idx + 1}</td>
+          <td class="p-2 border-r border-slate-200 font-mono text-xs">${emp.emp_id}</td>
+          <td class="p-2 border-r border-slate-200 font-bold">${emp.full_name}</td>
+          <td class="p-2 border-r border-slate-200 text-slate-600">${emp.designation || '—'}</td>
+          <td class="p-2 border-r border-slate-200">
+            <select class="status-select w-full border border-slate-300 p-1 text-xs rounded focus:outline-none focus:border-[#0055a5]">
+              <option value="Present" ${status === 'Present' ? 'selected' : ''}>Present</option>
+              <option value="Absent" ${status === 'Absent' ? 'selected' : ''}>Absent</option>
+              <option value="Half-Day" ${status === 'Half-Day' ? 'selected' : ''}>Half-Day</option>
+              <option value="Weekly Off" ${status === 'Weekly Off' ? 'selected' : ''}>Weekly Off</option>
+              <option value="Leave" ${status === 'Leave' ? 'selected' : ''}>Leave</option>
+            </select>
+          </td>
+          <td class="p-2 border-r border-slate-200">
+            <select class="shift-select w-full border border-slate-300 p-1 text-xs rounded focus:outline-none focus:border-[#0055a5]">
+              <option value="General" ${shift === 'General' ? 'selected' : ''}>General</option>
+              <option value="Day" ${shift === 'Day' ? 'selected' : ''}>Day</option>
+              <option value="Night" ${shift === 'Night' ? 'selected' : ''}>Night</option>
+            </select>
+          </td>
+          <td class="p-2 border-r border-slate-200 text-center">
+            <input type="number" class="ot-input w-full border border-slate-300 p-1 text-xs text-center rounded focus:outline-none focus:border-[#0055a5]" min="0" max="12" step="0.5" value="${otHours}">
+          </td>
+          <td class="p-2">
+            <input type="text" class="remarks-input w-full border border-slate-300 p-1 text-xs rounded focus:outline-none focus:border-[#0055a5]" value="${remarks}" placeholder="Optional remarks...">
+          </td>
+        `;
+
+        // Status change → recolor row + update stats
+        const statusSel = tr.querySelector('.status-select');
+        statusSel.addEventListener('change', () => {
+          tr.className = `border-b border-slate-200 hover:brightness-95 transition-colors ${getRowClass(statusSel.value)}`;
+          updateStats();
+        });
+
+        // OT change → update stats
+        tr.querySelector('.ot-input').addEventListener('input', updateStats);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function getRowClass(status) {
+      switch (status) {
+        case 'Present': return 'row-present';
+        case 'Absent': return 'row-absent';
+        case 'Half-Day': return 'row-halfday';
+        case 'Weekly Off': return 'row-weeklyoff';
+        case 'Leave': return 'row-leave';
+        default: return '';
+      }
+    }
+
+    // ——— UPDATE STATS ———
+    function updateStats() {
+      const rows = document.querySelectorAll('#attendanceTbody tr[data-employee-id]');
+      let present = 0, absent = 0, halfday = 0, otTotal = 0;
+      rows.forEach(row => {
+        const status = row.querySelector('.status-select')?.value;
+        const ot = parseFloat(row.querySelector('.ot-input')?.value) || 0;
+        if (status === 'Present') present++;
+        else if (status === 'Absent') absent++;
+        else if (status === 'Half-Day') halfday++;
+        otTotal += ot;
+      });
+      document.getElementById('statTotal').textContent = rows.length;
+      document.getElementById('statPresent').textContent = present;
+      document.getElementById('statAbsent').textContent = absent;
+      document.getElementById('statHalfDay').textContent = halfday;
+      document.getElementById('statOT').textContent = otTotal % 1 === 0 ? otTotal : otTotal.toFixed(1);
+    }
+
+    // ——— SAVE ALL ATTENDANCE ———
+    function initActions() {
+      document.getElementById('saveAllBtn').addEventListener('click', saveAllAttendance);
+      document.getElementById('markAllPresent').addEventListener('click', () => {
+        document.querySelectorAll('#attendanceTbody .status-select').forEach(sel => {
+          sel.value = 'Present';
+          sel.dispatchEvent(new Event('change'));
+        });
+      });
+      document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
+      document.getElementById('printMusterBtn').addEventListener('click', printMuster);
+    }
+
+    async function saveAllAttendance() {
+      const btn = document.getElementById('saveAllBtn');
+      const statusEl = document.getElementById('saveStatus');
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...';
+      lucide.createIcons();
+
+      const rows = document.querySelectorAll('#attendanceTbody tr[data-employee-id]');
+      const records = [];
+      rows.forEach(row => {
+        records.push({
+          employee_id: row.dataset.employeeId,
+          date: currentDate,
+          status: row.querySelector('.status-select').value,
+          shift: row.querySelector('.shift-select').value,
+          overtime_hours: parseFloat(row.querySelector('.ot-input').value) || 0,
+          remarks: row.querySelector('.remarks-input').value.trim(),
+          marked_by: 'employer_portal'
+        });
+      });
+
+      const { error } = await sb
+        .from('attendance')
+        .upsert(records, { onConflict: 'employee_id,date' });
+
+      btn.disabled = false;
+      if (error) {
+        console.error('Save error:', error);
+        btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Save All Attendance';
+        statusEl.innerHTML = `<span class="text-red-600 font-semibold">❌ Error: ${error.message}</span>`;
+      } else {
+        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Saved!';
+        statusEl.innerHTML = `<span class="text-green-600 font-semibold">✅ Attendance saved for ${rows.length} employees — ${new Date().toLocaleTimeString()}</span>`;
+        setTimeout(() => {
+          btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Save All Attendance';
+          lucide.createIcons();
+        }, 2000);
+      }
+      lucide.createIcons();
+    }
+
+    // ——— MONTHLY VIEW ———
+    async function loadMonthlyView(monthStr) {
+      if (!monthStr) return;
+      const [year, month] = monthStr.split('-').map(Number);
+      const daysInMonth = new Date(year, month, 0).getDate();
+
+      // Build header
+      const thead = document.getElementById('monthlyThead');
+      let headerHtml = `
+        <tr class="bg-[#0055a5] text-white text-[10px] font-bold uppercase border-b border-[#003d7a]">
+          <th class="p-1.5 border-r border-[#003d7a] sticky left-0 bg-[#0055a5] z-10 min-w-[70px]">Emp ID</th>
+          <th class="p-1.5 border-r border-[#003d7a] sticky left-[70px] bg-[#0055a5] z-10 min-w-[130px]">Name</th>`;
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayDate = new Date(year, month - 1, d);
+        const dayName = dayDate.toLocaleDateString('en', { weekday: 'narrow' });
+        const isSun = dayDate.getDay() === 0;
+        headerHtml += `<th class="p-1 border-r border-[#003d7a] text-center w-8 ${isSun ? 'bg-[#003d7a]' : ''}">${d}<br><span class="text-[8px] font-normal opacity-75">${dayName}</span></th>`;
+      }
+      headerHtml += `<th class="p-1.5 text-center min-w-[60px]">Total</th></tr>`;
+      thead.innerHTML = headerHtml;
+
+      // Fetch all employees
+      if (!employees.length) await loadEmployees();
+      if (!employees.length) return;
+
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+
+      const { data: records, error } = await sb
+        .from('attendance')
+        .select('employee_id, date, status')
+        .gte('date', startDate)
+        .lte('date', endDate)
+        .in('employee_id', employees.map(e => e.id));
+
+      if (error) {
+        console.error('Monthly view error:', error);
+        return;
+      }
+
+      // Map: employee_id -> { date_str -> status }
+      const attendanceMap = {};
+      (records || []).forEach(r => {
+        if (!attendanceMap[r.employee_id]) attendanceMap[r.employee_id] = {};
+        attendanceMap[r.employee_id][r.date] = r.status;
+      });
+
+      const tbody = document.getElementById('monthlyTbody');
+      tbody.innerHTML = '';
+
+      employees.forEach((emp, idx) => {
+        const empAttendance = attendanceMap[emp.id] || {};
+        let totalPresent = 0;
+        let tr = `<tr class="${idx % 2 === 1 ? 'bg-[#f9f9f9]' : ''} border-b border-slate-200 hover:bg-[#f1f1f1] text-xs">`;
+        tr += `<td class="p-1.5 border-r border-slate-200 font-mono sticky left-0 ${idx % 2 === 1 ? 'bg-[#f9f9f9]' : 'bg-white'} z-[5]">${emp.emp_id}</td>`;
+        tr += `<td class="p-1.5 border-r border-slate-200 font-bold sticky left-[70px] ${idx % 2 === 1 ? 'bg-[#f9f9f9]' : 'bg-white'} z-[5] truncate max-w-[130px]" title="${emp.full_name}">${emp.full_name}</td>`;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const status = empAttendance[dateStr];
+          let code = '', cellClass = 'cell-empty';
+          if (status) {
+            switch (status) {
+              case 'Present': code = 'P'; cellClass = 'cell-P'; totalPresent++; break;
+              case 'Absent': code = 'A'; cellClass = 'cell-A'; break;
+              case 'Half-Day': code = 'H'; cellClass = 'cell-H'; totalPresent += 0.5; break;
+              case 'Weekly Off': code = 'W'; cellClass = 'cell-W'; break;
+              case 'Leave': code = 'L'; cellClass = 'cell-L'; break;
+            }
+          } else {
+            code = '·';
+          }
+          tr += `<td class="p-0.5 border-r border-slate-200 text-center"><div class="monthly-cell ${cellClass} mx-auto">${code}</div></td>`;
+        }
+
+        const totalDisplay = totalPresent % 1 === 0 ? totalPresent : totalPresent.toFixed(1);
+        tr += `<td class="p-1.5 text-center font-bold text-[#0055a5]">${totalDisplay}/${daysInMonth}</td>`;
+        tr += '</tr>';
+        tbody.innerHTML += tr;
+      });
+    }
+
+    // ——— CSV IMPORT ———
+    function initCSVImport() {
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('csvFileInput');
+
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.csv')) processCSV(file);
+      });
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) processCSV(e.target.files[0]);
+      });
+
+      document.getElementById('csvCancelBtn').addEventListener('click', () => {
+        document.getElementById('csvPreview').classList.add('hidden');
+        document.getElementById('dropZone').classList.remove('hidden');
+        parsedCsvData = [];
+      });
+
+      document.getElementById('csvConfirmBtn').addEventListener('click', confirmCSVImport);
+    }
+
+    function processCSV(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const lines = text.trim().split('\n');
+        if (lines.length < 2) return;
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+        const empIdIdx = headers.indexOf('emp_id');
+        const dateIdx = headers.indexOf('date');
+        const statusIdx = headers.indexOf('status');
+        const shiftIdx = headers.indexOf('shift');
+        const otIdx = headers.indexOf('overtime_hours');
+
+        if (empIdIdx === -1 || dateIdx === -1 || statusIdx === -1) {
+          alert('CSV must contain columns: emp_id, date, status');
+          return;
+        }
+
+        parsedCsvData = [];
+        const tbody = document.getElementById('csvTbody');
+        tbody.innerHTML = '';
+
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',').map(c => c.trim().replace(/['"]/g, ''));
+          if (cols.length < 3) continue;
+
+          const row = {
+            emp_id: cols[empIdIdx],
+            date: cols[dateIdx],
+            status: cols[statusIdx],
+            shift: shiftIdx !== -1 ? cols[shiftIdx] : 'General',
+            overtime_hours: otIdx !== -1 ? parseFloat(cols[otIdx]) || 0 : 0,
+          };
+          parsedCsvData.push(row);
+
+          const statusClass = row.status === 'Present' ? 'text-green-700' : row.status === 'Absent' ? 'text-red-700' : 'text-amber-700';
+          tbody.innerHTML += `
+            <tr class="${i % 2 === 0 ? 'bg-[#f9f9f9]' : ''} border-b border-slate-200">
+              <td class="p-2 border-r border-slate-200 text-center text-xs text-slate-500">${i}</td>
+              <td class="p-2 border-r border-slate-200 font-mono text-xs">${row.emp_id}</td>
+              <td class="p-2 border-r border-slate-200">${row.date}</td>
+              <td class="p-2 border-r border-slate-200 font-semibold ${statusClass}">${row.status}</td>
+              <td class="p-2 border-r border-slate-200">${row.shift}</td>
+              <td class="p-2">${row.overtime_hours}</td>
+            </tr>`;
+        }
+
+        document.getElementById('csvRowCount').textContent = parsedCsvData.length;
+        document.getElementById('dropZone').classList.add('hidden');
+        document.getElementById('csvPreview').classList.remove('hidden');
+        document.getElementById('importStatus').classList.add('hidden');
+      };
+      reader.readAsText(file);
+    }
+
+    async function confirmCSVImport() {
+      if (!parsedCsvData.length) return;
+
+      const btn = document.getElementById('csvConfirmBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Importing...';
+      lucide.createIcons();
+
+      // Resolve emp_id strings to employee UUIDs
+      const empIdStrings = [...new Set(parsedCsvData.map(r => r.emp_id))];
+      const { data: empData, error: empError } = await sb
+        .from('employees')
+        .select('id, emp_id')
+        .in('emp_id', empIdStrings);
+
+      if (empError) {
+        showImportStatus('error', 'Failed to look up employees: ' + empError.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="database" class="w-4 h-4"></i> Confirm Import';
+        lucide.createIcons();
+        return;
+      }
+
+      const empMap = {};
+      (empData || []).forEach(e => { empMap[e.emp_id] = e.id; });
+
+      const records = [];
+      const unmatched = [];
+      parsedCsvData.forEach(r => {
+        const employeeId = empMap[r.emp_id];
+        if (!employeeId) {
+          unmatched.push(r.emp_id);
+          return;
+        }
+        records.push({
+          employee_id: employeeId,
+          date: r.date,
+          status: r.status,
+          shift: r.shift,
+          overtime_hours: r.overtime_hours,
+          marked_by: 'csv_import',
+        });
+      });
+
+      if (!records.length) {
+        showImportStatus('error', `No matching employees found. Unmatched IDs: ${unmatched.join(', ')}`);
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="database" class="w-4 h-4"></i> Confirm Import';
+        lucide.createIcons();
+        return;
+      }
+
+      const { error: upsertError } = await sb
+        .from('attendance')
+        .upsert(records, { onConflict: 'employee_id,date' });
+
+      btn.disabled = false;
+      if (upsertError) {
+        showImportStatus('error', 'Import failed: ' + upsertError.message);
+      } else {
+        let msg = `Successfully imported ${records.length} records.`;
+        if (unmatched.length) msg += ` (${unmatched.length} unmatched emp IDs skipped: ${unmatched.slice(0, 5).join(', ')}${unmatched.length > 5 ? '...' : ''})`;
+        showImportStatus('success', msg);
+        document.getElementById('csvPreview').classList.add('hidden');
+        document.getElementById('dropZone').classList.remove('hidden');
+        parsedCsvData = [];
+      }
+      btn.innerHTML = '<i data-lucide="database" class="w-4 h-4"></i> Confirm Import';
+      lucide.createIcons();
+    }
+
+    function showImportStatus(type, message) {
+      const el = document.getElementById('importStatus');
+      el.classList.remove('hidden');
+      if (type === 'error') {
+        el.className = 'mt-4 p-4 rounded-lg border border-red-300 bg-red-50 text-red-800 text-sm font-semibold';
+        el.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 inline mr-1"></i>${message}`;
+      } else {
+        el.className = 'mt-4 p-4 rounded-lg border border-green-300 bg-green-50 text-green-800 text-sm font-semibold';
+        el.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 inline mr-1"></i>${message}`;
+      }
+      lucide.createIcons();
+    }
+
+    // ——— EXPORT CSV ———
+    function exportCSV() {
+      const monthStr = document.getElementById('monthlyMonth').value;
+      if (!monthStr) { alert('Please select a month first.'); return; }
+      const [year, month] = monthStr.split('-').map(Number);
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+      const endDate = `${year}-${String(month).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+
+      sb.from('attendance')
+        .select('employee_id, date, status, shift, overtime_hours, remarks, employees!inner(emp_id, full_name, designation)')
+        .gte('date', startDate)
+        .lte('date', endDate)
+        .order('date', { ascending: true })
+        .then(({ data, error }) => {
+          if (error) { alert('Export failed: ' + error.message); return; }
+          if (!data || !data.length) { alert('No attendance data for this month.'); return; }
+
+          let csv = 'Emp ID,Employee Name,Designation,Date,Status,Shift,OT Hours,Remarks\n';
+          data.forEach(r => {
+            const emp = r.employees;
+            csv += `"${emp.emp_id}","${emp.full_name}","${emp.designation || ''}","${r.date}","${r.status}","${r.shift}","${r.overtime_hours}","${(r.remarks || '').replace(/"/g, '""')}"\n`;
+          });
+
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const monthName = new Date(year, month - 1).toLocaleDateString('en', { month: 'long' });
+          a.download = `attendance_${monthName}_${year}.csv`;
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+    }
+
+    // ——— PRINT MUSTER ROLL ———
+    function printMuster() {
+      const monthStr = document.getElementById('monthlyMonth').value;
+      if (!monthStr) { alert('Please load a month first.'); return; }
+      const [year, month] = monthStr.split('-').map(Number);
+      const monthName = new Date(year, month - 1).toLocaleDateString('en', { month: 'long', year: 'numeric' });
+      document.getElementById('printSubtitle').textContent = `Month: ${monthName} | Generated: ${new Date().toLocaleDateString('en-IN')}`;
+      window.print();
+    }
+
+  })();
+  </script>
+</body>
+</html>
