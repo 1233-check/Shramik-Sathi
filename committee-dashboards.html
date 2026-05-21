@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Committee Dashboards | Shramik Sathi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } } }</script>
+  <style>
+    .tab-active { border-bottom: 3px solid #0055a5; color: #0055a5; font-weight: 700; }
+    .card-pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#0055a5] text-white">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i data-lucide="hard-hat" class="w-7 h-7"></i>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">Shramik Sathi</h1>
+          <span class="text-xs text-white/70">Committee Dashboards — Reporting & Grievance</span>
+        </div>
+      </div>
+      <a href="hire.html" class="text-white/80 hover:text-white text-sm flex items-center gap-1">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Portal
+      </a>
+    </div>
+  </header>
+
+  <!-- Committee Tabs -->
+  <nav class="bg-white border-b shadow-sm sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 flex gap-0 overflow-x-auto text-sm">
+      <button class="cd-tab tab-active px-5 py-3 whitespace-nowrap" data-tab="all">All Reports</button>
+      <button class="cd-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="safety">Safety & OH</button>
+      <button class="cd-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="posh">POSH Committee</button>
+      <button class="cd-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="grievance">Grievance</button>
+      <button class="cd-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="analytics">Analytics</button>
+    </div>
+  </nav>
+
+  <!-- Stats Bar -->
+  <div class="max-w-7xl mx-auto px-4 py-3">
+    <div class="grid grid-cols-5 gap-3">
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-amber-600" id="statOpen">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Open</p>
+      </div>
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-blue-600" id="statInProgress">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">In Progress</p>
+      </div>
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-red-600" id="statEscalated">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Escalated</p>
+      </div>
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-green-600" id="statResolved">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Resolved</p>
+      </div>
+      <div class="bg-white rounded-lg border p-3 text-center">
+        <p class="text-2xl font-bold text-slate-600" id="statTotal">0</p>
+        <p class="text-[10px] font-bold text-slate-500 uppercase">Total</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Escalation Alert -->
+  <div class="max-w-7xl mx-auto px-4 mb-2">
+    <div id="escalationAlert" class="hidden bg-red-50 border border-red-300 rounded-lg p-3 text-xs text-red-700 flex items-center gap-2">
+      <i data-lucide="siren" class="w-5 h-5 text-red-600 card-pulse"></i>
+      <span id="escalationMsg" class="font-semibold"></span>
+    </div>
+  </div>
+
+  <!-- Tab Panels -->
+  <main class="max-w-7xl mx-auto px-4 pb-8">
+
+    <!-- All Reports / Safety / POSH / Grievance (shared table, filtered) -->
+    <section id="panel-all" class="cd-panel">
+      <div class="bg-white rounded-lg shadow border overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-[#0055a5] text-white text-[10px] uppercase">
+            <tr>
+              <th class="p-2">ID</th><th class="p-2">Date</th><th class="p-2">Employee</th>
+              <th class="p-2">Category</th><th class="p-2">Route</th><th class="p-2">Department</th>
+              <th class="p-2 max-w-[200px]">Description</th><th class="p-2">Status</th>
+              <th class="p-2">Age</th><th class="p-2 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reportsBody"></tbody>
+        </table>
+      </div>
+    </section>
+    <section id="panel-safety" class="cd-panel hidden"></section>
+    <section id="panel-posh" class="cd-panel hidden"></section>
+    <section id="panel-grievance" class="cd-panel hidden"></section>
+
+    <!-- Analytics -->
+    <section id="panel-analytics" class="cd-panel hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Category Breakdown -->
+        <div class="bg-white rounded-lg border p-4">
+          <h3 class="font-bold text-sm text-slate-700 mb-3">Reports by Category</h3>
+          <div id="catChart" class="space-y-2"></div>
+        </div>
+        <!-- Status Breakdown -->
+        <div class="bg-white rounded-lg border p-4">
+          <h3 class="font-bold text-sm text-slate-700 mb-3">Resolution Status</h3>
+          <div id="statusChart" class="space-y-2"></div>
+        </div>
+        <!-- Monthly Trend -->
+        <div class="bg-white rounded-lg border p-4">
+          <h3 class="font-bold text-sm text-slate-700 mb-3">Monthly Trend (Last 6 Months)</h3>
+          <div id="trendChart" class="flex items-end gap-2 h-32"></div>
+        </div>
+        <!-- Avg Resolution Time -->
+        <div class="bg-white rounded-lg border p-4 flex flex-col items-center justify-center">
+          <p class="text-4xl font-bold text-[#0055a5]" id="avgResTime">—</p>
+          <p class="text-xs font-bold text-slate-500 uppercase mt-1">Avg. Resolution Time (Days)</p>
+          <p class="text-xs text-slate-400 mt-2">Target: &lt; 7 days</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Action Modal -->
+  <div id="actionModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4" style="display:none;">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="bg-[#0055a5] text-white p-4">
+        <h3 class="font-bold" id="actionTitle">Take Action</h3>
+        <p class="text-xs text-white/70" id="actionSub"></p>
+      </div>
+      <div class="p-5 space-y-3">
+        <div>
+          <label class="text-xs font-bold text-gray-600 block mb-1">Update Status</label>
+          <select id="actionStatus" class="w-full border rounded-lg px-3 py-2 text-sm">
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Escalated">Escalated</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-600 block mb-1">Action Taken / Notes</label>
+          <textarea id="actionNotes" rows="3" class="w-full border rounded-lg px-3 py-2 text-sm resize-none" placeholder="Describe action taken..."></textarea>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-600 block mb-1">Rate Resolution (if closing)</label>
+          <div class="flex gap-1" id="ratingStars">
+            <button class="star-btn text-2xl text-slate-300 hover:text-amber-400" data-r="1">★</button>
+            <button class="star-btn text-2xl text-slate-300 hover:text-amber-400" data-r="2">★</button>
+            <button class="star-btn text-2xl text-slate-300 hover:text-amber-400" data-r="3">★</button>
+            <button class="star-btn text-2xl text-slate-300 hover:text-amber-400" data-r="4">★</button>
+            <button class="star-btn text-2xl text-slate-300 hover:text-amber-400" data-r="5">★</button>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button id="saveAction" class="flex-1 py-2.5 bg-[#0055a5] text-white font-bold rounded-lg text-sm">Save</button>
+          <button onclick="document.getElementById('actionModal').style.display='none'" class="px-4 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-lg text-sm">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  lucide.createIcons();
+  const sb = getSupabaseClient();
+  let _allReports = [];
+  let _currentFilter = 'all';
+  let _actionReportId = null;
+  let _selectedRating = null;
+
+  // Tab switching
+  document.querySelectorAll('.cd-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.cd-tab').forEach(t => { t.classList.remove('tab-active'); t.classList.add('text-slate-500'); });
+      tab.classList.add('tab-active'); tab.classList.remove('text-slate-500');
+      document.querySelectorAll('.cd-panel').forEach(p => p.classList.add('hidden'));
+      const tabId = tab.dataset.tab;
+      if (['safety', 'posh', 'grievance'].includes(tabId)) {
+        document.getElementById('panel-all').classList.remove('hidden');
+      } else {
+        document.getElementById('panel-' + tabId).classList.remove('hidden');
+      }
+      _currentFilter = tabId;
+      renderReports();
+    });
+  });
+
+  // Star rating
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _selectedRating = parseInt(btn.dataset.r);
+      document.querySelectorAll('.star-btn').forEach((s, i) => {
+        s.classList.toggle('text-amber-400', i < _selectedRating);
+        s.classList.toggle('text-slate-300', i >= _selectedRating);
+      });
+    });
+  });
+
+  const FILTER_MAP = { safety: 'Safety & OH', posh: 'POSH Committee', grievance: 'Grievance Committee' };
+  const ESCALATION_HOURS = 72; // Auto-escalate after 72 hours
+
+  async function loadAll() {
+    const { data } = await sb.from('reports')
+      .select('*, employees(emp_id, full_name)')
+      .order('created_at', { ascending: false });
+    _allReports = data || [];
+
+    // Auto-escalation check
+    const now = Date.now();
+    let escalationCount = 0;
+    for (const r of _allReports) {
+      if (r.status === 'Open') {
+        const age = (now - new Date(r.created_at).getTime()) / 3600000;
+        if (age > ESCALATION_HOURS && !r.escalated_at) {
+          escalationCount++;
+          // Auto-escalate in DB
+          await sb.from('reports').update({ status: 'Escalated', escalated_at: new Date().toISOString() }).eq('id', r.id);
+          r.status = 'Escalated';
+          r.escalated_at = new Date().toISOString();
+        }
+      }
+    }
+
+    if (escalationCount > 0) {
+      document.getElementById('escalationAlert').classList.remove('hidden');
+      document.getElementById('escalationMsg').textContent = `${escalationCount} report(s) auto-escalated (unresolved > ${ESCALATION_HOURS}hrs)`;
+    }
+
+    updateStats();
+    renderReports();
+    renderAnalytics();
+  }
+  loadAll();
+
+  function updateStats() {
+    const open = _allReports.filter(r => r.status === 'Open').length;
+    const inProg = _allReports.filter(r => r.status === 'In Progress').length;
+    const esc = _allReports.filter(r => r.status === 'Escalated').length;
+    const res = _allReports.filter(r => r.status === 'Resolved' || r.status === 'Closed').length;
+    document.getElementById('statOpen').textContent = open;
+    document.getElementById('statInProgress').textContent = inProg;
+    document.getElementById('statEscalated').textContent = esc;
+    document.getElementById('statResolved').textContent = res;
+    document.getElementById('statTotal').textContent = _allReports.length;
+  }
+
+  function renderReports() {
+    let filtered = _allReports;
+    if (FILTER_MAP[_currentFilter]) filtered = _allReports.filter(r => r.route_to === FILTER_MAP[_currentFilter]);
+
+    const body = document.getElementById('reportsBody');
+    body.innerHTML = filtered.map((r, i) => {
+      const bg = i % 2 ? 'bg-slate-50' : '';
+      const dt = new Date(r.created_at);
+      const dateStr = dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      const ageHrs = Math.round((Date.now() - dt.getTime()) / 3600000);
+      const ageStr = ageHrs < 24 ? `${ageHrs}h` : `${Math.round(ageHrs / 24)}d`;
+      const empName = r.employees?.full_name || '—';
+      const empId = r.employees?.emp_id || '—';
+
+      const statusColors = {
+        'Open': 'bg-amber-100 text-amber-700 border-amber-300',
+        'In Progress': 'bg-blue-100 text-blue-700 border-blue-300',
+        'Escalated': 'bg-red-100 text-red-700 border-red-300',
+        'Resolved': 'bg-green-100 text-green-700 border-green-300',
+        'Closed': 'bg-slate-100 text-slate-700 border-slate-300'
+      };
+      const sc = statusColors[r.status] || statusColors['Open'];
+
+      const catColors = {
+        'Unsafe Condition': 'text-orange-600',
+        'Unsafe Behaviour': 'text-red-600',
+        'Near Miss': 'text-amber-600',
+        'Sexual Harassment': 'text-purple-700 font-bold',
+        'Grievance': 'text-blue-600',
+        'Suggestion': 'text-teal-600',
+      };
+      const cc = catColors[r.category] || 'text-slate-700';
+
+      return `<tr class="${bg} border-b hover:bg-slate-100">
+        <td class="p-2 font-mono text-[10px]">${r.id.slice(0,8)}</td>
+        <td class="p-2">${dateStr}</td>
+        <td class="p-2"><span class="font-semibold">${empName}</span><br><span class="text-slate-400">${empId}</span></td>
+        <td class="p-2 ${cc}">${r.category}</td>
+        <td class="p-2">${r.route_to || '—'}</td>
+        <td class="p-2">${r.department || '—'}</td>
+        <td class="p-2 max-w-[200px] truncate">${r.description || '—'}</td>
+        <td class="p-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${sc}">${r.status}</span></td>
+        <td class="p-2 font-semibold ${ageHrs > ESCALATION_HOURS && r.status !== 'Resolved' && r.status !== 'Closed' ? 'text-red-600' : ''}">${ageStr}</td>
+        <td class="p-2 text-center">
+          <button class="action-btn px-2 py-1 bg-[#0055a5] text-white text-[10px] rounded font-bold hover:bg-[#003d7a]" data-id="${r.id}">Action</button>
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="10" class="p-4 text-center text-slate-400">No reports found</td></tr>';
+
+    // Wire action buttons
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', () => openActionModal(btn.dataset.id));
+    });
+  }
+
+  function openActionModal(reportId) {
+    _actionReportId = reportId;
+    _selectedRating = null;
+    document.querySelectorAll('.star-btn').forEach(s => { s.classList.remove('text-amber-400'); s.classList.add('text-slate-300'); });
+    const r = _allReports.find(x => x.id === reportId);
+    if (!r) return;
+    document.getElementById('actionTitle').textContent = `Action: ${r.category}`;
+    document.getElementById('actionSub').textContent = `Reported by ${r.employees?.full_name || 'Unknown'} — ${r.department || 'No dept'}`;
+    document.getElementById('actionStatus').value = r.status;
+    document.getElementById('actionNotes').value = r.action_taken || '';
+    document.getElementById('actionModal').style.display = 'flex';
+  }
+
+  document.getElementById('saveAction').addEventListener('click', async () => {
+    if (!_actionReportId) return;
+    const btn = document.getElementById('saveAction');
+    btn.innerHTML = 'Saving...'; btn.disabled = true;
+
+    const newStatus = document.getElementById('actionStatus').value;
+    const update = {
+      status: newStatus,
+      action_taken: document.getElementById('actionNotes').value
+    };
+    if (newStatus === 'Resolved' || newStatus === 'Closed') update.resolved_at = new Date().toISOString();
+    if (newStatus === 'Escalated') update.escalated_at = new Date().toISOString();
+    if (_selectedRating) update.rating = _selectedRating;
+
+    await sb.from('reports').update(update).eq('id', _actionReportId);
+
+    btn.innerHTML = '✓ Saved'; btn.disabled = false;
+    setTimeout(() => {
+      document.getElementById('actionModal').style.display = 'none';
+      btn.innerHTML = 'Save';
+      loadAll();
+    }, 800);
+  });
+
+  // ============ ANALYTICS ============
+  function renderAnalytics() {
+    // Category breakdown
+    const catCounts = {};
+    _allReports.forEach(r => { catCounts[r.category] = (catCounts[r.category] || 0) + 1; });
+    const maxCat = Math.max(...Object.values(catCounts), 1);
+    const catColors = { 'Unsafe Condition': '#f97316', 'Near Miss': '#f59e0b', 'Unsafe Behaviour': '#ef4444', 'Sexual Harassment': '#7c3aed', 'Grievance': '#3b82f6', 'Suggestion': '#14b8a6', 'Unhealthy Condition': '#ec4899', 'Others': '#6b7280' };
+    document.getElementById('catChart').innerHTML = Object.entries(catCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, count]) => `
+        <div class="flex items-center gap-2">
+          <span class="w-28 text-[11px] font-semibold text-slate-600 truncate">${cat}</span>
+          <div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+            <div class="h-full rounded-full" style="width:${(count/maxCat)*100}%;background:${catColors[cat]||'#6b7280'}"></div>
+          </div>
+          <span class="text-xs font-bold text-slate-700 w-6 text-right">${count}</span>
+        </div>
+      `).join('');
+
+    // Status breakdown
+    const statusCounts = { Open: 0, 'In Progress': 0, Escalated: 0, Resolved: 0, Closed: 0 };
+    _allReports.forEach(r => { if (statusCounts[r.status] !== undefined) statusCounts[r.status]++; });
+    const statusColors = { Open: '#f59e0b', 'In Progress': '#3b82f6', Escalated: '#ef4444', Resolved: '#22c55e', Closed: '#6b7280' };
+    const maxStatus = Math.max(...Object.values(statusCounts), 1);
+    document.getElementById('statusChart').innerHTML = Object.entries(statusCounts).map(([s, c]) => `
+      <div class="flex items-center gap-2">
+        <span class="w-20 text-[11px] font-semibold text-slate-600">${s}</span>
+        <div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+          <div class="h-full rounded-full" style="width:${(c/maxStatus)*100}%;background:${statusColors[s]}"></div>
+        </div>
+        <span class="text-xs font-bold text-slate-700 w-6 text-right">${c}</span>
+      </div>
+    `).join('');
+
+    // Monthly trend (last 6 months)
+    const monthCounts = {};
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      monthCounts[key] = 0;
+    }
+    _allReports.forEach(r => {
+      const key = r.created_at.slice(0, 7);
+      if (monthCounts[key] !== undefined) monthCounts[key]++;
+    });
+    const maxMonth = Math.max(...Object.values(monthCounts), 1);
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('trendChart').innerHTML = Object.entries(monthCounts).map(([key, c]) => {
+      const m = parseInt(key.split('-')[1]) - 1;
+      const pct = Math.max((c / maxMonth) * 100, 4);
+      return `<div class="flex-1 flex flex-col items-center gap-1">
+        <span class="text-[10px] font-bold text-slate-700">${c}</span>
+        <div class="w-full bg-[#0055a5] rounded-t" style="height:${pct}%"></div>
+        <span class="text-[10px] text-slate-500">${monthNames[m]}</span>
+      </div>`;
+    }).join('');
+
+    // Avg resolution time
+    const resolved = _allReports.filter(r => r.resolved_at);
+    if (resolved.length > 0) {
+      const totalDays = resolved.reduce((sum, r) => sum + (new Date(r.resolved_at) - new Date(r.created_at)) / 86400000, 0);
+      document.getElementById('avgResTime').textContent = (totalDays / resolved.length).toFixed(1);
+    }
+  }
+
+  // Close action modal on backdrop
+  document.getElementById('actionModal').addEventListener('click', (e) => {
+    if (e.target.id === 'actionModal') e.target.style.display = 'none';
+  });
+</script>
+</body>
+</html>

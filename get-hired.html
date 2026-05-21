@@ -129,12 +129,12 @@
             <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Income<br>Calculator</span>
           </button>
 
-          <!-- Safety (Blue for Info/Tool) -->
-          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
-            <div class="w-[52px] h-[52px] rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-              <i data-lucide="hard-hat" class="w-6 h-6"></i>
+          <!-- Report Issue (Red for Alert) -->
+          <button id="reportIssueBtn" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
+            <div class="w-[52px] h-[52px] rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+              <i data-lucide="alert-triangle" class="w-6 h-6"></i>
             </div>
-            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Safety<br>Training</span>
+            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Report<br>Issue</span>
           </button>
 
           <!-- Rate (Amber for Rating) -->
@@ -708,6 +708,163 @@
       if (e.target.id === id) e.target.style.display = 'none';
     });
   });
+  </script>
+
+  <!-- ============================================ -->
+  <!-- REPORT ISSUE MODAL -->
+  <!-- ============================================ -->
+  <div id="reportModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-4" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="bg-red-600 text-white p-4 text-center">
+        <i data-lucide="alert-triangle" class="w-8 h-8 mx-auto mb-1"></i>
+        <h3 class="font-bold text-lg">Report an Issue</h3>
+        <p class="text-xs text-white/70">Your identity is protected</p>
+      </div>
+      <div class="p-5">
+        <form id="reportForm" class="space-y-3">
+          <div>
+            <label class="text-xs font-bold text-gray-600 block mb-1">Category</label>
+            <select id="reportCategory" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+              <option value="Unsafe Condition">⚠️ Unsafe Condition</option>
+              <option value="Unhealthy Condition">🏥 Unhealthy Condition</option>
+              <option value="Near Miss">🎯 Near Miss</option>
+              <option value="Unsafe Behaviour">🚫 Unsafe Behaviour</option>
+              <option value="Suggestion">💡 Suggestion</option>
+              <option value="Grievance">📋 Grievance</option>
+              <option value="Sexual Harassment">🛡️ Sexual Harassment (POSH)</option>
+              <option value="Others">📝 Others</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-600 block mb-1">Department / Location</label>
+            <input type="text" id="reportDept" placeholder="e.g. Welding Bay 3, Block C" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-600 block mb-1">Description</label>
+            <textarea id="reportDesc" rows="3" required placeholder="Describe the issue in detail..." class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 resize-none"></textarea>
+          </div>
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700" id="routePreview">
+            <span class="font-bold">Auto-routes to:</span> <span id="routeTarget">Safety & OH Department</span>
+          </div>
+          <button type="submit" class="w-full py-3 bg-red-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">
+            Submit Report
+          </button>
+          <button type="button" onclick="document.getElementById('reportModal').style.display='none'" class="w-full py-2 text-gray-500 text-sm font-semibold">Cancel</button>
+        </form>
+
+        <!-- Report History -->
+        <div class="mt-4 border-t pt-3">
+          <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">My Reports</h4>
+          <div id="reportHistory" class="space-y-2 text-xs max-h-32 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ============================================
+  // REPORT ISSUE LOGIC
+  // ============================================
+  (function() {
+    const sb = getSupabaseClient();
+
+    // Auto-routing map
+    const ROUTE_MAP = {
+      'Unsafe Condition': 'Safety & OH',
+      'Unhealthy Condition': 'Safety & OH',
+      'Near Miss': 'Safety & OH',
+      'Unsafe Behaviour': 'Safety & OH',
+      'Suggestion': 'Department',
+      'Grievance': 'Grievance Committee',
+      'Sexual Harassment': 'POSH Committee',
+      'Others': 'Department'
+    };
+
+    // Update route preview on category change
+    document.getElementById('reportCategory')?.addEventListener('change', (e) => {
+      const route = ROUTE_MAP[e.target.value] || 'Department';
+      document.getElementById('routeTarget').textContent = route;
+    });
+
+    // Open modal
+    document.getElementById('reportIssueBtn')?.addEventListener('click', () => {
+      document.getElementById('reportModal').style.display = 'flex';
+      loadReportHistory();
+      lucide.createIcons();
+    });
+
+    // Submit report
+    document.getElementById('reportForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type=submit]');
+      btn.innerHTML = 'Submitting...'; btn.disabled = true;
+
+      let empId = null;
+      try {
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) {
+          const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', user.id).single();
+          empId = emp?.id;
+        }
+      } catch (ex) {}
+
+      const category = document.getElementById('reportCategory').value;
+      const { error } = await sb.from('reports').insert({
+        employee_id: empId,
+        category: category,
+        department: document.getElementById('reportDept').value || null,
+        route_to: ROUTE_MAP[category] || 'Department',
+        description: document.getElementById('reportDesc').value,
+        status: 'Open'
+      });
+
+      if (!error) {
+        btn.innerHTML = '✓ Report Submitted!';
+        btn.classList.replace('bg-red-600', 'bg-green-500');
+        loadReportHistory();
+        setTimeout(() => {
+          document.getElementById('reportModal').style.display = 'none';
+          btn.innerHTML = 'Submit Report';
+          btn.classList.replace('bg-green-500', 'bg-red-600');
+          btn.disabled = false;
+          document.getElementById('reportForm').reset();
+        }, 1500);
+      } else {
+        btn.innerHTML = 'Error: ' + error.message;
+        btn.disabled = false;
+        setTimeout(() => { btn.innerHTML = 'Submit Report'; }, 2000);
+      }
+    });
+
+    async function loadReportHistory() {
+      let empId = null;
+      try {
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) {
+          const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', user.id).single();
+          empId = emp?.id;
+        }
+      } catch (ex) {}
+      if (!empId) { document.getElementById('reportHistory').innerHTML = '<p class="text-gray-400">Sign in to see your reports</p>'; return; }
+
+      const { data } = await sb.from('reports').select('*').eq('employee_id', empId)
+        .order('created_at', { ascending: false }).limit(5);
+      const el = document.getElementById('reportHistory');
+      el.innerHTML = (data || []).map(r => {
+        const sc = r.status === 'Resolved' || r.status === 'Closed' ? 'bg-green-100 text-green-700' : r.status === 'Escalated' ? 'bg-red-100 text-red-700' : r.status === 'In Progress' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700';
+        const dt = new Date(r.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2">
+          <div><span class="font-semibold">${r.category}</span> · ${dt}</div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${r.status}</span>
+        </div>`;
+      }).join('') || '<p class="text-gray-400">No reports yet</p>';
+    }
+
+    // Close on backdrop
+    document.getElementById('reportModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'reportModal') e.target.style.display = 'none';
+    });
+  })();
   </script>
 </body>
 </html>
