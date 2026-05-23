@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Shramik Sathi | Worker Portal</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0055a5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -802,5 +807,16 @@
     if (e.target.id === 'qrModal') { stopQrScanner(); e.target.style.display = 'none'; }
   });
 </script>
+<script>
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('[PWA] SW registered, scope:', reg.scope))
+        .catch(err => console.warn('[PWA] SW registration failed:', err.message));
+    });
+  }
+</script>
 </body>
 </html>
+

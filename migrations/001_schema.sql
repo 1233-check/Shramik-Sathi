@@ -279,6 +279,16 @@ CREATE POLICY "Workers manage own leaves" ON leave_requests FOR ALL USING (
 CREATE POLICY "Workers submit own reports" ON reports FOR INSERT WITH CHECK (
   employee_id IN (SELECT id FROM employees WHERE auth_user_id = auth.uid())
 );
+CREATE POLICY "Workers see own reports" ON reports FOR SELECT USING (
+  employee_id IN (SELECT id FROM employees WHERE auth_user_id = auth.uid())
+);
+CREATE POLICY "Employers update own reports" ON reports FOR UPDATE USING (
+  employee_id IN (SELECT id FROM employees WHERE company_id IN (SELECT id FROM companies WHERE auth_user_id = auth.uid()))
+);
 CREATE POLICY "Workers see own docs" ON documents FOR SELECT USING (
+  employee_id IN (SELECT id FROM employees WHERE auth_user_id = auth.uid())
+);
+-- Workers can mark attendance
+CREATE POLICY "Workers mark own attendance" ON attendance FOR INSERT WITH CHECK (
   employee_id IN (SELECT id FROM employees WHERE auth_user_id = auth.uid())
 );
