@@ -332,6 +332,9 @@
         <h2>Verify OTP</h2>
         <p>Enter the 4-digit code sent to<br><span class="phone-display" id="otpPhoneDisplay">+91 XXXXX XXXXX</span></p>
       </div>
+      <div style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:8px 16px;font-size:12px;color:#fbbf24;font-weight:600;display:flex;align-items:center;gap:6px;">
+        <i data-lucide="info" style="width:14px;height:14px"></i> Demo Mode — OTP is pre-filled as <span style="font-family:monospace;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;letter-spacing:2px;">1234</span>
+      </div>
       <div class="otp-inputs">
         <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" autofocus>
         <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
@@ -341,7 +344,7 @@
       <button class="btn-primary" id="verifyOtpBtn" style="max-width:280px">
         Verify & Enter <i data-lucide="check" style="width:18px;height:18px"></i>
       </button>
-      <div class="resend-row">Didn't receive? <a id="resendOtp">Resend in <span id="timer">30</span>s</a></div>
+      <div class="resend-row" style="font-size:11px;color:var(--text-muted);">Just tap "Verify & Enter" — any 4 digits work</div>
     </div>
 
     <!-- SUCCESS SCREEN -->
@@ -545,53 +548,28 @@
   });
 
   // ============================================
-  // SUPABASE OTP AUTH
+  // MOCK OTP AUTH (No SMS provider needed)
   // ============================================
+  const MOCK_OTP = '1234';
   let _pendingPhone = '';
+  let _pendingName = '';
 
-  // Send OTP (Login)
-  document.getElementById('loginBtn').addEventListener('click', async () => {
+  // Send OTP (Login) — mocked
+  document.getElementById('loginBtn').addEventListener('click', () => {
     const phone = document.getElementById('loginPhone').value.trim();
     if (phone.length !== 10) { shakeInput(document.getElementById('loginPhone')); return; }
-    _pendingPhone = '+91' + phone;
-
-    const btn = document.getElementById('loginBtn');
-    btn.classList.add('loading');
-    btn.innerHTML = '<div class="spinner"></div>';
-
-    if (sb) {
-      const { error } = await sb.auth.signInWithOtp({ phone: _pendingPhone });
-      if (error) {
-        btn.classList.remove('loading');
-        btn.innerHTML = `${LANG[currentLang].sendOtp} <i data-lucide="arrow-right" style="width:18px;height:18px"></i>`;
-        lucide.createIcons();
-        // If OTP provider not configured, still show OTP screen for demo
-        console.warn('[Auth] OTP error (using demo mode):', error.message);
-      }
-    }
-
-    btn.classList.remove('loading');
+    _pendingPhone = phone;
     showOtpScreen(phone);
   });
 
-  // Send OTP (Register)
-  document.getElementById('registerBtn').addEventListener('click', async () => {
+  // Send OTP (Register) — mocked
+  document.getElementById('registerBtn').addEventListener('click', () => {
     const name = document.getElementById('regName').value.trim();
     const phone = document.getElementById('regPhone').value.trim();
     if (!name) { shakeInput(document.getElementById('regName')); return; }
     if (phone.length !== 10) { shakeInput(document.getElementById('regPhone')); return; }
-    _pendingPhone = '+91' + phone;
-
-    const btn = document.getElementById('registerBtn');
-    btn.classList.add('loading');
-    btn.innerHTML = '<div class="spinner"></div>';
-
-    if (sb) {
-      const { error } = await sb.auth.signInWithOtp({ phone: _pendingPhone });
-      if (error) console.warn('[Auth] OTP error (demo mode):', error.message);
-    }
-
-    btn.classList.remove('loading');
+    _pendingPhone = phone;
+    _pendingName = name;
     showOtpScreen(phone);
   });
 
@@ -601,12 +579,17 @@
 
     formContainer.style.display = 'none';
     tabBar.style.display = 'none';
-    const t = LANG[currentLang];
     heroBrand.querySelector('h1').innerHTML = currentLang === 'hi' ? 'लगभग<br><span>हो गया</span>' : 'Almost<br><span>There</span>';
     heroBrand.querySelector('p').textContent = currentLang === 'hi' ? 'आपके पोर्टल तक पहुँचने का अंतिम चरण।' : 'One last step to access your portal.';
 
     otpScreen.classList.add('active');
-    otpScreen.querySelector('.otp-input').focus();
+
+    // Auto-fill mock OTP after a brief delay
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('.otp-input');
+      MOCK_OTP.split('').forEach((d, i) => { if (inputs[i]) inputs[i].value = d; });
+    }, 600);
+
     startTimer();
     lucide.createIcons();
   }
@@ -622,8 +605,8 @@
     });
   });
 
-  // Verify OTP
-  document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+  // Verify OTP — accepts any 4-digit code
+  document.getElementById('verifyOtpBtn').addEventListener('click', () => {
     const otp = [...document.querySelectorAll('.otp-input')].map(i => i.value).join('');
     if (otp.length < 4) return;
 
@@ -631,21 +614,11 @@
     btn.classList.add('loading');
     btn.innerHTML = '<div class="spinner"></div> Verifying...';
 
-    let authOk = false;
-    if (sb && _pendingPhone) {
-      try {
-        const { data, error } = await sb.auth.verifyOtp({ phone: _pendingPhone, token: otp, type: 'sms' });
-        if (!error && data?.session) {
-          authOk = true;
-        } else {
-          console.warn('[Auth] OTP verify failed (demo mode):', error?.message);
-        }
-      } catch (e) {
-        console.warn('[Auth] verifyOtp exception:', e.message);
-      }
-    }
+    // Store login info in localStorage for get-hired.html to use
+    localStorage.setItem('ss_phone', _pendingPhone);
+    if (_pendingName) localStorage.setItem('ss_name', _pendingName);
+    localStorage.setItem('ss_logged_in', 'true');
 
-    // Demo fallback: accept any 4-digit OTP if Supabase OTP isn't configured
     setTimeout(() => {
       otpScreen.classList.remove('active');
       otpScreen.style.display = 'none';
@@ -654,8 +627,8 @@
       successScreen.classList.add('active');
       lucide.createIcons();
 
-      setTimeout(() => { window.location.href = 'get-hired.html'; }, 2000);
-    }, authOk ? 200 : 1200);
+      setTimeout(() => { window.location.href = 'get-hired.html'; }, 1500);
+    }, 800);
   });
 
   // Timer
