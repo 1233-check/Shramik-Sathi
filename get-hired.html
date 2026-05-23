@@ -4,262 +4,527 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Employee Portal | Shramik Sathi</title>
+  <meta name="description" content="Shramik Sathi Worker Dashboard — Attendance, Leave, Salary, Reports">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0055a5">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            emerald: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857' },
-            blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb' },
-            amber: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 600: '#d97706' },
-            gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 800: '#1f2937', 900: '#111827' }
-          }
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
       }
     }
   </script>
   <style>
-    body { background-color: #cbd5e1; /* slate-300 background for desktop to highlight the mobile app frame */ }
+    body { background: #0f172a; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    /* Touch target enforcement */
     button, a { -webkit-tap-highlight-color: transparent; }
-    .touch-target { min-height: 48px; min-width: 48px; }
+    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+    .glass-white { background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); }
+    .action-card { transition: transform 0.15s, box-shadow 0.15s; }
+    .action-card:active { transform: scale(0.96); }
+    .shimmer { background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%); background-size: 200% 100%; animation: shimmer 2s infinite; }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .progress-ring { transform: rotate(-90deg); }
+    .stat-glow { box-shadow: 0 0 20px rgba(16,185,129,0.15); }
   </style>
 </head>
 <body class="text-gray-900 antialiased font-sans flex justify-center">
 
   <!-- Mobile App Frame -->
   <main class="w-full max-w-md bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-hidden border-x border-gray-200">
-    
-    <!-- 1. Top App Bar (Sticky Header) -->
-    <header class="sticky top-0 z-50 bg-white shadow-sm px-4 py-3 flex items-center justify-between touch-target">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
-          VS
+
+    <!-- Header — Dynamic -->
+    <header class="sticky top-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center font-bold text-base shadow-lg" id="avatarInitials">
+            SS
+          </div>
+          <div class="flex flex-col">
+            <span class="font-bold text-white text-[15px] leading-tight" id="greetingName">Hello, Worker</span>
+            <span class="text-[11px] text-slate-400 font-medium flex items-center gap-1">
+              <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full inline-block"></span>
+              <span id="headerPhone">Active</span>
+            </span>
+          </div>
         </div>
-        <div class="flex flex-col">
-          <span class="font-semibold text-gray-900 leading-tight">Hello, Virat</span>
-          <span class="text-xs text-gray-500 font-medium">ID: 15937</span>
+        <div class="flex items-center gap-0.5">
+          <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-colors" aria-label="Notifications">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+          </button>
+          <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors" aria-label="Logout">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
         </div>
       </div>
-      <div class="flex items-center gap-1">
-        <button class="touch-target flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors active:bg-gray-200" aria-label="Language">
-          <i data-lucide="languages" class="w-6 h-6"></i>
-        </button>
-        <button class="touch-target flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors active:bg-gray-200 relative" aria-label="Notifications">
-          <i data-lucide="bell" class="w-6 h-6"></i>
-          <span class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-amber-500 rounded-full border-2 border-white"></span>
-        </button>
+
+      <!-- Quick Stats Row -->
+      <div class="grid grid-cols-4 gap-2 mt-4">
+        <div class="glass rounded-xl px-2 py-2.5 text-center">
+          <p class="text-lg font-bold text-emerald-400" id="statDays">—</p>
+          <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">Days</p>
+        </div>
+        <div class="glass rounded-xl px-2 py-2.5 text-center">
+          <p class="text-lg font-bold text-blue-400" id="statLeave">—</p>
+          <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">Leave Bal</p>
+        </div>
+        <div class="glass rounded-xl px-2 py-2.5 text-center">
+          <p class="text-lg font-bold text-amber-400" id="statPay">—</p>
+          <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">Pending</p>
+        </div>
+        <div class="glass rounded-xl px-2 py-2.5 text-center">
+          <p class="text-lg font-bold text-purple-400" id="statReports">0</p>
+          <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">Reports</p>
+        </div>
       </div>
     </header>
 
     <!-- Scrollable Content -->
     <div class="flex-1 overflow-y-auto no-scrollbar pb-24">
-      
-      <!-- 2. Core Action Banner (The "Find Jobs" Hub) -->
-      <section class="p-4 pt-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
-          <h2 class="text-[1.4rem] font-bold text-gray-900 mb-5 tracking-tight leading-tight">Find Verified Jobs</h2>
-          
-          <div class="relative flex items-center mb-5">
-            <div class="absolute left-4 text-gray-400">
-              <i data-lucide="search" class="w-5 h-5"></i>
-            </div>
-            <input type="text" placeholder="Search jobs (e.g. Fitter)" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3.5 pl-11 pr-14 text-[15px] font-medium outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all touch-target placeholder-gray-400">
-            <button class="absolute right-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg touch-target flex items-center justify-center active:bg-blue-200 transition-colors" style="min-width: 40px; min-height: 40px;" aria-label="Voice Search">
-              <i data-lucide="mic" class="w-5 h-5"></i>
-            </button>
-          </div>
 
-          <div class="grid grid-cols-2 gap-3">
-            <button class="flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl touch-target text-gray-700 font-semibold text-sm active:bg-gray-50 transition-colors">
-              <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-              <span>Filters</span>
-            </button>
-            <button class="flex items-center justify-center gap-2 bg-emerald-600 border border-emerald-600 text-white rounded-xl touch-target font-semibold text-sm active:bg-emerald-700 transition-colors shadow-sm">
-              <i data-lucide="file-up" class="w-4 h-4"></i>
-              <span>Upload CV</span>
-            </button>
+      <!-- Earnings Card -->
+      <section class="p-4 pt-5 fade-in">
+        <div class="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div class="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+          <div class="relative">
+            <p class="text-emerald-100 text-xs font-semibold uppercase tracking-wider">This Month's Earnings</p>
+            <p class="text-3xl font-black mt-1" id="monthlyPay">₹ —</p>
+            <div class="flex items-center gap-4 mt-3 text-xs">
+              <span class="flex items-center gap-1 bg-white/20 rounded-full px-2.5 py-1">
+                <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+                <span id="earningsMonth">May 2026</span>
+              </span>
+              <span class="flex items-center gap-1 text-emerald-100" id="lastPayDate">
+                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                Last paid: —
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- 3. "My Work & Money" Grid -->
-      <section class="px-4 py-2">
-        <h3 class="text-[1.1rem] font-bold text-gray-800 mb-4 px-1">My Work & Money</h3>
-        <div class="grid grid-cols-2 gap-3">
-          
-          <!-- Attendance (Green for Go/Action) -->
-          <button id="markAttendanceBtn" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
-            <div class="w-[52px] h-[52px] rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <i data-lucide="map-pin" class="w-6 h-6"></i>
+      <!-- Action Grid -->
+      <section class="px-4 py-2 fade-in" style="animation-delay:0.1s">
+        <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <i data-lucide="grid-3x3" class="w-4 h-4 text-slate-400"></i>
+          Quick Actions
+        </h3>
+        <div class="grid grid-cols-3 gap-3">
+
+          <button id="markAttendanceBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="map-pin-check" class="w-6 h-6"></i>
             </div>
-            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Mark<br>Attendance</span>
+            <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Attendance</span>
           </button>
 
-          <!-- Leave (Red/Amber for Stop/Pause) -->
-          <button id="applyLeaveBtn" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
-            <div class="w-[52px] h-[52px] rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
-              <i data-lucide="calendar" class="w-6 h-6"></i>
+          <button id="applyLeaveBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 flex items-center justify-center">
+              <i data-lucide="calendar-off" class="w-6 h-6"></i>
             </div>
-            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Apply<br>Leave</span>
+            <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Apply Leave</span>
           </button>
 
-          <!-- Salary (Green/Emerald for Money) -->
-          <button id="advanceSalaryBtn" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
-            <div class="w-[52px] h-[52px] rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <i data-lucide="indian-rupee" class="w-6 h-6"></i>
+          <button id="advanceSalaryBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 flex items-center justify-center">
+              <i data-lucide="banknote" class="w-6 h-6"></i>
             </div>
-            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Advance<br>Salary</span>
+            <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Advance</span>
           </button>
 
-          <!-- Calculator (Blue for Info/Tool) -->
-          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
-            <div class="w-[52px] h-[52px] rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-              <i data-lucide="calculator" class="w-6 h-6"></i>
-            </div>
-            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Income<br>Calculator</span>
-          </button>
-
-          <!-- Report Issue (Red for Alert) -->
-          <button id="reportIssueBtn" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
-            <div class="w-[52px] h-[52px] rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+          <button id="reportIssueBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 text-red-600 flex items-center justify-center">
               <i data-lucide="alert-triangle" class="w-6 h-6"></i>
             </div>
-            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Report<br>Issue</span>
+            <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Report Issue</span>
           </button>
 
-          <!-- Rate (Amber for Rating) -->
-          <button class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex flex-col items-center justify-center gap-3 active:bg-gray-50 active:scale-[0.98] transition-all touch-target min-h-[115px]">
-            <div class="w-[52px] h-[52px] rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
-              <i data-lucide="star" class="w-6 h-6"></i>
+          <button id="viewPayslipBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 flex items-center justify-center">
+              <i data-lucide="receipt-indian-rupee" class="w-6 h-6"></i>
             </div>
-            <span class="font-semibold text-gray-700 text-[13px] leading-tight text-center">Rate<br>Employer</span>
+            <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Payslip</span>
           </button>
+
+          <a href="worker-jobs.html" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-100 text-teal-600 flex items-center justify-center">
+              <i data-lucide="search" class="w-6 h-6"></i>
+            </div>
+            <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Find Jobs</span>
+          </a>
 
         </div>
       </section>
 
-      <!-- 4. "My Trust Profile" Section -->
-      <section class="px-4 py-6">
-        <h3 class="text-[1.1rem] font-bold text-gray-800 mb-4 px-1">My Trust Profile</h3>
-        <div class="flex flex-col gap-3">
-          
-          <!-- UAN / PF -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
-              <i data-lucide="check-circle-2" class="w-6 h-6"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="font-bold text-gray-900 text-[15px]">UAN (PF) Status</h4>
-              <p class="text-emerald-600 text-sm font-semibold mt-0.5">Verified & Active</p>
-            </div>
+      <!-- Attendance Streak -->
+      <section class="px-4 py-4 fade-in" style="animation-delay:0.15s">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+              <i data-lucide="flame" class="w-4 h-4 text-orange-500"></i>
+              Attendance This Month
+            </h3>
+            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full" id="streakPct">—%</span>
           </div>
-
-          <!-- ESIC -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
-              <i data-lucide="clock" class="w-6 h-6"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="font-bold text-gray-900 text-[15px]">ESIC Number</h4>
-              <p class="text-amber-600 text-sm font-semibold mt-0.5">Pending Verification</p>
-            </div>
+          <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000" id="streakBar" style="width:0%"></div>
           </div>
-
-          <!-- Police Verification -->
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
-              <i data-lucide="shield-check" class="w-6 h-6"></i>
-            </div>
-            <div class="flex-1">
-              <h4 class="font-bold text-gray-900 text-[15px]">Police Verification</h4>
-              <p class="text-blue-600 text-sm font-semibold mt-0.5">Submitted</p>
-            </div>
-          </div>
-
+          <p class="text-[11px] text-gray-500 mt-2" id="streakText">Loading attendance data...</p>
         </div>
       </section>
-      
+
+      <!-- Recent Activity -->
+      <section class="px-4 py-2 pb-6 fade-in" style="animation-delay:0.2s">
+        <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
+          Recent Activity
+        </h3>
+        <div class="space-y-2" id="activityFeed">
+          <div class="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shimmer"></div>
+            <div class="flex-1">
+              <div class="h-3 bg-gray-100 rounded w-3/4 shimmer mb-1.5"></div>
+              <div class="h-2.5 bg-gray-100 rounded w-1/2 shimmer"></div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center shimmer"></div>
+            <div class="flex-1">
+              <div class="h-3 bg-gray-100 rounded w-2/3 shimmer mb-1.5"></div>
+              <div class="h-2.5 bg-gray-100 rounded w-1/3 shimmer"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trust Profile -->
+      <section class="px-4 py-2 pb-6 fade-in" style="animation-delay:0.25s">
+        <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-slate-400"></i>
+          Compliance Status
+        </h3>
+        <div class="flex flex-col gap-2" id="trustProfile">
+          <div class="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-800 text-[13px]">UAN (PF)</h4>
+              <p class="text-emerald-600 text-[11px] font-semibold" id="pfStatus">Checking...</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="heart-pulse" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-800 text-[13px]">ESIC</h4>
+              <p class="text-blue-600 text-[11px] font-semibold" id="esicStatus">Checking...</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="fingerprint" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-bold text-gray-800 text-[13px]">Police Verification</h4>
+              <p class="text-purple-600 text-[11px] font-semibold" id="pvStatus">Checking...</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <!-- 5. Bottom Navigation Bar (Sticky Footer) -->
-    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px]">
-      
-      <a href="#" class="flex-1 flex flex-col items-center justify-center touch-target text-emerald-600 h-full">
-        <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-bold">Home</span>
+    <!-- Bottom Navigation -->
+    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+      <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center h-full text-emerald-600">
+        <i data-lucide="layout-dashboard" class="w-[20px] h-[20px] mb-0.5"></i>
+        <span class="text-[10px] font-bold">Home</span>
       </a>
-      
-      <a href="#" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="briefcase" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">Jobs</span>
+      <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="briefcase" class="w-[20px] h-[20px] mb-0.5"></i>
+        <span class="text-[10px] font-semibold">Jobs</span>
       </a>
-      
-      <a href="#" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="newspaper" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">News</span>
+      <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="newspaper" class="w-[20px] h-[20px] mb-0.5"></i>
+        <span class="text-[10px] font-semibold">News</span>
       </a>
-      
-      <a href="#" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="user" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">Profile</span>
+      <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="user-circle" class="w-[20px] h-[20px] mb-0.5"></i>
+        <span class="text-[10px] font-semibold">Profile</span>
       </a>
-
     </nav>
   </main>
 
+  <!-- ============================================ -->
+  <!-- GLOBAL SCRIPTS -->
+  <!-- ============================================ -->
   <script>
-    // Initialize Lucide Icons
     lucide.createIcons();
+    const sb = getSupabaseClient();
 
-    // Bottom Navigation Logic
-    const navButtons = document.querySelectorAll('nav.absolute.bottom-0 a');
-    
-    navButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault(); // Prevent default anchor jump
-        
-        // Remove active state from all buttons
-        navButtons.forEach(nav => {
-          nav.classList.remove('text-emerald-600');
-          nav.classList.add('text-gray-400', 'hover:text-gray-600');
-          nav.querySelector('span').classList.remove('font-bold');
-          nav.querySelector('span').classList.add('font-semibold');
-        });
+    // ============================================
+    // AUTH GUARD + DYNAMIC DATA LOADER
+    // ============================================
+    let _empId = null;
+    const _userName = localStorage.getItem('ss_name') || '';
+    const _userPhone = localStorage.getItem('ss_phone') || '';
 
-        // Add active state to clicked button
-        btn.classList.remove('text-gray-400', 'hover:text-gray-600');
-        btn.classList.add('text-emerald-600');
-        btn.querySelector('span').classList.remove('font-semibold');
-        btn.querySelector('span').classList.add('font-bold');
-      });
-    });
-  </script>
-  <script>
-    // Auth guard — redirect to worker-login if not authenticated
+    // Auth check — localStorage mock OR Supabase session
     (async () => {
-      try {
-        const sb = getSupabaseClient();
-        const { data: { session } } = await sb.auth.getSession();
-        if (!session) { window.location.href = 'worker-login.html'; }
-      } catch (e) {
-        // Supabase not available — allow access (offline mode)
+      const isLoggedIn = localStorage.getItem('ss_logged_in') === 'true';
+      if (!isLoggedIn) {
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          if (!session) { window.location.href = 'worker-login.html'; return; }
+        } catch (e) { window.location.href = 'worker-login.html'; return; }
       }
+
+      // Populate header
+      const name = _userName || 'Worker';
+      const firstName = name.split(' ')[0];
+      document.getElementById('greetingName').textContent = getGreeting() + ', ' + firstName;
+      document.getElementById('avatarInitials').textContent = getInitials(name);
+      document.getElementById('headerPhone').textContent = _userPhone ? `+91 ${_userPhone.slice(0,5)}•••••` : 'Active';
+
+      // Try to resolve employee ID
+      await resolveEmpId();
+
+      // Load dashboard data
+      loadDashboardStats();
+      loadActivityFeed();
+      loadComplianceStatus();
     })();
+
+    function getGreeting() {
+      const h = new Date().getHours();
+      if (h < 12) return 'Good Morning';
+      if (h < 17) return 'Good Afternoon';
+      return 'Good Evening';
+    }
+
+    function getInitials(name) {
+      if (!name || name === 'Worker') return 'SS';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    // Employee ID resolver — tries Supabase auth first, then phone lookup
+    async function resolveEmpId() {
+      if (_empId) return _empId;
+      try {
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) {
+          const { data } = await sb.from('employees').select('id, full_name').eq('auth_user_id', user.id).single();
+          if (data) { _empId = data.id; return _empId; }
+        }
+      } catch (e) {}
+      // Fallback: lookup by phone
+      if (_userPhone) {
+        try {
+          const phone = '+91' + _userPhone;
+          const { data } = await sb.from('employees').select('id, full_name').eq('phone', phone).single();
+          if (data) { _empId = data.id; return _empId; }
+          // Try without +91
+          const { data: d2 } = await sb.from('employees').select('id, full_name').eq('phone', _userPhone).single();
+          if (d2) { _empId = d2.id; return _empId; }
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    async function getEmpId() {
+      return _empId || await resolveEmpId();
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('ss_logged_in');
+      localStorage.removeItem('ss_phone');
+      localStorage.removeItem('ss_name');
+      try { sb.auth.signOut(); } catch (e) {}
+      window.location.href = 'worker-login.html';
+    });
+
+    // ============================================
+    // DASHBOARD STATS LOADER
+    // ============================================
+    async function loadDashboardStats() {
+      const empId = await getEmpId();
+      const now = new Date();
+      const monthStr = now.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+      document.getElementById('earningsMonth').textContent = monthStr;
+
+      if (!empId) {
+        document.getElementById('statDays').textContent = '0';
+        document.getElementById('statLeave').textContent = '33';
+        document.getElementById('statPay').textContent = '₹0';
+        document.getElementById('statReports').textContent = '0';
+        document.getElementById('monthlyPay').textContent = '₹ —';
+        document.getElementById('streakPct').textContent = '0%';
+        document.getElementById('streakText').textContent = 'No attendance data yet';
+        return;
+      }
+
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const firstDay = `${year}-${month}-01`;
+      const lastDay = new Date(year, now.getMonth() + 1, 0).toISOString().slice(0, 10);
+
+      // Attendance this month
+      const { data: att } = await sb.from('attendance').select('attendance_date, status')
+        .eq('employee_id', empId).gte('attendance_date', firstDay).lte('attendance_date', lastDay);
+      const daysPresent = (att || []).filter(a => a.status === 'Present' || a.status === 'Half Day').length;
+      const workingDays = getWorkingDays(now);
+
+      document.getElementById('statDays').textContent = daysPresent;
+      const pct = workingDays > 0 ? Math.round((daysPresent / workingDays) * 100) : 0;
+      document.getElementById('streakPct').textContent = pct + '%';
+      document.getElementById('streakBar').style.width = pct + '%';
+      document.getElementById('streakText').textContent = `${daysPresent} of ${workingDays} working days this month`;
+
+      // Leave balance (CL=12, SL=6, EL=15)
+      const { data: leaves } = await sb.from('leave_requests').select('leave_type, days')
+        .eq('employee_id', empId).in('status', ['Approved', 'Pending'])
+        .gte('from_date', `${year}-01-01`);
+      let usedLeave = 0;
+      (leaves || []).forEach(l => { if (l.leave_type !== 'Advance') usedLeave += (l.days || 0); });
+      const totalLeave = 33; // CL12 + SL6 + EL15
+      document.getElementById('statLeave').textContent = totalLeave - usedLeave;
+
+      // Wage
+      const { data: wages } = await sb.from('wage_records').select('net_payable, pay_period_end')
+        .eq('employee_id', empId).order('pay_period_end', { ascending: false }).limit(1);
+      if (wages && wages.length > 0) {
+        document.getElementById('monthlyPay').textContent = '₹' + (wages[0].net_payable || 0).toLocaleString('en-IN');
+        document.getElementById('statPay').textContent = '₹' + Math.round((wages[0].net_payable || 0) / 1000) + 'k';
+        const pd = new Date(wages[0].pay_period_end);
+        document.getElementById('lastPayDate').innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> Last: ${pd.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}`;
+        lucide.createIcons();
+      } else {
+        document.getElementById('monthlyPay').textContent = '₹ —';
+        document.getElementById('statPay').textContent = '—';
+      }
+
+      // Reports
+      const { count } = await sb.from('reports').select('id', { count: 'exact', head: true }).eq('employee_id', empId);
+      document.getElementById('statReports').textContent = count || 0;
+    }
+
+    function getWorkingDays(date) {
+      const year = date.getFullYear(), month = date.getMonth();
+      const today = date.getDate();
+      let count = 0;
+      for (let d = 1; d <= today; d++) {
+        const day = new Date(year, month, d).getDay();
+        if (day !== 0) count++; // Exclude Sundays
+      }
+      return count;
+    }
+
+    // ============================================
+    // ACTIVITY FEED
+    // ============================================
+    async function loadActivityFeed() {
+      const empId = await getEmpId();
+      const el = document.getElementById('activityFeed');
+
+      if (!empId) {
+        el.innerHTML = renderActivityItem('user-plus', 'blue', 'Welcome to Shramik Sathi!', 'Start by marking your attendance', 'Just now');
+        return;
+      }
+
+      const activities = [];
+
+      // Recent attendance
+      const { data: att } = await sb.from('attendance').select('attendance_date, status, check_in')
+        .eq('employee_id', empId).order('attendance_date', { ascending: false }).limit(2);
+      (att || []).forEach(a => {
+        const d = new Date(a.attendance_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        activities.push({ icon: 'map-pin-check', color: 'emerald', title: `Attendance: ${a.status}`, sub: `Checked in at ${a.check_in || '—'}`, time: d });
+      });
+
+      // Recent leaves
+      const { data: lvs } = await sb.from('leave_requests').select('leave_type, status, from_date')
+        .eq('employee_id', empId).order('created_at', { ascending: false }).limit(2);
+      (lvs || []).forEach(l => {
+        const d = new Date(l.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        const color = l.status === 'Approved' ? 'emerald' : l.status === 'Rejected' ? 'red' : 'amber';
+        activities.push({ icon: 'calendar', color, title: `${l.leave_type} Leave — ${l.status}`, sub: `From ${d}`, time: d });
+      });
+
+      // Recent reports
+      const { data: reps } = await sb.from('reports').select('category, status, created_at')
+        .eq('employee_id', empId).order('created_at', { ascending: false }).limit(1);
+      (reps || []).forEach(r => {
+        const d = new Date(r.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        activities.push({ icon: 'alert-triangle', color: 'red', title: `Report: ${r.category}`, sub: `Status: ${r.status}`, time: d });
+      });
+
+      if (activities.length === 0) {
+        el.innerHTML = renderActivityItem('sparkles', 'blue', 'No activity yet', 'Mark attendance to get started', 'Today');
+      } else {
+        el.innerHTML = activities.slice(0, 4).map(a => renderActivityItem(a.icon, a.color, a.title, a.sub, a.time)).join('');
+      }
+      lucide.createIcons();
+    }
+
+    function renderActivityItem(icon, color, title, sub, time) {
+      return `<div class="bg-white rounded-xl p-3 border border-gray-100 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-${color}-50 text-${color}-600 flex items-center justify-center flex-shrink-0">
+          <i data-lucide="${icon}" class="w-4 h-4"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-gray-800 text-[12px] truncate">${title}</p>
+          <p class="text-[11px] text-gray-400 truncate">${sub}</p>
+        </div>
+        <span class="text-[10px] text-gray-400 flex-shrink-0">${time}</span>
+      </div>`;
+    }
+
+    // ============================================
+    // COMPLIANCE STATUS
+    // ============================================
+    async function loadComplianceStatus() {
+      const empId = await getEmpId();
+      if (!empId) {
+        document.getElementById('pfStatus').textContent = 'Not linked yet';
+        document.getElementById('esicStatus').textContent = 'Not linked yet';
+        document.getElementById('pvStatus').textContent = 'Not linked yet';
+        return;
+      }
+
+      const { data: emp } = await sb.from('employees').select('uan_number, esic_number, police_verification_status').eq('id', empId).single();
+      if (emp) {
+        document.getElementById('pfStatus').textContent = emp.uan_number ? `Verified — ${emp.uan_number}` : 'Not linked';
+        document.getElementById('pfStatus').className = emp.uan_number ? 'text-emerald-600 text-[11px] font-semibold' : 'text-amber-600 text-[11px] font-semibold';
+
+        document.getElementById('esicStatus').textContent = emp.esic_number ? `Active — ${emp.esic_number}` : 'Pending';
+        document.getElementById('esicStatus').className = emp.esic_number ? 'text-emerald-600 text-[11px] font-semibold' : 'text-amber-600 text-[11px] font-semibold';
+
+        const pvs = emp.police_verification_status || 'Pending';
+        document.getElementById('pvStatus').textContent = pvs;
+        document.getElementById('pvStatus').className = pvs === 'Verified' ? 'text-emerald-600 text-[11px] font-semibold' : 'text-purple-600 text-[11px] font-semibold';
+      }
+    }
   </script>
 
-  <!-- Attendance Modal -->
+  <!-- ============================================ -->
+  <!-- ATTENDANCE MODAL -->
+  <!-- ============================================ -->
   <div id="attendanceModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-6" style="display:none;">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
       <div class="bg-emerald-600 text-white p-4 text-center">
@@ -281,17 +546,15 @@
       const modal = document.getElementById('attendanceModal');
       const content = document.getElementById('attendanceContent');
       modal.style.display = 'flex';
+      lucide.createIcons();
 
-      // Get geolocation
       if (!navigator.geolocation) {
         content.innerHTML = `<div class="text-center text-red-500 py-4">
           <i data-lucide="alert-triangle" class="w-10 h-10 mx-auto mb-2"></i>
           <p class="font-semibold">Location not supported</p>
-          <p class="text-sm text-gray-500 mt-1">Your browser doesn't support geolocation.</p>
           <button onclick="document.getElementById('attendanceModal').style.display='none'" class="mt-4 px-6 py-2 bg-gray-200 rounded-xl text-sm font-semibold">Close</button>
         </div>`;
-        lucide.createIcons();
-        return;
+        lucide.createIcons(); return;
       }
 
       navigator.geolocation.getCurrentPosition(
@@ -308,59 +571,30 @@
                 <p class="text-xs text-emerald-600 font-bold uppercase">Location Captured</p>
                 <p class="text-sm font-mono text-emerald-800 mt-1">${lat}, ${lng}</p>
               </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Date</span>
-                <span class="font-semibold">${dateStr}</span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Time</span>
-                <span class="font-semibold">${timeStr}</span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Status</span>
-                <span class="font-semibold text-emerald-600">Present</span>
-              </div>
-              <button id="confirmAttendance" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">
-                Confirm Attendance ✓
-              </button>
+              <div class="flex justify-between text-sm"><span class="text-gray-500">Date</span><span class="font-semibold">${dateStr}</span></div>
+              <div class="flex justify-between text-sm"><span class="text-gray-500">Time</span><span class="font-semibold">${timeStr}</span></div>
+              <div class="flex justify-between text-sm"><span class="text-gray-500">Status</span><span class="font-semibold text-emerald-600">Present</span></div>
+              <button id="confirmAttendance" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">Confirm Attendance ✓</button>
               <button onclick="document.getElementById('attendanceModal').style.display='none'" class="w-full py-2 text-gray-500 text-sm font-semibold">Cancel</button>
             </div>`;
           lucide.createIcons();
 
-          // Confirm handler
           document.getElementById('confirmAttendance').addEventListener('click', async () => {
             const btn = document.getElementById('confirmAttendance');
             btn.innerHTML = '<div class="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full mx-auto"></div>';
             btn.disabled = true;
 
             try {
-              const sb = getSupabaseClient();
-              const { data: { user } } = await sb.auth.getUser();
-              if (!user) throw new Error('Not authenticated');
-
-              // Find employee linked to this user
-              const { data: emp } = await sb.from('employees')
-                .select('id').eq('auth_user_id', user.id).single();
-
+              const empId = await getEmpId();
               const today = now.toISOString().slice(0, 10);
               const checkIn = now.toTimeString().slice(0, 8);
 
-              const record = {
-                employee_id: emp?.id || null,
-                attendance_date: today,
-                status: 'Present',
-                method: 'online',
-                check_in: checkIn,
-                geo_lat: parseFloat(lat),
-                geo_lng: parseFloat(lng)
-              };
-
-              // Upsert (if already marked today, update)
-              if (emp?.id) {
-                const { error } = await sb.from('attendance').upsert(record, {
-                  onConflict: 'employee_id,attendance_date'
-                });
-                if (error) throw error;
+              if (empId) {
+                await sb.from('attendance').upsert({
+                  employee_id: empId, attendance_date: today,
+                  status: 'Present', method: 'online',
+                  check_in: checkIn, geo_lat: parseFloat(lat), geo_lng: parseFloat(lng)
+                }, { onConflict: 'employee_id,attendance_date' });
               }
 
               content.innerHTML = `<div class="text-center py-4">
@@ -369,17 +603,13 @@
                 </div>
                 <p class="font-bold text-lg text-gray-900">Attendance Marked!</p>
                 <p class="text-sm text-gray-500 mt-1">${dateStr} at ${timeStr}</p>
-                <button onclick="document.getElementById('attendanceModal').style.display='none'" class="mt-4 px-6 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold">Done</button>
+                <button onclick="document.getElementById('attendanceModal').style.display='none';loadDashboardStats();loadActivityFeed();" class="mt-4 px-6 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold">Done</button>
               </div>`;
               lucide.createIcons();
             } catch (e) {
               btn.innerHTML = 'Error: ' + (e.message || 'Failed');
-              btn.classList.replace('bg-emerald-600', 'bg-red-500');
-              setTimeout(() => {
-                btn.innerHTML = 'Confirm Attendance ✓';
-                btn.classList.replace('bg-red-500', 'bg-emerald-600');
-                btn.disabled = false;
-              }, 2000);
+              btn.disabled = false;
+              setTimeout(() => { btn.innerHTML = 'Confirm Attendance ✓'; }, 2000);
             }
           });
         },
@@ -387,7 +617,7 @@
           content.innerHTML = `<div class="text-center py-4">
             <i data-lucide="map-pin-off" class="w-10 h-10 text-red-400 mx-auto mb-2"></i>
             <p class="font-semibold text-red-600">Location Access Denied</p>
-            <p class="text-sm text-gray-500 mt-1">Please enable location access in your browser settings to mark attendance.</p>
+            <p class="text-sm text-gray-500 mt-1">Please enable location in browser settings.</p>
             <button onclick="document.getElementById('attendanceModal').style.display='none'" class="mt-4 px-6 py-2 bg-gray-200 rounded-xl text-sm font-semibold">Close</button>
           </div>`;
           lucide.createIcons();
@@ -396,7 +626,6 @@
       );
     });
 
-    // Close modal on backdrop click
     document.getElementById('attendanceModal')?.addEventListener('click', (e) => {
       if (e.target.id === 'attendanceModal') e.target.style.display = 'none';
     });
@@ -412,63 +641,31 @@
         <h3 class="font-bold text-lg">Apply Leave</h3>
       </div>
       <div class="p-5" id="leaveContent">
-        <!-- Balance Cards -->
         <div class="grid grid-cols-4 gap-2 mb-4" id="leaveBalanceCards">
-          <div class="bg-blue-50 rounded-lg p-2 text-center">
-            <p class="text-[10px] font-bold text-blue-500 uppercase">Casual</p>
-            <p class="text-lg font-bold text-blue-700" id="balCL">--</p>
-          </div>
-          <div class="bg-green-50 rounded-lg p-2 text-center">
-            <p class="text-[10px] font-bold text-green-500 uppercase">Sick</p>
-            <p class="text-lg font-bold text-green-700" id="balSL">--</p>
-          </div>
-          <div class="bg-purple-50 rounded-lg p-2 text-center">
-            <p class="text-[10px] font-bold text-purple-500 uppercase">Earned</p>
-            <p class="text-lg font-bold text-purple-700" id="balEL">--</p>
-          </div>
-          <div class="bg-teal-50 rounded-lg p-2 text-center">
-            <p class="text-[10px] font-bold text-teal-500 uppercase">Comp.</p>
-            <p class="text-lg font-bold text-teal-700" id="balCO">--</p>
-          </div>
+          <div class="bg-blue-50 rounded-lg p-2 text-center"><p class="text-[10px] font-bold text-blue-500 uppercase">Casual</p><p class="text-lg font-bold text-blue-700" id="balCL">--</p></div>
+          <div class="bg-green-50 rounded-lg p-2 text-center"><p class="text-[10px] font-bold text-green-500 uppercase">Sick</p><p class="text-lg font-bold text-green-700" id="balSL">--</p></div>
+          <div class="bg-purple-50 rounded-lg p-2 text-center"><p class="text-[10px] font-bold text-purple-500 uppercase">Earned</p><p class="text-lg font-bold text-purple-700" id="balEL">--</p></div>
+          <div class="bg-teal-50 rounded-lg p-2 text-center"><p class="text-[10px] font-bold text-teal-500 uppercase">Comp.</p><p class="text-lg font-bold text-teal-700" id="balCO">--</p></div>
         </div>
-
         <form id="leaveForm" class="space-y-3">
-          <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Leave Type</label>
+          <div><label class="text-xs font-bold text-gray-600 block mb-1">Leave Type</label>
             <select id="leaveType" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
-              <option value="Casual">Casual Leave (CL)</option>
-              <option value="Sick">Sick Leave (SL)</option>
-              <option value="Earned">Earned Leave (EL)</option>
-              <option value="Compensatory">Compensatory Off</option>
+              <option value="Casual">Casual Leave (CL)</option><option value="Sick">Sick Leave (SL)</option>
+              <option value="Earned">Earned Leave (EL)</option><option value="Compensatory">Compensatory Off</option>
               <option value="Unpaid">Leave Without Pay</option>
-            </select>
-          </div>
+            </select></div>
           <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-xs font-bold text-gray-600 block mb-1">From</label>
-              <input type="date" id="leaveFrom" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
-            </div>
-            <div>
-              <label class="text-xs font-bold text-gray-600 block mb-1">To</label>
-              <input type="date" id="leaveTo" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500">
-            </div>
+            <div><label class="text-xs font-bold text-gray-600 block mb-1">From</label><input type="date" id="leaveFrom" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm"></div>
+            <div><label class="text-xs font-bold text-gray-600 block mb-1">To</label><input type="date" id="leaveTo" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm"></div>
           </div>
           <div class="text-xs text-amber-600 font-semibold" id="leaveDaysCount"></div>
-          <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Reason</label>
-            <textarea id="leaveReason" rows="2" required placeholder="Brief reason..." class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none"></textarea>
-          </div>
-          <button type="submit" class="w-full py-3 bg-amber-500 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">
-            Submit Leave Request
-          </button>
+          <div><label class="text-xs font-bold text-gray-600 block mb-1">Reason</label>
+            <textarea id="leaveReason" rows="2" required placeholder="Brief reason..." class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm resize-none"></textarea></div>
+          <button type="submit" class="w-full py-3 bg-amber-500 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">Submit Leave Request</button>
           <button type="button" onclick="document.getElementById('leaveModal').style.display='none'" class="w-full py-2 text-gray-500 text-sm font-semibold">Cancel</button>
         </form>
-
-        <!-- Leave History -->
-        <div class="mt-4 border-t pt-3">
-          <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">Recent Requests</h4>
-          <div id="leaveHistory" class="space-y-2 text-xs max-h-32 overflow-y-auto"></div>
-        </div>
+        <div class="mt-4 border-t pt-3"><h4 class="text-xs font-bold text-gray-500 uppercase mb-2">Recent Requests</h4>
+          <div id="leaveHistory" class="space-y-2 text-xs max-h-32 overflow-y-auto"></div></div>
       </div>
     </div>
   </div>
@@ -478,239 +675,32 @@
   <!-- ============================================ -->
   <div id="advanceModal" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center p-4" style="display:none;">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-      <div class="bg-emerald-600 text-white p-4 text-center">
+      <div class="bg-blue-600 text-white p-4 text-center">
         <i data-lucide="banknote" class="w-8 h-8 mx-auto mb-1"></i>
         <h3 class="font-bold text-lg">Request Advance</h3>
       </div>
       <div class="p-5">
         <form id="advanceForm" class="space-y-3">
-          <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Amount (₹)</label>
-            <input type="number" id="advanceAmount" required min="500" step="100" placeholder="e.g. 5000" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
-          </div>
-          <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Purpose</label>
-            <select id="advancePurpose" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
-              <option value="Medical Emergency">Medical Emergency</option>
-              <option value="Family Emergency">Family Emergency</option>
-              <option value="Education">Education</option>
-              <option value="Festival / Marriage">Festival / Marriage</option>
-              <option value="Housing">Housing</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Repayment Plan</label>
-            <select id="advanceRepay" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500">
-              <option value="1">Deduct in 1 month</option>
-              <option value="2">Deduct over 2 months</option>
-              <option value="3" selected>Deduct over 3 months</option>
-              <option value="6">Deduct over 6 months</option>
-            </select>
-          </div>
-          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-700" id="advancePreview">
-            Monthly deduction: ₹--
-          </div>
-          <button type="submit" class="w-full py-3 bg-emerald-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">
-            Submit Request
-          </button>
+          <div><label class="text-xs font-bold text-gray-600 block mb-1">Amount (₹)</label>
+            <input type="number" id="advanceAmount" required min="500" step="100" placeholder="e.g. 5000" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm"></div>
+          <div><label class="text-xs font-bold text-gray-600 block mb-1">Purpose</label>
+            <select id="advancePurpose" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm">
+              <option value="Medical Emergency">Medical Emergency</option><option value="Family Emergency">Family Emergency</option>
+              <option value="Education">Education</option><option value="Festival / Marriage">Festival / Marriage</option>
+              <option value="Housing">Housing</option><option value="Other">Other</option>
+            </select></div>
+          <div><label class="text-xs font-bold text-gray-600 block mb-1">Repayment Plan</label>
+            <select id="advanceRepay" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm">
+              <option value="1">Deduct in 1 month</option><option value="2">Deduct over 2 months</option>
+              <option value="3" selected>Deduct over 3 months</option><option value="6">Deduct over 6 months</option>
+            </select></div>
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700" id="advancePreview">Monthly deduction: ₹--</div>
+          <button type="submit" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">Submit Request</button>
           <button type="button" onclick="document.getElementById('advanceModal').style.display='none'" class="w-full py-2 text-gray-500 text-sm font-semibold">Cancel</button>
         </form>
       </div>
     </div>
   </div>
-
-  <script>
-  // ============================================
-  // LEAVE APPLICATION LOGIC
-  // ============================================
-  (async () => {
-    const sb = getSupabaseClient();
-    let _empId = null; // employee UUID
-
-    // Resolve current user to employee
-    async function getEmpId() {
-      if (_empId) return _empId;
-      try {
-        const { data: { user } } = await sb.auth.getUser();
-        if (!user) return null;
-        const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', user.id).single();
-        _empId = emp?.id;
-        return _empId;
-      } catch { return null; }
-    }
-
-    // Leave balance defaults (per year: CL=12, SL=6, EL=15, Comp=0 earned)
-    const LEAVE_QUOTA = { Casual: 12, Sick: 6, Earned: 15, Compensatory: 0 };
-
-    async function loadLeaveBalance() {
-      const empId = await getEmpId();
-      if (!empId) return;
-      const year = new Date().getFullYear();
-      const { data: taken } = await sb.from('leave_requests')
-        .select('leave_type, days').eq('employee_id', empId)
-        .in('status', ['Approved', 'Pending'])
-        .gte('from_date', `${year}-01-01`);
-
-      const used = { Casual: 0, Sick: 0, Earned: 0, Compensatory: 0 };
-      (taken || []).forEach(l => { if (used[l.leave_type] !== undefined) used[l.leave_type] += (l.days || 0); });
-
-      document.getElementById('balCL').textContent = LEAVE_QUOTA.Casual - used.Casual;
-      document.getElementById('balSL').textContent = LEAVE_QUOTA.Sick - used.Sick;
-      document.getElementById('balEL').textContent = LEAVE_QUOTA.Earned - used.Earned;
-      document.getElementById('balCO').textContent = used.Compensatory * -1 || 0; // Comp is earned, not fixed
-    }
-
-    async function loadLeaveHistory() {
-      const empId = await getEmpId();
-      if (!empId) return;
-      const { data } = await sb.from('leave_requests').select('*').eq('employee_id', empId)
-        .order('created_at', { ascending: false }).limit(5);
-      const el = document.getElementById('leaveHistory');
-      el.innerHTML = (data || []).map(l => {
-        const sc = l.status === 'Approved' ? 'bg-green-100 text-green-700' : l.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
-        const fd = new Date(l.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-        const td = new Date(l.to_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-        return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2">
-          <div><span class="font-semibold">${l.leave_type}</span> · ${fd}–${td} (${l.days}d)</div>
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${l.status}</span>
-        </div>`;
-      }).join('') || '<p class="text-gray-400">No requests yet</p>';
-    }
-
-    // Days count
-    const calcDays = () => {
-      const from = document.getElementById('leaveFrom')?.value;
-      const to = document.getElementById('leaveTo')?.value;
-      if (from && to) {
-        const days = Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1;
-        document.getElementById('leaveDaysCount').textContent = days > 0 ? `${days} day(s) selected` : '';
-      }
-    };
-    document.getElementById('leaveFrom')?.addEventListener('change', calcDays);
-    document.getElementById('leaveTo')?.addEventListener('change', calcDays);
-
-    // Open modal
-    document.getElementById('applyLeaveBtn')?.addEventListener('click', () => {
-      document.getElementById('leaveModal').style.display = 'flex';
-      document.getElementById('leaveFrom').value = new Date().toISOString().slice(0, 10);
-      document.getElementById('leaveTo').value = new Date().toISOString().slice(0, 10);
-      calcDays();
-      loadLeaveBalance();
-      loadLeaveHistory();
-      lucide.createIcons();
-    });
-
-    // Submit leave
-    document.getElementById('leaveForm')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const empId = await getEmpId();
-      if (!empId) { alert('Not authenticated'); return; }
-
-      const from = document.getElementById('leaveFrom').value;
-      const to = document.getElementById('leaveTo').value;
-      const days = Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1;
-      if (days < 1) { alert('Invalid date range'); return; }
-
-      const btn = e.target.querySelector('button[type=submit]');
-      btn.innerHTML = 'Submitting...'; btn.disabled = true;
-
-      const { error } = await sb.from('leave_requests').insert({
-        employee_id: empId,
-        leave_type: document.getElementById('leaveType').value,
-        from_date: from,
-        to_date: to,
-        days: days,
-        reason: document.getElementById('leaveReason').value,
-        status: 'Pending'
-      });
-
-      if (!error) {
-        btn.innerHTML = '✓ Submitted!';
-        btn.classList.replace('bg-amber-500', 'bg-green-500');
-        loadLeaveBalance();
-        loadLeaveHistory();
-        setTimeout(() => {
-          document.getElementById('leaveModal').style.display = 'none';
-          btn.innerHTML = 'Submit Leave Request';
-          btn.classList.replace('bg-green-500', 'bg-amber-500');
-          btn.disabled = false;
-          document.getElementById('leaveForm').reset();
-        }, 1500);
-      } else {
-        btn.innerHTML = 'Error: ' + error.message;
-        btn.classList.replace('bg-amber-500', 'bg-red-500');
-        btn.disabled = false;
-        setTimeout(() => { btn.innerHTML = 'Submit Leave Request'; btn.classList.replace('bg-red-500', 'bg-amber-500'); }, 2000);
-      }
-    });
-
-    // ============================================
-    // ADVANCE REQUEST LOGIC
-    // ============================================
-    const updateAdvPreview = () => {
-      const amt = parseFloat(document.getElementById('advanceAmount')?.value) || 0;
-      const months = parseInt(document.getElementById('advanceRepay')?.value) || 1;
-      document.getElementById('advancePreview').textContent = `Monthly deduction: ₹${Math.ceil(amt / months).toLocaleString('en-IN')} × ${months} months`;
-    };
-    document.getElementById('advanceAmount')?.addEventListener('input', updateAdvPreview);
-    document.getElementById('advanceRepay')?.addEventListener('change', updateAdvPreview);
-
-    document.getElementById('advanceSalaryBtn')?.addEventListener('click', () => {
-      document.getElementById('advanceModal').style.display = 'flex';
-      updateAdvPreview();
-      lucide.createIcons();
-    });
-
-    document.getElementById('advanceForm')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const empId = await getEmpId();
-      if (!empId) { alert('Not authenticated'); return; }
-
-      const btn = e.target.querySelector('button[type=submit]');
-      btn.innerHTML = 'Submitting...'; btn.disabled = true;
-
-      const amount = parseFloat(document.getElementById('advanceAmount').value);
-      const months = parseInt(document.getElementById('advanceRepay').value);
-      const purpose = document.getElementById('advancePurpose').value;
-
-      // Store advance request as a leave_request with type metadata (reusing leave_requests table)
-      // OR use wage_records.advance_deduction — for now, log to leave_requests with a custom type
-      const { error } = await sb.from('leave_requests').insert({
-        employee_id: empId,
-        leave_type: 'Advance',
-        from_date: new Date().toISOString().slice(0, 10),
-        to_date: new Date().toISOString().slice(0, 10),
-        days: months,
-        reason: `₹${amount.toLocaleString('en-IN')} — ${purpose} (Repay: ${months} months, ₹${Math.ceil(amount/months)}/mo)`,
-        status: 'Pending'
-      });
-
-      if (!error) {
-        btn.innerHTML = '✓ Request Submitted!';
-        btn.classList.replace('bg-emerald-600', 'bg-green-500');
-        setTimeout(() => {
-          document.getElementById('advanceModal').style.display = 'none';
-          btn.innerHTML = 'Submit Request';
-          btn.classList.replace('bg-green-500', 'bg-emerald-600');
-          btn.disabled = false;
-          document.getElementById('advanceForm').reset();
-        }, 1500);
-      } else {
-        btn.innerHTML = 'Error';
-        btn.disabled = false;
-        setTimeout(() => { btn.innerHTML = 'Submit Request'; }, 2000);
-      }
-    });
-  })();
-
-  // Close modals on backdrop click
-  ['leaveModal', 'advanceModal'].forEach(id => {
-    document.getElementById(id)?.addEventListener('click', (e) => {
-      if (e.target.id === id) e.target.style.display = 'none';
-    });
-  });
-  </script>
 
   <!-- ============================================ -->
   <!-- REPORT ISSUE MODAL -->
@@ -724,148 +714,186 @@
       </div>
       <div class="p-5">
         <form id="reportForm" class="space-y-3">
-          <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Category</label>
-            <select id="reportCategory" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
-              <option value="Unsafe Condition">⚠️ Unsafe Condition</option>
-              <option value="Unhealthy Condition">🏥 Unhealthy Condition</option>
-              <option value="Near Miss">🎯 Near Miss</option>
-              <option value="Unsafe Behaviour">🚫 Unsafe Behaviour</option>
-              <option value="Suggestion">💡 Suggestion</option>
-              <option value="Grievance">📋 Grievance</option>
-              <option value="Sexual Harassment">🛡️ Sexual Harassment (POSH)</option>
-              <option value="Others">📝 Others</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Department / Location</label>
-            <input type="text" id="reportDept" placeholder="e.g. Welding Bay 3, Block C" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500">
-          </div>
-          <div>
-            <label class="text-xs font-bold text-gray-600 block mb-1">Description</label>
-            <textarea id="reportDesc" rows="3" required placeholder="Describe the issue in detail..." class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 resize-none"></textarea>
-          </div>
-          <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700" id="routePreview">
-            <span class="font-bold">Auto-routes to:</span> <span id="routeTarget">Safety & OH Department</span>
-          </div>
-          <button type="submit" class="w-full py-3 bg-red-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">
-            Submit Report
-          </button>
+          <div><label class="text-xs font-bold text-gray-600 block mb-1">Category</label>
+            <select id="reportCategory" required class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm">
+              <option value="Unsafe Condition">⚠️ Unsafe Condition</option><option value="Unhealthy Condition">🏥 Unhealthy Condition</option>
+              <option value="Near Miss">🎯 Near Miss</option><option value="Unsafe Behaviour">🚫 Unsafe Behaviour</option>
+              <option value="Suggestion">💡 Suggestion</option><option value="Grievance">📋 Grievance</option>
+              <option value="Sexual Harassment">🛡️ Sexual Harassment (POSH)</option><option value="Others">📝 Others</option>
+            </select></div>
+          <div><label class="text-xs font-bold text-gray-600 block mb-1">Department / Location</label>
+            <input type="text" id="reportDept" placeholder="e.g. Welding Bay 3" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm"></div>
+          <div><label class="text-xs font-bold text-gray-600 block mb-1">Description</label>
+            <textarea id="reportDesc" rows="3" required placeholder="Describe the issue..." class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm resize-none"></textarea></div>
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700"><span class="font-bold">Auto-routes to:</span> <span id="routeTarget">Safety & OH Department</span></div>
+          <button type="submit" class="w-full py-3 bg-red-600 text-white font-bold rounded-xl active:scale-[0.97] transition-transform">Submit Report</button>
           <button type="button" onclick="document.getElementById('reportModal').style.display='none'" class="w-full py-2 text-gray-500 text-sm font-semibold">Cancel</button>
         </form>
-
-        <!-- Report History -->
-        <div class="mt-4 border-t pt-3">
-          <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">My Reports</h4>
-          <div id="reportHistory" class="space-y-2 text-xs max-h-32 overflow-y-auto"></div>
-        </div>
+        <div class="mt-4 border-t pt-3"><h4 class="text-xs font-bold text-gray-500 uppercase mb-2">My Reports</h4>
+          <div id="reportHistory" class="space-y-2 text-xs max-h-32 overflow-y-auto"></div></div>
       </div>
     </div>
   </div>
 
   <script>
   // ============================================
+  // LEAVE & ADVANCE LOGIC (Uses global getEmpId)
+  // ============================================
+  (async () => {
+    const LEAVE_QUOTA = { Casual: 12, Sick: 6, Earned: 15, Compensatory: 0 };
+
+    async function loadLeaveBalance() {
+      const empId = await getEmpId();
+      if (!empId) return;
+      const year = new Date().getFullYear();
+      const { data: taken } = await sb.from('leave_requests').select('leave_type, days').eq('employee_id', empId)
+        .in('status', ['Approved', 'Pending']).gte('from_date', `${year}-01-01`);
+      const used = { Casual: 0, Sick: 0, Earned: 0, Compensatory: 0 };
+      (taken || []).forEach(l => { if (used[l.leave_type] !== undefined) used[l.leave_type] += (l.days || 0); });
+      document.getElementById('balCL').textContent = LEAVE_QUOTA.Casual - used.Casual;
+      document.getElementById('balSL').textContent = LEAVE_QUOTA.Sick - used.Sick;
+      document.getElementById('balEL').textContent = LEAVE_QUOTA.Earned - used.Earned;
+      document.getElementById('balCO').textContent = used.Compensatory * -1 || 0;
+    }
+
+    async function loadLeaveHistory() {
+      const empId = await getEmpId();
+      if (!empId) return;
+      const { data } = await sb.from('leave_requests').select('*').eq('employee_id', empId).order('created_at', { ascending: false }).limit(5);
+      const el = document.getElementById('leaveHistory');
+      el.innerHTML = (data || []).map(l => {
+        const sc = l.status === 'Approved' ? 'bg-green-100 text-green-700' : l.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
+        const fd = new Date(l.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        const td = new Date(l.to_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+        return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2">
+          <div><span class="font-semibold">${l.leave_type}</span> · ${fd}–${td} (${l.days}d)</div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${l.status}</span></div>`;
+      }).join('') || '<p class="text-gray-400">No requests yet</p>';
+    }
+
+    const calcDays = () => {
+      const from = document.getElementById('leaveFrom')?.value, to = document.getElementById('leaveTo')?.value;
+      if (from && to) { const d = Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1; document.getElementById('leaveDaysCount').textContent = d > 0 ? `${d} day(s) selected` : ''; }
+    };
+    document.getElementById('leaveFrom')?.addEventListener('change', calcDays);
+    document.getElementById('leaveTo')?.addEventListener('change', calcDays);
+
+    document.getElementById('applyLeaveBtn')?.addEventListener('click', () => {
+      document.getElementById('leaveModal').style.display = 'flex';
+      document.getElementById('leaveFrom').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('leaveTo').value = new Date().toISOString().slice(0, 10);
+      calcDays(); loadLeaveBalance(); loadLeaveHistory(); lucide.createIcons();
+    });
+
+    document.getElementById('leaveForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const empId = await getEmpId();
+      if (!empId) { alert('Employee not linked. Please contact admin.'); return; }
+      const from = document.getElementById('leaveFrom').value, to = document.getElementById('leaveTo').value;
+      const days = Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1;
+      if (days < 1) { alert('Invalid date range'); return; }
+      const btn = e.target.querySelector('button[type=submit]');
+      btn.innerHTML = 'Submitting...'; btn.disabled = true;
+      const { error } = await sb.from('leave_requests').insert({
+        employee_id: empId, leave_type: document.getElementById('leaveType').value,
+        from_date: from, to_date: to, days, reason: document.getElementById('leaveReason').value, status: 'Pending'
+      });
+      if (!error) {
+        btn.innerHTML = '✓ Submitted!'; btn.classList.replace('bg-amber-500', 'bg-green-500');
+        loadLeaveBalance(); loadLeaveHistory();
+        setTimeout(() => { document.getElementById('leaveModal').style.display = 'none'; btn.innerHTML = 'Submit Leave Request'; btn.classList.replace('bg-green-500', 'bg-amber-500'); btn.disabled = false; document.getElementById('leaveForm').reset(); }, 1500);
+      } else { btn.innerHTML = 'Error: ' + error.message; btn.disabled = false; setTimeout(() => { btn.innerHTML = 'Submit Leave Request'; }, 2000); }
+    });
+
+    // Advance
+    const updateAdvPreview = () => {
+      const amt = parseFloat(document.getElementById('advanceAmount')?.value) || 0;
+      const months = parseInt(document.getElementById('advanceRepay')?.value) || 1;
+      document.getElementById('advancePreview').textContent = `Monthly deduction: ₹${Math.ceil(amt / months).toLocaleString('en-IN')} × ${months} months`;
+    };
+    document.getElementById('advanceAmount')?.addEventListener('input', updateAdvPreview);
+    document.getElementById('advanceRepay')?.addEventListener('change', updateAdvPreview);
+    document.getElementById('advanceSalaryBtn')?.addEventListener('click', () => { document.getElementById('advanceModal').style.display = 'flex'; updateAdvPreview(); lucide.createIcons(); });
+
+    document.getElementById('advanceForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const empId = await getEmpId();
+      if (!empId) { alert('Employee not linked.'); return; }
+      const btn = e.target.querySelector('button[type=submit]');
+      btn.innerHTML = 'Submitting...'; btn.disabled = true;
+      const amount = parseFloat(document.getElementById('advanceAmount').value);
+      const months = parseInt(document.getElementById('advanceRepay').value);
+      const purpose = document.getElementById('advancePurpose').value;
+      const { error } = await sb.from('leave_requests').insert({
+        employee_id: empId, leave_type: 'Advance', from_date: new Date().toISOString().slice(0, 10),
+        to_date: new Date().toISOString().slice(0, 10), days: months,
+        reason: `₹${amount.toLocaleString('en-IN')} — ${purpose} (Repay: ${months}mo, ₹${Math.ceil(amount/months)}/mo)`, status: 'Pending'
+      });
+      if (!error) {
+        btn.innerHTML = '✓ Request Submitted!'; btn.classList.replace('bg-blue-600', 'bg-green-500');
+        setTimeout(() => { document.getElementById('advanceModal').style.display = 'none'; btn.innerHTML = 'Submit Request'; btn.classList.replace('bg-green-500', 'bg-blue-600'); btn.disabled = false; document.getElementById('advanceForm').reset(); }, 1500);
+      } else { btn.innerHTML = 'Error'; btn.disabled = false; setTimeout(() => { btn.innerHTML = 'Submit Request'; }, 2000); }
+    });
+  })();
+
+  ['leaveModal', 'advanceModal'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', (e) => { if (e.target.id === id) e.target.style.display = 'none'; });
+  });
+  </script>
+
+  <script>
+  // ============================================
   // REPORT ISSUE LOGIC
   // ============================================
   (function() {
-    const sb = getSupabaseClient();
-
-    // Auto-routing map
     const ROUTE_MAP = {
-      'Unsafe Condition': 'Safety & OH',
-      'Unhealthy Condition': 'Safety & OH',
-      'Near Miss': 'Safety & OH',
-      'Unsafe Behaviour': 'Safety & OH',
-      'Suggestion': 'Department',
-      'Grievance': 'Grievance Committee',
-      'Sexual Harassment': 'POSH Committee',
-      'Others': 'Department'
+      'Unsafe Condition': 'Safety & OH', 'Unhealthy Condition': 'Safety & OH',
+      'Near Miss': 'Safety & OH', 'Unsafe Behaviour': 'Safety & OH',
+      'Suggestion': 'Department', 'Grievance': 'Grievance Committee',
+      'Sexual Harassment': 'POSH Committee', 'Others': 'Department'
     };
 
-    // Update route preview on category change
     document.getElementById('reportCategory')?.addEventListener('change', (e) => {
-      const route = ROUTE_MAP[e.target.value] || 'Department';
-      document.getElementById('routeTarget').textContent = route;
+      document.getElementById('routeTarget').textContent = ROUTE_MAP[e.target.value] || 'Department';
     });
 
-    // Open modal
     document.getElementById('reportIssueBtn')?.addEventListener('click', () => {
       document.getElementById('reportModal').style.display = 'flex';
-      loadReportHistory();
-      lucide.createIcons();
+      loadReportHistory(); lucide.createIcons();
     });
 
-    // Submit report
     document.getElementById('reportForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = e.target.querySelector('button[type=submit]');
       btn.innerHTML = 'Submitting...'; btn.disabled = true;
-
-      let empId = null;
-      try {
-        const { data: { user } } = await sb.auth.getUser();
-        if (user) {
-          const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', user.id).single();
-          empId = emp?.id;
-        }
-      } catch (ex) {}
-
+      const empId = await getEmpId();
       const category = document.getElementById('reportCategory').value;
       const { error } = await sb.from('reports').insert({
-        employee_id: empId,
-        category: category,
-        department: document.getElementById('reportDept').value || null,
-        route_to: ROUTE_MAP[category] || 'Department',
-        description: document.getElementById('reportDesc').value,
-        status: 'Open'
+        employee_id: empId, category, department: document.getElementById('reportDept').value || null,
+        route_to: ROUTE_MAP[category] || 'Department', description: document.getElementById('reportDesc').value, status: 'Open'
       });
-
       if (!error) {
-        btn.innerHTML = '✓ Report Submitted!';
-        btn.classList.replace('bg-red-600', 'bg-green-500');
+        btn.innerHTML = '✓ Report Submitted!'; btn.classList.replace('bg-red-600', 'bg-green-500');
         loadReportHistory();
-        setTimeout(() => {
-          document.getElementById('reportModal').style.display = 'none';
-          btn.innerHTML = 'Submit Report';
-          btn.classList.replace('bg-green-500', 'bg-red-600');
-          btn.disabled = false;
-          document.getElementById('reportForm').reset();
-        }, 1500);
-      } else {
-        btn.innerHTML = 'Error: ' + error.message;
-        btn.disabled = false;
-        setTimeout(() => { btn.innerHTML = 'Submit Report'; }, 2000);
-      }
+        setTimeout(() => { document.getElementById('reportModal').style.display = 'none'; btn.innerHTML = 'Submit Report'; btn.classList.replace('bg-green-500', 'bg-red-600'); btn.disabled = false; document.getElementById('reportForm').reset(); }, 1500);
+      } else { btn.innerHTML = 'Error: ' + error.message; btn.disabled = false; setTimeout(() => { btn.innerHTML = 'Submit Report'; }, 2000); }
     });
 
     async function loadReportHistory() {
-      let empId = null;
-      try {
-        const { data: { user } } = await sb.auth.getUser();
-        if (user) {
-          const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', user.id).single();
-          empId = emp?.id;
-        }
-      } catch (ex) {}
-      if (!empId) { document.getElementById('reportHistory').innerHTML = '<p class="text-gray-400">Sign in to see your reports</p>'; return; }
-
-      const { data } = await sb.from('reports').select('*').eq('employee_id', empId)
-        .order('created_at', { ascending: false }).limit(5);
+      const empId = await getEmpId();
+      if (!empId) { document.getElementById('reportHistory').innerHTML = '<p class="text-gray-400">No employee linked</p>'; return; }
+      const { data } = await sb.from('reports').select('*').eq('employee_id', empId).order('created_at', { ascending: false }).limit(5);
       const el = document.getElementById('reportHistory');
       el.innerHTML = (data || []).map(r => {
         const sc = r.status === 'Resolved' || r.status === 'Closed' ? 'bg-green-100 text-green-700' : r.status === 'Escalated' ? 'bg-red-100 text-red-700' : r.status === 'In Progress' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700';
         const dt = new Date(r.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
         return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2">
           <div><span class="font-semibold">${r.category}</span> · ${dt}</div>
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${r.status}</span>
-        </div>`;
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${r.status}</span></div>`;
       }).join('') || '<p class="text-gray-400">No reports yet</p>';
     }
 
-    // Close on backdrop
-    document.getElementById('reportModal')?.addEventListener('click', (e) => {
-      if (e.target.id === 'reportModal') e.target.style.display = 'none';
-    });
+    document.getElementById('reportModal')?.addEventListener('click', (e) => { if (e.target.id === 'reportModal') e.target.style.display = 'none'; });
   })();
   </script>
 </body>
