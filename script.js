@@ -67,19 +67,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Form handler
+  // Form handler — Save lead to Supabase
   const form = document.getElementById('leadForm');
   if (form) {
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = form.querySelector('.form-submit');
-      btn.textContent = '✓ Submitted!';
-      btn.style.background = '#16a34a';
-      setTimeout(() => {
-        btn.textContent = 'Submit Enquiry';
-        btn.style.background = '';
-        form.reset();
-      }, 2500);
+      const originalText = btn.textContent;
+      btn.textContent = 'Submitting...';
+      btn.disabled = true;
+
+      const leadData = {
+        full_name: form.querySelector('#name').value.trim(),
+        company_name: form.querySelector('#company').value.trim() || null,
+        mobile: form.querySelector('#mobile').value.trim(),
+        user_type: form.querySelector('#userType').value || null,
+      };
+
+      try {
+        if (typeof getSupabaseClient === 'function') {
+          const sb = getSupabaseClient();
+          const { error } = await sb.from('leads').insert(leadData);
+          if (error) throw error;
+        }
+        btn.textContent = '✓ Submitted!';
+        btn.style.background = '#16a34a';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = '';
+          btn.disabled = false;
+          form.reset();
+        }, 2500);
+      } catch (err) {
+        console.error('Lead submission error:', err);
+        btn.textContent = '✗ Error — Try Again';
+        btn.style.background = '#dc2626';
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 2500);
+      }
     });
   }
 });

@@ -330,13 +330,12 @@
       </div>
       <div>
         <h2>Verify OTP</h2>
-        <p>Enter the 4-digit code sent to<br><span class="phone-display" id="otpPhoneDisplay">+91 XXXXX XXXXX</span></p>
-      </div>
-      <div style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:8px 16px;font-size:12px;color:#fbbf24;font-weight:600;display:flex;align-items:center;gap:6px;">
-        <i data-lucide="info" style="width:14px;height:14px"></i> Demo Mode — OTP is pre-filled as <span style="font-family:monospace;background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:4px;letter-spacing:2px;">1234</span>
+        <p>Enter the 6-digit code sent to<br><span class="phone-display" id="otpPhoneDisplay">+91 XXXXX XXXXX</span></p>
       </div>
       <div class="otp-inputs">
         <input type="tel" class="otp-input" maxlength="1" inputmode="numeric" autofocus>
+        <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
+        <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
         <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
         <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
         <input type="tel" class="otp-input" maxlength="1" inputmode="numeric">
@@ -344,7 +343,7 @@
       <button class="btn-primary" id="verifyOtpBtn" style="max-width:280px">
         Verify & Enter <i data-lucide="check" style="width:18px;height:18px"></i>
       </button>
-      <div class="resend-row" style="font-size:11px;color:var(--text-muted);">Just tap "Verify & Enter" — any 4 digits work</div>
+      <div class="resend-row" id="resendRow"><span id="resendTimer">Resend in <span id="timer">30</span>s</span> <span id="resendOtp"></span></div>
     </div>
 
     <!-- SUCCESS SCREEN -->
@@ -426,7 +425,7 @@
       skillDefault: 'Select your trade',
       createAccount: 'Create Account',
       verifyTitle: 'Verify OTP',
-      verifySub: 'Enter the 4-digit code sent to',
+      verifySub: 'Enter the 6-digit code sent to',
       verifyBtn: 'Verify & Enter',
       didntReceive: "Didn't receive?",
       resendIn: 'Resend in',
@@ -456,7 +455,7 @@
       skillDefault: 'अपना व्यापार चुनें',
       createAccount: 'खाता बनाएं',
       verifyTitle: 'OTP सत्यापित करें',
-      verifySub: '4-अंकों का कोड दर्ज करें',
+      verifySub: '6-अंकों का कोड दर्ज करें',
       verifyBtn: 'सत्यापित करें',
       didntReceive: 'प्राप्त नहीं हुआ?',
       resendIn: 'पुनः भेजें',
@@ -548,29 +547,65 @@
   });
 
   // ============================================
-  // MOCK OTP AUTH (No SMS provider needed)
+  // REAL SUPABASE PHONE OTP AUTH
   // ============================================
-  const MOCK_OTP = '1234';
   let _pendingPhone = '';
   let _pendingName = '';
+  let _isRegistering = false;
 
-  // Send OTP (Login) — mocked
-  document.getElementById('loginBtn').addEventListener('click', () => {
+  // Send OTP (Login)
+  document.getElementById('loginBtn').addEventListener('click', async () => {
     const phone = document.getElementById('loginPhone').value.trim();
-    if (phone.length !== 10) { shakeInput(document.getElementById('loginPhone')); return; }
+    if (phone.length !== 10 || !/^\d{10}$/.test(phone)) { shakeInput(document.getElementById('loginPhone')); return; }
     _pendingPhone = phone;
-    showOtpScreen(phone);
+    _isRegistering = false;
+
+    const btn = document.getElementById('loginBtn');
+    btn.classList.add('loading');
+    btn.innerHTML = '<div class="spinner"></div> Sending...';
+
+    try {
+      const { error } = await sb.auth.signInWithOtp({ phone: '+91' + phone });
+      if (error) throw error;
+      showOtpScreen(phone);
+    } catch (err) {
+      console.error('OTP send error:', err);
+      btn.innerHTML = '✗ ' + (err.message || 'Failed to send OTP');
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        btn.innerHTML = `${LANG[currentLang].sendOtp} <i data-lucide="arrow-right" style="width:18px;height:18px"></i>`;
+        lucide.createIcons();
+      }, 2500);
+    }
   });
 
-  // Send OTP (Register) — mocked
-  document.getElementById('registerBtn').addEventListener('click', () => {
+  // Send OTP (Register)
+  document.getElementById('registerBtn').addEventListener('click', async () => {
     const name = document.getElementById('regName').value.trim();
     const phone = document.getElementById('regPhone').value.trim();
     if (!name) { shakeInput(document.getElementById('regName')); return; }
-    if (phone.length !== 10) { shakeInput(document.getElementById('regPhone')); return; }
+    if (phone.length !== 10 || !/^\d{10}$/.test(phone)) { shakeInput(document.getElementById('regPhone')); return; }
     _pendingPhone = phone;
     _pendingName = name;
-    showOtpScreen(phone);
+    _isRegistering = true;
+
+    const btn = document.getElementById('registerBtn');
+    btn.classList.add('loading');
+    btn.innerHTML = '<div class="spinner"></div> Sending...';
+
+    try {
+      const { error } = await sb.auth.signInWithOtp({ phone: '+91' + phone });
+      if (error) throw error;
+      showOtpScreen(phone);
+    } catch (err) {
+      console.error('OTP send error:', err);
+      btn.innerHTML = '✗ ' + (err.message || 'Failed to send OTP');
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        btn.innerHTML = `${LANG[currentLang].createAccount} <i data-lucide="arrow-right" style="width:18px;height:18px"></i>`;
+        lucide.createIcons();
+      }, 2500);
+    }
   });
 
   function showOtpScreen(phone) {
@@ -583,12 +618,9 @@
     heroBrand.querySelector('p').textContent = currentLang === 'hi' ? 'आपके पोर्टल तक पहुँचने का अंतिम चरण।' : 'One last step to access your portal.';
 
     otpScreen.classList.add('active');
-
-    // Auto-fill mock OTP after a brief delay
-    setTimeout(() => {
-      const inputs = document.querySelectorAll('.otp-input');
-      MOCK_OTP.split('').forEach((d, i) => { if (inputs[i]) inputs[i].value = d; });
-    }, 600);
+    // Clear previous OTP inputs
+    document.querySelectorAll('.otp-input').forEach(inp => { inp.value = ''; });
+    document.querySelectorAll('.otp-input')[0]?.focus();
 
     startTimer();
     lucide.createIcons();
@@ -605,21 +637,32 @@
     });
   });
 
-  // Verify OTP — accepts any 4-digit code
-  document.getElementById('verifyOtpBtn').addEventListener('click', () => {
+  // Verify OTP — real Supabase verification
+  document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
     const otp = [...document.querySelectorAll('.otp-input')].map(i => i.value).join('');
-    if (otp.length < 4) return;
+    if (otp.length < 6) return;
 
     const btn = document.getElementById('verifyOtpBtn');
     btn.classList.add('loading');
     btn.innerHTML = '<div class="spinner"></div> Verifying...';
 
-    // Store login info in localStorage for get-hired.html to use
-    localStorage.setItem('ss_phone', _pendingPhone);
-    if (_pendingName) localStorage.setItem('ss_name', _pendingName);
-    localStorage.setItem('ss_logged_in', 'true');
+    try {
+      const { data, error } = await sb.auth.verifyOtp({
+        phone: '+91' + _pendingPhone,
+        token: otp,
+        type: 'sms'
+      });
+      if (error) throw error;
 
-    setTimeout(() => {
+      // OTP verified — check if employee profile exists
+      const userId = data.user?.id || data.session?.user?.id;
+      let hasProfile = false;
+      if (userId) {
+        const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', userId).single();
+        hasProfile = !!emp;
+      }
+
+      // Show success animation
       otpScreen.classList.remove('active');
       otpScreen.style.display = 'none';
       heroBrand.style.display = 'none';
@@ -627,22 +670,59 @@
       successScreen.classList.add('active');
       lucide.createIcons();
 
-      setTimeout(() => { window.location.href = 'get-hired.html'; }, 1500);
-    }, 800);
+      // Route to registration or dashboard
+      setTimeout(() => {
+        if (hasProfile) {
+          window.location.href = 'get-hired.html';
+        } else {
+          // Pass pending name via URL if available
+          const params = new URLSearchParams();
+          if (_pendingName) params.set('name', _pendingName);
+          params.set('phone', _pendingPhone);
+          window.location.href = 'worker-registration.html' + (params.toString() ? '?' + params.toString() : '');
+        }
+      }, 1500);
+
+    } catch (err) {
+      console.error('OTP verify error:', err);
+      btn.classList.remove('loading');
+      btn.innerHTML = '✗ ' + (err.message || 'Invalid OTP');
+      setTimeout(() => {
+        btn.innerHTML = `${LANG[currentLang].verifyBtn} <i data-lucide="check" style="width:18px;height:18px"></i>`;
+        lucide.createIcons();
+      }, 2500);
+    }
   });
 
   // Timer
+  let _timerInterval = null;
   function startTimer() {
+    if (_timerInterval) clearInterval(_timerInterval);
     let t = 30;
     const el = document.getElementById('timer');
+    const timerRow = document.getElementById('resendTimer');
     const link = document.getElementById('resendOtp');
-    const iv = setInterval(() => {
+    if (timerRow) timerRow.style.display = '';
+    if (link) link.innerHTML = '';
+    if (el) el.textContent = t;
+    _timerInterval = setInterval(() => {
       t--;
-      el.textContent = t;
+      if (el) el.textContent = t;
       if (t <= 0) {
-        clearInterval(iv);
+        clearInterval(_timerInterval);
+        _timerInterval = null;
+        if (timerRow) timerRow.style.display = 'none';
         const resendText = currentLang === 'hi' ? 'पुनः OTP भेजें' : 'Resend OTP';
-        link.innerHTML = `<a href="#" onclick="startTimer();return false;" style="color:#34d399;font-weight:700">${resendText}</a>`;
+        if (link) link.innerHTML = `<a href="#" id="resendLink" style="color:#34d399;font-weight:700">${resendText}</a>`;
+        document.getElementById('resendLink')?.addEventListener('click', async (e) => {
+          e.preventDefault();
+          try {
+            await sb.auth.signInWithOtp({ phone: '+91' + _pendingPhone });
+            startTimer();
+          } catch (err) {
+            console.error('Resend OTP error:', err);
+          }
+        });
       }
     }, 1000);
   }
@@ -658,6 +738,23 @@
   const shakeStyle = document.createElement('style');
   shakeStyle.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}';
   document.head.appendChild(shakeStyle);
+
+  // ============================================
+  // AUTO-REDIRECT IF ALREADY LOGGED IN
+  // ============================================
+  (async () => {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', session.user.id).single();
+        if (emp) {
+          window.location.href = 'get-hired.html';
+        } else {
+          window.location.href = 'worker-registration.html';
+        }
+      }
+    } catch (e) { /* Not logged in, stay on login page */ }
+  })();
 
   // ============================================
   // QR CODE SCANNER

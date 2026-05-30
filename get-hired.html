@@ -279,33 +279,45 @@
     // AUTH GUARD + DYNAMIC DATA LOADER
     // ============================================
     let _empId = null;
-    const _userName = localStorage.getItem('ss_name') || '';
-    const _userPhone = localStorage.getItem('ss_phone') || '';
+    let _userName = '';
+    let _userPhone = '';
 
-    // Auth check — localStorage mock OR Supabase session
+    // Auth check — Supabase session only (no localStorage)
     (async () => {
-      const isLoggedIn = localStorage.getItem('ss_logged_in') === 'true';
-      if (!isLoggedIn) {
-        try {
-          const { data: { session } } = await sb.auth.getSession();
-          if (!session) { window.location.href = 'worker-login.html'; return; }
-        } catch (e) { window.location.href = 'worker-login.html'; return; }
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.href = 'worker-login.html'; return; }
+
+        // Resolve employee profile from auth user
+        const userId = session.user.id;
+        const { data: emp } = await sb.from('employees').select('id, full_name, mobile').eq('auth_user_id', userId).single();
+
+        if (!emp) {
+          // No employee profile — redirect to registration
+          window.location.href = 'worker-registration.html';
+          return;
+        }
+
+        _empId = emp.id;
+        _userName = emp.full_name || '';
+        _userPhone = emp.mobile || session.user.phone?.replace('+91', '') || '';
+
+        // Populate header
+        const name = _userName || 'Worker';
+        const firstName = name.split(' ')[0];
+        document.getElementById('greetingName').textContent = getGreeting() + ', ' + firstName;
+        document.getElementById('avatarInitials').textContent = getInitials(name);
+        document.getElementById('headerPhone').textContent = _userPhone ? `+91 ${_userPhone.slice(0,5)}•••••` : 'Active';
+
+        // Load dashboard data
+        loadDashboardStats();
+        loadActivityFeed();
+        loadComplianceStatus();
+      } catch (e) {
+        console.error('Auth check error:', e);
+        window.location.href = 'worker-login.html';
+        return;
       }
-
-      // Populate header
-      const name = _userName || 'Worker';
-      const firstName = name.split(' ')[0];
-      document.getElementById('greetingName').textContent = getGreeting() + ', ' + firstName;
-      document.getElementById('avatarInitials').textContent = getInitials(name);
-      document.getElementById('headerPhone').textContent = _userPhone ? `+91 ${_userPhone.slice(0,5)}•••••` : 'Active';
-
-      // Try to resolve employee ID
-      await resolveEmpId();
-
-      // Load dashboard data
-      loadDashboardStats();
-      loadActivityFeed();
-      loadComplianceStatus();
     })();
 
     function getGreeting() {
@@ -322,7 +334,7 @@
       return parts[0].slice(0, 2).toUpperCase();
     }
 
-    // Employee ID resolver — tries Supabase auth first, then phone lookup
+    // Employee ID resolver — uses cached _empId from auth guard
     async function resolveEmpId() {
       if (_empId) return _empId;
       try {
@@ -332,17 +344,6 @@
           if (data) { _empId = data.id; return _empId; }
         }
       } catch (e) {}
-      // Fallback: lookup by phone
-      if (_userPhone) {
-        try {
-          const phone = '+91' + _userPhone;
-          const { data } = await sb.from('employees').select('id, full_name').eq('phone', phone).single();
-          if (data) { _empId = data.id; return _empId; }
-          // Try without +91
-          const { data: d2 } = await sb.from('employees').select('id, full_name').eq('phone', _userPhone).single();
-          if (d2) { _empId = d2.id; return _empId; }
-        } catch (e) {}
-      }
       return null;
     }
 
@@ -350,12 +351,9 @@
       return _empId || await resolveEmpId();
     }
 
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('ss_logged_in');
-      localStorage.removeItem('ss_phone');
-      localStorage.removeItem('ss_name');
-      try { sb.auth.signOut(); } catch (e) {}
+    // Logout — Supabase sign out only
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try { await sb.auth.signOut(); } catch (e) {}
       window.location.href = 'worker-login.html';
     });
 

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Complete Your Profile | Shramik Sathi</title>
+  <meta name="description" content="Shramik Sathi — Complete your KYC registration to access jobs, wages, and compliance services.">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0055a5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --emerald: #059669; --emerald-light: #10b981; --emerald-glow: #34d399;
+      --dark: #0f172a; --darker: #020617; --card: rgba(255,255,255,0.06);
+      --glass: rgba(255,255,255,0.08); --border: rgba(255,255,255,0.1);
+      --text: #f1f5f9; --text-dim: #94a3b8; --text-muted: #64748b;
+      --amber: #f59e0b; --blue: #3b82f6; --red: #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif; background: var(--darker);
+      color: var(--text); min-height: 100dvh; display: flex;
+      justify-content: center; overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app-frame {
+      width: 100%; max-width: 430px; min-height: 100dvh; position: relative;
+      display: flex; flex-direction: column; overflow: hidden;
+      background: linear-gradient(170deg, #0f172a 0%, #020617 40%, #041c2c 70%, #020617 100%);
+    }
+
+    /* Animated Background */
+    .bg-effects { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.3; animation: orbFloat 8s ease-in-out infinite alternate; }
+    .orb-1 { width: 300px; height: 300px; background: var(--emerald); top: -80px; right: -60px; }
+    .orb-2 { width: 250px; height: 250px; background: var(--blue); bottom: 10%; left: -80px; animation-delay: -3s; opacity: 0.2; }
+    @keyframes orbFloat { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(20px,-30px) scale(1.15); } }
+
+    /* Content */
+    .content { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; padding: 0 20px; }
+
+    /* Header */
+    .reg-header { padding: 48px 0 12px; text-align: center; }
+    .reg-header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .reg-header h1 span { background: linear-gradient(135deg, var(--emerald-glow), var(--emerald-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .reg-header p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+    /* Progress Steps */
+    .progress-bar { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 16px 0 24px; }
+    .step-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--glass); border: 1.5px solid var(--border); transition: all 0.3s; }
+    .step-dot.active { background: var(--emerald); border-color: var(--emerald); box-shadow: 0 0 12px rgba(16,185,129,0.5); }
+    .step-dot.done { background: var(--emerald-light); border-color: var(--emerald-light); }
+    .step-connector { width: 24px; height: 2px; background: var(--border); transition: background 0.3s; }
+    .step-connector.done { background: var(--emerald-light); }
+
+    /* Section Title */
+    .section-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 11px; font-weight: 700; color: var(--emerald-glow); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+
+    /* Form Styling */
+    .form-step { display: none; flex-direction: column; gap: 14px; animation: fadeIn 0.35s ease-out; }
+    .form-step.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.4px; }
+    .field label .req { color: var(--red); }
+
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 13px 14px; border: 1px solid var(--border); border-radius: 12px;
+      background: var(--glass); color: var(--text); font-family: inherit; font-size: 14px;
+      font-weight: 500; outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--emerald); box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+    }
+    .field input::placeholder, .field textarea::placeholder { color: var(--text-muted); }
+    .field select { appearance: none; cursor: pointer; }
+    .field select option { background: var(--dark); color: var(--text); }
+    .field textarea { resize: none; min-height: 60px; }
+    .field .hint { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .field input.invalid, .field select.invalid { border-color: var(--red); }
+
+    /* Buttons */
+    .btn-row { display: flex; gap: 12px; padding: 20px 0 36px; }
+    .btn-back {
+      flex: 0 0 auto; padding: 14px 20px; border: 1px solid var(--border); border-radius: 14px;
+      background: var(--glass); color: var(--text); font-family: inherit; font-size: 14px;
+      font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-back:active { background: rgba(255,255,255,0.12); }
+
+    .btn-next {
+      flex: 1; padding: 14px; border: none; border-radius: 14px; cursor: pointer;
+      font-family: inherit; font-size: 15px; font-weight: 700; color: white;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      box-shadow: 0 4px 20px rgba(16,185,129,0.4);
+      transition: transform 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-next:active { transform: scale(0.97); }
+    .btn-next:disabled { opacity: 0.6; pointer-events: none; }
+
+    .btn-next .spinner {
+      width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Compliance Info Banner */
+    .info-banner {
+      background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 12px; padding: 10px 14px; font-size: 11px; color: #93c5fd;
+      display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+    }
+    .info-banner i { flex-shrink: 0; margin-top: 1px; }
+
+    /* Success Screen */
+    .success-screen { display: none; flex-direction: column; align-items: center; text-align: center; gap: 16px; padding-top: 60px; }
+    .success-screen.active { display: flex; }
+    .success-check {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--emerald), var(--emerald-light));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 60px rgba(16,185,129,0.4);
+      animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes successPop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    .success-screen h2 { font-size: 24px; font-weight: 800; }
+    .success-screen p { font-size: 14px; color: var(--text-dim); max-width: 280px; }
+
+    .hidden { display: none !important; }
+
+    @media (min-width: 431px) {
+      body { background: #0a0a0a; }
+      .app-frame { min-height: 100vh; border-left: 1px solid var(--border); border-right: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-frame">
+  <div class="bg-effects">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="content">
+    <!-- Header -->
+    <div class="reg-header" id="regHeader">
+      <h1>Complete Your <span>Profile</span></h1>
+      <p>Fill in your details as per your Aadhar card and official documents. This is required for compliance.</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-bar" id="progressBar">
+      <div class="step-dot active" data-step="1"></div>
+      <div class="step-connector"></div>
+      <div class="step-dot" data-step="2"></div>
+      <div class="step-connector"></div>
+      <div class="step-dot" data-step="3"></div>
+      <div class="step-connector"></div>
+      <div class="step-dot" data-step="4"></div>
+      <div class="step-connector"></div>
+      <div class="step-dot" data-step="5"></div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- STEP 1: Personal Information -->
+    <!-- ============================================ -->
+    <div class="form-step active" id="step1">
+      <div class="section-badge"><i data-lucide="user" style="width:14px;height:14px"></i> Personal Information</div>
+
+      <div class="field">
+        <label>Full Name (as per Aadhar) <span class="req">*</span></label>
+        <input type="text" id="fullName" placeholder="Enter your full name" required>
+      </div>
+
+      <div class="field">
+        <label>Father's / Husband's Name <span class="req">*</span></label>
+        <input type="text" id="fatherName" placeholder="Father's or Husband's name">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Date of Birth <span class="req">*</span></label>
+          <input type="date" id="dob" required>
+        </div>
+        <div class="field">
+          <label>Gender <span class="req">*</span></label>
+          <select id="gender" required>
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Blood Group</label>
+          <select id="bloodGroup">
+            <option value="">Select</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Marital Status</label>
+          <select id="maritalStatus">
+            <option value="">Select</option>
+            <option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Identification Mark</label>
+        <input type="text" id="identityMark" placeholder="e.g. Mole on left cheek">
+        <span class="hint">As required under Factories Act, 1948 — Form No. 25-B</span>
+      </div>
+
+      <div class="info-banner">
+        <i data-lucide="info" style="width:14px;height:14px"></i>
+        <span>All personal details must match your Aadhar card. This data is used for PF enrollment (Form 11), ESIC (Form 1), and statutory registers under the Factories Act.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-next" onclick="goToStep(2)">Next — Contact Details <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- STEP 2: Contact & Address -->
+    <!-- ============================================ -->
+    <div class="form-step" id="step2">
+      <div class="section-badge"><i data-lucide="map-pin" style="width:14px;height:14px"></i> Contact & Address</div>
+
+      <div class="field">
+        <label>Mobile Number <span class="req">*</span></label>
+        <input type="tel" id="mobile" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" required>
+      </div>
+
+      <div class="field">
+        <label>Emergency Contact Number <span class="req">*</span></label>
+        <input type="tel" id="emergencyContact" placeholder="Family/relative number" maxlength="10" inputmode="numeric">
+      </div>
+
+      <div class="field">
+        <label>Permanent Address <span class="req">*</span></label>
+        <textarea id="address" placeholder="Full address including village/town, district" required></textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>State <span class="req">*</span></label>
+          <select id="state" required>
+            <option value="">Select State</option>
+            <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+            <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option>
+            <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+            <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+            <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+            <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
+            <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+            <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
+            <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+            <option>West Bengal</option>
+            <option>Delhi</option><option>Jammu & Kashmir</option><option>Ladakh</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>PIN Code <span class="req">*</span></label>
+          <input type="text" id="pinCode" placeholder="6-digit PIN" maxlength="6" inputmode="numeric" required>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goToStep(1)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back</button>
+        <button class="btn-next" onclick="goToStep(3)">Next — ID & Compliance <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- STEP 3: Compliance & Government IDs -->
+    <!-- ============================================ -->
+    <div class="form-step" id="step3">
+      <div class="section-badge"><i data-lucide="shield-check" style="width:14px;height:14px"></i> Compliance & IDs</div>
+
+      <div class="field">
+        <label>Aadhar Number <span class="req">*</span></label>
+        <input type="text" id="aadharNo" placeholder="12-digit Aadhar number" maxlength="14" inputmode="numeric" required>
+        <span class="hint">Required for UAN/PF registration (EPFO Form 11) and ESIC (Form 1).</span>
+      </div>
+
+      <div class="field">
+        <label>PAN Number</label>
+        <input type="text" id="panNo" placeholder="e.g. ABCDE1234F" maxlength="10" style="text-transform:uppercase">
+        <span class="hint">Required if salary exceeds ₹2,50,000/year (Income Tax Act, Section 206AA).</span>
+      </div>
+
+      <div class="field">
+        <label>Voter ID</label>
+        <input type="text" id="voterId" placeholder="Voter ID card number">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>UAN Number (PF)</label>
+          <input type="text" id="uanNo" placeholder="12-digit UAN" maxlength="12" inputmode="numeric">
+          <span class="hint">If previously enrolled in EPF.</span>
+        </div>
+        <div class="field">
+          <label>ESIC Number</label>
+          <input type="text" id="esiNo" placeholder="17-digit ESIC IP No" maxlength="17" inputmode="numeric">
+          <span class="hint">If previously registered.</span>
+        </div>
+      </div>
+
+      <div class="info-banner">
+        <i data-lucide="scale" style="width:14px;height:14px"></i>
+        <span><strong>Legal basis:</strong> EPF & Misc. Provisions Act 1952, ESI Act 1948, Payment of Wages Act 1936, Contract Labour (R&A) Act 1970, and Jharkhand Shops & Establishments Act.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goToStep(2)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back</button>
+        <button class="btn-next" onclick="goToStep(4)">Next — Bank Details <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- STEP 4: Bank Details -->
+    <!-- ============================================ -->
+    <div class="form-step" id="step4">
+      <div class="section-badge"><i data-lucide="landmark" style="width:14px;height:14px"></i> Bank Account Details</div>
+
+      <div class="field">
+        <label>Bank Name <span class="req">*</span></label>
+        <input type="text" id="bankName" placeholder="e.g. State Bank of India" required>
+      </div>
+
+      <div class="field">
+        <label>Account Number <span class="req">*</span></label>
+        <input type="text" id="accountNo" placeholder="Savings account number" inputmode="numeric" required>
+      </div>
+
+      <div class="field">
+        <label>IFSC Code <span class="req">*</span></label>
+        <input type="text" id="ifscCode" placeholder="e.g. SBIN0001234" maxlength="11" style="text-transform:uppercase" required>
+      </div>
+
+      <div class="info-banner">
+        <i data-lucide="info" style="width:14px;height:14px"></i>
+        <span>As per the Payment of Wages Act, 1936 (Section 6), wages must be paid via bank transfer. Your bank details will be used for direct salary credit and PF withdrawal (if applicable).</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goToStep(3)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back</button>
+        <button class="btn-next" onclick="goToStep(5)">Next — Trade & Skill <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- STEP 5: Trade/Skill & Declaration -->
+    <!-- ============================================ -->
+    <div class="form-step" id="step5">
+      <div class="section-badge"><i data-lucide="wrench" style="width:14px;height:14px"></i> Trade & Skill</div>
+
+      <div class="field">
+        <label>Category <span class="req">*</span></label>
+        <select id="category" required>
+          <option value="">Select Skill Category</option>
+          <option value="Unskilled">Unskilled</option>
+          <option value="Semi-skilled">Semi-skilled</option>
+          <option value="Skilled">Skilled</option>
+          <option value="Highly Skilled">Highly Skilled</option>
+        </select>
+        <span class="hint">As classified under the Minimum Wages Act, 1948 (Central/State Schedule).</span>
+      </div>
+
+      <div class="field">
+        <label>Trade / Designation <span class="req">*</span></label>
+        <select id="designation" required>
+          <option value="">Select your trade</option>
+          <option>Fitter</option><option>Welder (MIG/TIG)</option>
+          <option>Electrician</option><option>Crane Operator</option>
+          <option>Rigger</option><option>Scaffolder</option>
+          <option>Plumber</option><option>General Helper</option>
+          <option>Safety Steward</option><option>Mason</option>
+          <option>Painter</option><option>Carpenter</option>
+          <option>Turner</option><option>Machinist</option>
+          <option>Boiler Attendant</option><option>Driver (HMV)</option>
+          <option>Security Guard</option><option>Housekeeping</option>
+          <option>Office Boy / Peon</option><option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Employee Type</label>
+        <select id="employeeType">
+          <option value="Contractual">Contractual (Contract Labour)</option>
+          <option value="Permanent">Permanent / Regular</option>
+          <option value="Temporary">Temporary</option>
+          <option value="Apprentice">Apprentice (under Apprentices Act)</option>
+        </select>
+      </div>
+
+      <div class="info-banner" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25);color:#6ee7b7;">
+        <i data-lucide="check-circle-2" style="width:14px;height:14px"></i>
+        <span><strong>Declaration:</strong> I hereby declare that all information provided above is true and correct to the best of my knowledge. I understand that any misrepresentation may lead to termination as per the terms of my employment agreement.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" onclick="goToStep(4)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back</button>
+        <button class="btn-next" id="submitBtn" onclick="submitRegistration()">Submit & Complete <i data-lucide="check" style="width:18px;height:18px"></i></button>
+      </div>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-check"><i data-lucide="check" style="width:40px;height:40px;color:white;stroke-width:3"></i></div>
+      <h2>Registration Complete!</h2>
+      <p>Your profile has been saved. Redirecting to your dashboard...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+  const sb = getSupabaseClient();
+
+  // ============================================
+  // AUTH GUARD — Must be logged in
+  // ============================================
+  let _userId = null;
+  (async () => {
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'worker-login.html'; return; }
+      _userId = session.user.id;
+
+      // Check if already registered
+      const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', _userId).single();
+      if (emp) { window.location.href = 'get-hired.html'; return; }
+
+      // Pre-fill data from URL params
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('name')) document.getElementById('fullName').value = params.get('name');
+      if (params.get('phone')) document.getElementById('mobile').value = params.get('phone');
+      // Pre-fill phone from Supabase auth
+      if (session.user.phone) {
+        const phone = session.user.phone.replace('+91', '');
+        document.getElementById('mobile').value = phone;
+      }
+    } catch (e) {
+      console.error('Auth check error:', e);
+      window.location.href = 'worker-login.html';
+    }
+  })();
+
+  // ============================================
+  // MULTI-STEP NAVIGATION
+  // ============================================
+  let currentStep = 1;
+  const totalSteps = 5;
+
+  function goToStep(step) {
+    // Validate current step before advancing
+    if (step > currentStep && !validateStep(currentStep)) return;
+
+    currentStep = step;
+
+    // Update form visibility
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + step).classList.add('active');
+
+    // Update progress dots
+    document.querySelectorAll('.step-dot').forEach(dot => {
+      const s = parseInt(dot.dataset.step);
+      dot.classList.toggle('active', s === step);
+      dot.classList.toggle('done', s < step);
+    });
+    document.querySelectorAll('.step-connector').forEach((conn, i) => {
+      conn.classList.toggle('done', i + 1 < step);
+    });
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    lucide.createIcons();
+  }
+
+  function validateStep(step) {
+    let valid = true;
+    const stepEl = document.getElementById('step' + step);
+    const requiredFields = stepEl.querySelectorAll('[required]');
+
+    requiredFields.forEach(field => {
+      field.classList.remove('invalid');
+      if (!field.value.trim()) {
+        field.classList.add('invalid');
+        valid = false;
+      }
+    });
+
+    // Step-specific validation
+    if (step === 1) {
+      const dob = document.getElementById('dob').value;
+      if (dob) {
+        const age = Math.floor((Date.now() - new Date(dob)) / (365.25 * 24 * 60 * 60 * 1000));
+        if (age < 18) {
+          document.getElementById('dob').classList.add('invalid');
+          alert('Worker must be at least 18 years old as per the Factories Act, 1948 and Child Labour (Prohibition & Regulation) Act, 1986.');
+          valid = false;
+        }
+      }
+    }
+
+    if (step === 2) {
+      const pin = document.getElementById('pinCode').value;
+      if (pin && !/^\d{6}$/.test(pin)) {
+        document.getElementById('pinCode').classList.add('invalid');
+        valid = false;
+      }
+      const mob = document.getElementById('mobile').value;
+      if (mob && !/^\d{10}$/.test(mob)) {
+        document.getElementById('mobile').classList.add('invalid');
+        valid = false;
+      }
+    }
+
+    if (step === 3) {
+      const aadhar = document.getElementById('aadharNo').value.replace(/\s/g, '');
+      if (aadhar && !/^\d{12}$/.test(aadhar)) {
+        document.getElementById('aadharNo').classList.add('invalid');
+        valid = false;
+      }
+      const pan = document.getElementById('panNo').value.toUpperCase();
+      if (pan && !/^[A-Z]{5}\d{4}[A-Z]$/.test(pan)) {
+        document.getElementById('panNo').classList.add('invalid');
+        valid = false;
+      }
+    }
+
+    if (step === 4) {
+      const ifsc = document.getElementById('ifscCode').value.toUpperCase();
+      if (ifsc && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) {
+        document.getElementById('ifscCode').classList.add('invalid');
+        valid = false;
+      }
+    }
+
+    if (!valid) {
+      // Shake first invalid field
+      const firstInvalid = stepEl.querySelector('.invalid');
+      if (firstInvalid) {
+        firstInvalid.style.animation = 'shake 0.4s ease';
+        setTimeout(() => { firstInvalid.style.animation = ''; }, 500);
+      }
+    }
+
+    return valid;
+  }
+
+  // ============================================
+  // SUBMIT REGISTRATION
+  // ============================================
+  async function submitRegistration() {
+    if (!validateStep(5)) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Saving...';
+
+    const employeeData = {
+      auth_user_id: _userId,
+      full_name: document.getElementById('fullName').value.trim(),
+      father_name: document.getElementById('fatherName').value.trim() || null,
+      dob: document.getElementById('dob').value || null,
+      gender: document.getElementById('gender').value || null,
+      blood_group: document.getElementById('bloodGroup').value || null,
+      identity_mark: document.getElementById('identityMark').value.trim() || null,
+      mobile: document.getElementById('mobile').value.trim() || null,
+      emergency_contact: document.getElementById('emergencyContact').value.trim() || null,
+      address: document.getElementById('address').value.trim() || null,
+      state: document.getElementById('state').value || null,
+      pin_code: document.getElementById('pinCode').value.trim() || null,
+      aadhar_no: document.getElementById('aadharNo').value.replace(/\s/g, '').trim() || null,
+      pan_no: document.getElementById('panNo').value.toUpperCase().trim() || null,
+      voter_id: document.getElementById('voterId').value.trim() || null,
+      uan_no: document.getElementById('uanNo').value.trim() || null,
+      esi_no: document.getElementById('esiNo').value.trim() || null,
+      bank_name: document.getElementById('bankName').value.trim() || null,
+      account_no: document.getElementById('accountNo').value.trim() || null,
+      ifsc_code: document.getElementById('ifscCode').value.toUpperCase().trim() || null,
+      category: document.getElementById('category').value || null,
+      designation: document.getElementById('designation').value || null,
+      employee_type: document.getElementById('employeeType').value || 'Contractual',
+      status: 'Pending',
+      date_of_joining: new Date().toISOString().slice(0, 10),
+    };
+
+    try {
+      const { error } = await sb.from('employees').insert(employeeData);
+      if (error) throw error;
+
+      // Hide form, show success
+      document.getElementById('step5').classList.remove('active');
+      document.getElementById('progressBar').style.display = 'none';
+      document.getElementById('regHeader').style.display = 'none';
+      document.getElementById('successScreen').classList.add('active');
+      lucide.createIcons();
+
+      setTimeout(() => { window.location.href = 'get-hired.html'; }, 2000);
+    } catch (err) {
+      console.error('Registration error:', err);
+      btn.disabled = false;
+      btn.innerHTML = '✗ Error: ' + (err.message || 'Failed to save');
+      setTimeout(() => {
+        btn.innerHTML = 'Submit & Complete <i data-lucide="check" style="width:18px;height:18px"></i>';
+        lucide.createIcons();
+      }, 3000);
+    }
+  }
+
+  // Add shake keyframe
+  const shakeStyle = document.createElement('style');
+  shakeStyle.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}';
+  document.head.appendChild(shakeStyle);
+
+  // Aadhar formatting (add spaces every 4 digits)
+  document.getElementById('aadharNo').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '').slice(0, 12);
+    this.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+  });
+</script>
+</body>
+</html>

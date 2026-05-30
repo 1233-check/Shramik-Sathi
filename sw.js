@@ -11,6 +11,7 @@ const OFFLINE_URL = '/offline.html';
 const PRECACHE_ASSETS = [
   '/',
   '/worker-login.html',
+  '/worker-registration.html',
   '/get-hired.html',
   '/hire.html',
   '/manifest.json',
