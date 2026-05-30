@@ -23,11 +23,11 @@
     }
   </script>
   <style>
-    body { background: #0f172a; }
+    body { background: #f4f5f4; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     button, a { -webkit-tap-highlight-color: transparent; }
-    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+    .glass { background: #ffffff; border: 1px solid #e2e4e2; }
     .glass-white { background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); }
     .action-card { transition: transform 0.15s, box-shadow 0.15s; }
     .action-card:active { transform: scale(0.96); }
@@ -45,25 +45,25 @@
   <main class="w-full max-w-md bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-hidden border-x border-gray-200">
 
     <!-- Header — Dynamic -->
-    <header class="sticky top-0 z-50 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4 py-4">
+    <header class="sticky top-0 z-50 bg-[#f4f5f4] px-4 py-4 border-b border-[#e2e4e2]">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center font-bold text-base shadow-lg" id="avatarInitials">
+          <div class="w-11 h-11 rounded-full bg-[#4a5c54] text-white flex items-center justify-center font-bold text-base shadow-sm" id="avatarInitials">
             SS
           </div>
           <div class="flex flex-col">
-            <span class="font-bold text-white text-[15px] leading-tight" id="greetingName">Hello, Worker</span>
-            <span class="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-              <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full inline-block"></span>
+            <span class="font-bold text-[#1c211f] text-[15px] leading-tight" id="greetingName">Hello, Worker</span>
+            <span class="text-[11px] text-[#4a514e] font-medium flex items-center gap-1">
+              <span class="w-1.5 h-1.5 bg-[#5d7369] rounded-full inline-block"></span>
               <span id="headerPhone">Active</span>
             </span>
           </div>
         </div>
         <div class="flex items-center gap-0.5">
-          <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-colors" aria-label="Notifications">
+          <button class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#1c211f] hover:bg-white rounded-full transition-colors" aria-label="Notifications">
             <i data-lucide="bell" class="w-5 h-5"></i>
           </button>
-          <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors" aria-label="Logout">
+          <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#e76f51] hover:bg-white rounded-full transition-colors" aria-label="Logout">
             <i data-lucide="log-out" class="w-5 h-5"></i>
           </button>
         </div>
@@ -72,20 +72,20 @@
       <!-- Quick Stats Row -->
       <div class="grid grid-cols-4 gap-2 mt-4">
         <div class="glass rounded-xl px-2 py-2.5 text-center">
-          <p class="text-lg font-bold text-emerald-400" id="statDays">—</p>
-          <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">Days</p>
+          <p class="text-lg font-bold text-[#4a5c54]" id="statDays">—</p>
+          <p class="text-[9px] font-semibold text-[#8b928f] uppercase tracking-wider">Days</p>
         </div>
         <div class="glass rounded-xl px-2 py-2.5 text-center">
-          <p class="text-lg font-bold text-blue-400" id="statLeave">—</p>
-          <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">Leave Bal</p>
+          <p class="text-lg font-bold text-slate-600" id="statLeave">—</p>
+          <p class="text-[9px] font-semibold text-[#8b928f] uppercase tracking-wider">Leave Bal</p>
         </div>
         <div class="glass rounded-xl px-2 py-2.5 text-center">
-          <p class="text-lg font-bold text-amber-400" id="statPay">—</p>
-          <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">Pending</p>
+          <p class="text-lg font-bold text-slate-600" id="statPay">—</p>
+          <p class="text-[9px] font-semibold text-[#8b928f] uppercase tracking-wider">Pending</p>
         </div>
         <div class="glass rounded-xl px-2 py-2.5 text-center">
-          <p class="text-lg font-bold text-purple-400" id="statReports">0</p>
-          <p class="text-[9px] font-semibold text-slate-500 uppercase tracking-wider">Reports</p>
+          <p class="text-lg font-bold text-[#e76f51]" id="statReports">0</p>
+          <p class="text-[9px] font-semibold text-[#8b928f] uppercase tracking-wider">Reports</p>
         </div>
       </div>
     </header>
@@ -95,18 +95,18 @@
 
       <!-- Earnings Card -->
       <section class="p-4 pt-5 fade-in">
-        <div class="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+        <div class="bg-[#4a5c54] rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
           <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div class="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
           <div class="relative">
-            <p class="text-emerald-100 text-xs font-semibold uppercase tracking-wider">This Month's Earnings</p>
+            <p class="text-[#c2c9c5] text-xs font-semibold uppercase tracking-wider">This Month's Earnings</p>
             <p class="text-3xl font-black mt-1" id="monthlyPay">₹ —</p>
             <div class="flex items-center gap-4 mt-3 text-xs">
               <span class="flex items-center gap-1 bg-white/20 rounded-full px-2.5 py-1">
                 <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
                 <span id="earningsMonth">May 2026</span>
               </span>
-              <span class="flex items-center gap-1 text-emerald-100" id="lastPayDate">
+              <span class="flex items-center gap-1 text-[#c2c9c5]" id="lastPayDate">
                 <i data-lucide="clock" class="w-3.5 h-3.5"></i>
                 Last paid: —
               </span>
@@ -123,43 +123,43 @@
         </h3>
         <div class="grid grid-cols-3 gap-3">
 
-          <button id="markAttendanceBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-600 flex items-center justify-center">
+          <button id="markAttendanceBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-[#e2e4e2] flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gray-50 text-[#4a5c54] flex items-center justify-center border border-gray-100">
               <i data-lucide="map-pin-check" class="w-6 h-6"></i>
             </div>
             <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Attendance</span>
           </button>
 
-          <button id="applyLeaveBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-50 to-amber-100 text-amber-600 flex items-center justify-center">
+          <button id="applyLeaveBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-[#e2e4e2] flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gray-50 text-slate-600 flex items-center justify-center border border-gray-100">
               <i data-lucide="calendar-off" class="w-6 h-6"></i>
             </div>
             <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Apply Leave</span>
           </button>
 
-          <button id="advanceSalaryBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 flex items-center justify-center">
+          <button id="advanceSalaryBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-[#e2e4e2] flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gray-50 text-slate-600 flex items-center justify-center border border-gray-100">
               <i data-lucide="banknote" class="w-6 h-6"></i>
             </div>
             <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Advance</span>
           </button>
 
-          <button id="reportIssueBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 text-red-600 flex items-center justify-center">
+          <button id="reportIssueBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-[#e2e4e2] flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gray-50 text-[#e76f51] flex items-center justify-center border border-gray-100">
               <i data-lucide="alert-triangle" class="w-6 h-6"></i>
             </div>
             <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Report Issue</span>
           </button>
 
-          <button id="viewPayslipBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 flex items-center justify-center">
+          <button id="viewPayslipBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-[#e2e4e2] flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gray-50 text-slate-600 flex items-center justify-center border border-gray-100">
               <i data-lucide="receipt-indian-rupee" class="w-6 h-6"></i>
             </div>
             <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Payslip</span>
           </button>
 
-          <a href="worker-jobs.html" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-50 to-teal-100 text-teal-600 flex items-center justify-center">
+          <a href="worker-jobs.html" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-[#e2e4e2] flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+            <div class="w-12 h-12 rounded-2xl bg-gray-50 text-slate-600 flex items-center justify-center border border-gray-100">
               <i data-lucide="search" class="w-6 h-6"></i>
             </div>
             <span class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Find Jobs</span>
@@ -178,8 +178,8 @@
             </h3>
             <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full" id="streakPct">—%</span>
           </div>
-          <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-1000" id="streakBar" style="width:0%"></div>
+          <div class="w-full bg-[#f4f5f4] rounded-full h-3 overflow-hidden border border-[#e2e4e2]">
+            <div class="h-full bg-[#4a5c54] rounded-full transition-all duration-1000" id="streakBar" style="width:0%"></div>
           </div>
           <p class="text-[11px] text-gray-500 mt-2" id="streakText">Loading attendance data...</p>
         </div>
@@ -248,20 +248,20 @@
     </div>
 
     <!-- Bottom Navigation -->
-    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-      <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center h-full text-emerald-600">
+    <nav class="absolute bottom-0 w-full bg-[#f4f5f4] border-t border-[#e2e4e2] flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-sm">
+      <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center h-full text-[#4a5c54]">
         <i data-lucide="layout-dashboard" class="w-[20px] h-[20px] mb-0.5"></i>
         <span class="text-[10px] font-bold">Home</span>
       </a>
-      <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 active:bg-gray-50 rounded-xl transition-colors">
+      <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
         <i data-lucide="briefcase" class="w-[20px] h-[20px] mb-0.5"></i>
         <span class="text-[10px] font-semibold">Jobs</span>
       </a>
-      <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 active:bg-gray-50 rounded-xl transition-colors">
+      <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
         <i data-lucide="newspaper" class="w-[20px] h-[20px] mb-0.5"></i>
         <span class="text-[10px] font-semibold">News</span>
       </a>
-      <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center h-full text-gray-400 hover:text-gray-600 active:bg-gray-50 rounded-xl transition-colors">
+      <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
         <i data-lucide="user-circle" class="w-[20px] h-[20px] mb-0.5"></i>
         <span class="text-[10px] font-semibold">Profile</span>
       </a>
