@@ -463,6 +463,14 @@
         const phone = session.user.phone.replace('+91', '');
         document.getElementById('mobile').value = phone;
       }
+      // Pre-fill from Google profile if available
+      const meta = session.user.user_metadata;
+      if (meta) {
+        const googleName = meta.full_name || meta.name || '';
+        if (googleName && !document.getElementById('fullName').value) {
+          document.getElementById('fullName').value = googleName;
+        }
+      }
     } catch (e) {
       console.error('Auth check error:', e);
       window.location.href = 'worker-login.html';
@@ -589,6 +597,7 @@
       dob: document.getElementById('dob').value || null,
       gender: document.getElementById('gender').value || null,
       blood_group: document.getElementById('bloodGroup').value || null,
+      marital_status: document.getElementById('maritalStatus').value || null,
       identity_mark: document.getElementById('identityMark').value.trim() || null,
       mobile: document.getElementById('mobile').value.trim() || null,
       emergency_contact: document.getElementById('emergencyContact').value.trim() || null,

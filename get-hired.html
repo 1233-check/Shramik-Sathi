@@ -404,12 +404,12 @@
       document.getElementById('statLeave').textContent = totalLeave - usedLeave;
 
       // Wage
-      const { data: wages } = await sb.from('wage_records').select('net_payable, pay_period_end')
-        .eq('employee_id', empId).order('pay_period_end', { ascending: false }).limit(1);
+      const { data: wages } = await sb.from('wage_records').select('net_pay, created_at')
+        .eq('employee_id', empId).order('created_at', { ascending: false }).limit(1);
       if (wages && wages.length > 0) {
-        document.getElementById('monthlyPay').textContent = '₹' + (wages[0].net_payable || 0).toLocaleString('en-IN');
-        document.getElementById('statPay').textContent = '₹' + Math.round((wages[0].net_payable || 0) / 1000) + 'k';
-        const pd = new Date(wages[0].pay_period_end);
+        document.getElementById('monthlyPay').textContent = '₹' + (wages[0].net_pay || 0).toLocaleString('en-IN');
+        document.getElementById('statPay').textContent = '₹' + Math.round((wages[0].net_pay || 0) / 1000) + 'k';
+        const pd = new Date(wages[0].created_at);
         document.getElementById('lastPayDate').innerHTML = `<i data-lucide="clock" class="w-3.5 h-3.5"></i> Last: ${pd.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}`;
         lucide.createIcons();
       } else {
@@ -505,13 +505,13 @@
         return;
       }
 
-      const { data: emp } = await sb.from('employees').select('uan_number, esic_number, police_verification_status').eq('id', empId).single();
+      const { data: emp } = await sb.from('employees').select('uan_no, esi_no, police_verification_status').eq('id', empId).single();
       if (emp) {
-        document.getElementById('pfStatus').textContent = emp.uan_number ? `Verified — ${emp.uan_number}` : 'Not linked';
-        document.getElementById('pfStatus').className = emp.uan_number ? 'text-emerald-600 text-[11px] font-semibold' : 'text-amber-600 text-[11px] font-semibold';
+        document.getElementById('pfStatus').textContent = emp.uan_no ? `Verified — ${emp.uan_no}` : 'Not linked';
+        document.getElementById('pfStatus').className = emp.uan_no ? 'text-emerald-600 text-[11px] font-semibold' : 'text-amber-600 text-[11px] font-semibold';
 
-        document.getElementById('esicStatus').textContent = emp.esic_number ? `Active — ${emp.esic_number}` : 'Pending';
-        document.getElementById('esicStatus').className = emp.esic_number ? 'text-emerald-600 text-[11px] font-semibold' : 'text-amber-600 text-[11px] font-semibold';
+        document.getElementById('esicStatus').textContent = emp.esi_no ? `Active — ${emp.esi_no}` : 'Pending';
+        document.getElementById('esicStatus').className = emp.esi_no ? 'text-emerald-600 text-[11px] font-semibold' : 'text-amber-600 text-[11px] font-semibold';
 
         const pvs = emp.police_verification_status || 'Pending';
         document.getElementById('pvStatus').textContent = pvs;
