@@ -6,89 +6,94 @@
   <title>My Profile | Shramik Sathi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            emerald: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857' },
-            blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb' },
-            amber: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 600: '#d97706' },
-            gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 800: '#1f2937', 900: '#111827' }
-          }
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
       }
     }
   </script>
   <style>
-    body { background-color: #cbd5e1; }
+    body { background: #f4f5f4; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     button, a { -webkit-tap-highlight-color: transparent; }
-    .touch-target { min-height: 48px; min-width: 48px; }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body class="text-gray-900 antialiased font-sans flex justify-center">
 
   <main class="w-full max-w-md bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-hidden border-x border-gray-200">
-    
+
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white shadow-sm px-4 py-3 flex items-center justify-between touch-target">
-      <h1 class="font-bold text-xl text-gray-900 tracking-tight">My Profile</h1>
-      <button class="touch-target flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-full active:bg-gray-200" aria-label="Edit Profile">
-        <i data-lucide="edit-3" class="w-6 h-6"></i>
+    <header class="sticky top-0 z-50 bg-[#f4f5f4] px-4 py-3 flex items-center justify-between border-b border-[#e2e4e2]">
+      <h1 class="font-bold text-xl text-[#1c211f] tracking-tight">My Profile</h1>
+      <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#e76f51] hover:bg-white rounded-full transition-colors" aria-label="Logout">
+        <i data-lucide="log-out" class="w-5 h-5"></i>
       </button>
     </header>
 
     <!-- Scrollable Content -->
     <div class="flex-1 overflow-y-auto no-scrollbar pb-24">
-      
+
       <!-- Profile Header Card -->
-      <div class="bg-white border-b border-gray-200 p-6 flex flex-col items-center justify-center">
+      <div class="bg-white border-b border-gray-200 p-6 flex flex-col items-center justify-center fade-in">
         <div class="relative mb-4">
-          <div class="w-24 h-24 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-3xl shadow-sm border-4 border-white">
-            VS
+          <div class="w-24 h-24 rounded-full bg-[#4a5c54] text-white flex items-center justify-center font-bold text-3xl shadow-sm border-4 border-white" id="avatarInitials">
+            SS
           </div>
-          <div class="absolute bottom-0 right-0 w-6 h-6 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center">
+          <div class="absolute bottom-0 right-0 w-6 h-6 border-2 border-white rounded-full flex items-center justify-center" id="verifiedBadge" style="background:#5d7369;">
             <i data-lucide="check" class="w-3 h-3 text-white"></i>
           </div>
         </div>
-        <h2 class="text-2xl font-bold text-gray-900">Virat Singh</h2>
-        <p class="text-gray-500 font-medium mt-1 text-[15px]">Mechanical Fitter | ID: 15937</p>
-        <span class="mt-3 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100">KYC Verified</span>
+        <h2 class="text-2xl font-bold text-[#1c211f]" id="profileName">Loading...</h2>
+        <p class="text-[#4a514e] font-medium mt-1 text-[15px]" id="profileDesignation">—</p>
+        <span class="mt-3 px-3 py-1 text-xs font-bold rounded-full" id="profileStatus">—</span>
       </div>
 
       <!-- Identity Details -->
-      <section class="p-4 mt-2">
-        <h3 class="text-[13px] font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Identity Information</h3>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          
+      <section class="p-4 mt-2 fade-in" style="animation-delay:0.05s">
+        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Identity Information</h3>
+        <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] overflow-hidden">
+
           <div class="p-4 border-b border-gray-100 flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="text-gray-400"><i data-lucide="credit-card" class="w-5 h-5"></i></div>
+              <div class="text-[#8b928f]"><i data-lucide="credit-card" class="w-5 h-5"></i></div>
               <div>
-                <p class="text-xs text-gray-500 font-medium">Aadhar Number</p>
-                <p class="text-[15px] font-bold text-gray-900">XXXX-XXXX-3593</p>
+                <p class="text-xs text-[#8b928f] font-medium">Aadhar Number</p>
+                <p class="text-[15px] font-bold text-[#1c211f]" id="profileAadhar">—</p>
               </div>
             </div>
-            <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i>
+            <i data-lucide="check-circle-2" class="w-5 h-5 text-[#5d7369]" id="aadharCheck" style="display:none;"></i>
           </div>
 
           <div class="p-4 border-b border-gray-100 flex items-center gap-3">
-            <div class="text-gray-400"><i data-lucide="calendar" class="w-5 h-5"></i></div>
+            <div class="text-[#8b928f]"><i data-lucide="calendar" class="w-5 h-5"></i></div>
             <div>
-              <p class="text-xs text-gray-500 font-medium">Date of Birth</p>
-              <p class="text-[15px] font-bold text-gray-900">12 / 08 / 1995</p>
+              <p class="text-xs text-[#8b928f] font-medium">Date of Birth</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profileDob">—</p>
+            </div>
+          </div>
+
+          <div class="p-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="text-[#8b928f]"><i data-lucide="user" class="w-5 h-5"></i></div>
+            <div>
+              <p class="text-xs text-[#8b928f] font-medium">Gender</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profileGender">—</p>
             </div>
           </div>
 
           <div class="p-4 flex items-center gap-3">
-            <div class="text-gray-400"><i data-lucide="droplet" class="w-5 h-5"></i></div>
+            <div class="text-[#8b928f]"><i data-lucide="droplet" class="w-5 h-5"></i></div>
             <div>
-              <p class="text-xs text-gray-500 font-medium">Blood Group</p>
-              <p class="text-[15px] font-bold text-gray-900">O Positive (O+)</p>
+              <p class="text-xs text-[#8b928f] font-medium">Blood Group</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profileBlood">—</p>
             </div>
           </div>
 
@@ -96,56 +101,96 @@
       </section>
 
       <!-- Bank Details -->
-      <section class="p-4">
-        <h3 class="text-[13px] font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Bank Account details</h3>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-                <i data-lucide="building-2" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <h4 class="font-bold text-gray-900 text-[15px]">State Bank of India</h4>
-                <p class="text-xs text-emerald-600 font-semibold mt-0.5">Primary Salary Account</p>
-              </div>
+      <section class="p-4 fade-in" style="animation-delay:0.1s">
+        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Bank Account Details</h3>
+        <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] p-4">
+          <div class="flex items-start gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="building-2" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-[#1c211f] text-[15px]" id="profileBank">—</h4>
+              <p class="text-xs text-[#5d7369] font-semibold mt-0.5">Salary Account</p>
             </div>
           </div>
-          
           <div class="grid grid-cols-2 gap-4 mt-2">
             <div>
-              <p class="text-xs text-gray-500 font-medium">Account Number</p>
-              <p class="text-[15px] font-bold text-gray-900 mt-0.5">XXXXXX7890</p>
+              <p class="text-xs text-[#8b928f] font-medium">Account Number</p>
+              <p class="text-[15px] font-bold text-[#1c211f] mt-0.5" id="profileAccountNo">—</p>
             </div>
             <div>
-              <p class="text-xs text-gray-500 font-medium">IFSC Code</p>
-              <p class="text-[15px] font-bold text-gray-900 mt-0.5">SBIN0001234</p>
+              <p class="text-xs text-[#8b928f] font-medium">IFSC Code</p>
+              <p class="text-[15px] font-bold text-[#1c211f] mt-0.5" id="profileIfsc">—</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Emergency Contact -->
-      <section class="p-4">
-        <h3 class="text-[13px] font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">Emergency Contact</h3>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+      <!-- Contact Details -->
+      <section class="p-4 fade-in" style="animation-delay:0.15s">
+        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Contact Information</h3>
+        <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] overflow-hidden">
+          <div class="p-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-emerald-50 text-[#5d7369] flex items-center justify-center flex-shrink-0">
+              <i data-lucide="phone" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs text-[#8b928f] font-medium">Mobile Number</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profileMobile">—</p>
+            </div>
+          </div>
+          <div class="p-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
               <i data-lucide="phone-call" class="w-5 h-5"></i>
             </div>
             <div>
-              <p class="text-[15px] font-bold text-gray-900">Ramesh Singh</p>
-              <p class="text-xs text-gray-500 font-medium mt-0.5">Brother • +91 98765 43210</p>
+              <p class="text-xs text-[#8b928f] font-medium">Emergency Contact</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profileEmergency">—</p>
             </div>
           </div>
-          <button class="w-10 h-10 bg-gray-50 hover:bg-gray-100 rounded-full flex items-center justify-center text-gray-600 active:bg-gray-200 transition-colors touch-target">
-            <i data-lucide="pencil" class="w-4 h-4"></i>
-          </button>
+          <div class="p-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-xs text-[#8b928f] font-medium">Address</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profileAddress">—</p>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Logout Button -->
-      <div class="p-4 mt-4 mb-6">
-        <button class="w-full bg-white border border-red-200 text-red-600 font-bold py-3.5 rounded-xl touch-target active:bg-red-50 transition-colors shadow-sm flex items-center justify-center gap-2">
+      <!-- Compliance IDs -->
+      <section class="p-4 fade-in" style="animation-delay:0.2s">
+        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Compliance IDs</h3>
+        <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] overflow-hidden">
+          <div class="p-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="text-[#8b928f]"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
+            <div>
+              <p class="text-xs text-[#8b928f] font-medium">PAN Number</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profilePan">—</p>
+            </div>
+          </div>
+          <div class="p-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="text-[#8b928f]"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
+            <div>
+              <p class="text-xs text-[#8b928f] font-medium">UAN (PF)</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profileUan">—</p>
+            </div>
+          </div>
+          <div class="p-4 flex items-center gap-3">
+            <div class="text-[#8b928f]"><i data-lucide="heart-pulse" class="w-5 h-5"></i></div>
+            <div>
+              <p class="text-xs text-[#8b928f] font-medium">ESIC Number</p>
+              <p class="text-[15px] font-bold text-[#1c211f]" id="profileEsi">—</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sign Out -->
+      <div class="p-4 mt-2 mb-6 fade-in" style="animation-delay:0.25s">
+        <button id="signOutBtn" class="w-full bg-white border border-red-200 text-red-600 font-bold py-3.5 rounded-xl active:bg-red-50 transition-colors shadow-sm flex items-center justify-center gap-2">
           <i data-lucide="log-out" class="w-5 h-5"></i> Sign Out
         </button>
       </div>
@@ -153,26 +198,121 @@
     </div>
 
     <!-- Bottom Navigation Bar -->
-    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px]">
-      <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">Home</span>
+    <nav class="absolute bottom-0 w-full bg-[#f4f5f4] border-t border-[#e2e4e2] flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-sm">
+      <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
+        <i data-lucide="layout-dashboard" class="w-[20px] h-[20px] mb-0.5"></i>
+        <span class="text-[10px] font-semibold">Home</span>
       </a>
-      <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="briefcase" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">Jobs</span>
+      <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
+        <i data-lucide="briefcase" class="w-[20px] h-[20px] mb-0.5"></i>
+        <span class="text-[10px] font-semibold">Jobs</span>
       </a>
-      <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="newspaper" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">News</span>
+      <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
+        <i data-lucide="newspaper" class="w-[20px] h-[20px] mb-0.5"></i>
+        <span class="text-[10px] font-semibold">News</span>
       </a>
-      <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center touch-target text-emerald-600 h-full">
-        <i data-lucide="user" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-bold">Profile</span>
+      <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center h-full text-[#4a5c54]">
+        <i data-lucide="user-circle" class="w-[20px] h-[20px] mb-0.5"></i>
+        <span class="text-[10px] font-bold">Profile</span>
       </a>
     </nav>
   </main>
 
-  <script>lucide.createIcons();</script>
+  <script>
+    lucide.createIcons();
+    const sb = getSupabaseClient();
+
+    // ============================================
+    // HELPERS
+    // ============================================
+    function maskNumber(num, visible = 4) {
+      if (!num) return '—';
+      const clean = num.replace(/\s/g, '');
+      if (clean.length <= visible) return clean;
+      return 'XXXX-XXXX-' + clean.slice(-visible);
+    }
+
+    function getInitials(name) {
+      if (!name) return 'SS';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    // ============================================
+    // AUTH GUARD + LOAD PROFILE DATA
+    // ============================================
+    (async () => {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.href = 'worker-login.html'; return; }
+
+        const { data: emp } = await sb.from('employees')
+          .select('*')
+          .eq('auth_user_id', session.user.id)
+          .single();
+
+        if (!emp) { window.location.href = 'worker-registration.html'; return; }
+
+        // — Header avatar & name —
+        document.getElementById('avatarInitials').textContent = getInitials(emp.full_name);
+        document.getElementById('profileName').textContent = emp.full_name || 'Worker';
+        document.getElementById('profileDesignation').textContent =
+          [emp.designation, emp.emp_id ? `ID: ${emp.emp_id}` : null].filter(Boolean).join(' | ') || 'Employee';
+
+        // — Status badge —
+        const badge = document.getElementById('profileStatus');
+        const status = emp.status || 'Pending';
+        badge.textContent = status;
+        if (status === 'Active') {
+          badge.className = 'mt-3 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100';
+        } else if (status === 'Pending') {
+          badge.className = 'mt-3 px-3 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-full border border-amber-100';
+        } else {
+          badge.className = 'mt-3 px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full border border-gray-200';
+        }
+
+        // — Identity —
+        document.getElementById('profileAadhar').textContent = emp.aadhar_no ? maskNumber(emp.aadhar_no) : 'Not provided';
+        document.getElementById('aadharCheck').style.display = emp.aadhar_no ? '' : 'none';
+        document.getElementById('profileDob').textContent = emp.dob
+          ? new Date(emp.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })
+          : 'Not provided';
+        document.getElementById('profileGender').textContent = emp.gender || 'Not provided';
+        document.getElementById('profileBlood').textContent = emp.blood_group || 'Not provided';
+
+        // — Bank —
+        document.getElementById('profileBank').textContent = emp.bank_name || 'Not linked';
+        document.getElementById('profileAccountNo').textContent = emp.account_no ? maskNumber(emp.account_no, 4) : '—';
+        document.getElementById('profileIfsc').textContent = emp.ifsc_code || '—';
+
+        // — Contact —
+        document.getElementById('profileMobile').textContent = emp.mobile ? `+91 ${emp.mobile}` : '—';
+        document.getElementById('profileEmergency').textContent = emp.emergency_contact ? `+91 ${emp.emergency_contact}` : '—';
+        document.getElementById('profileAddress').textContent =
+          [emp.address, emp.state, emp.pin_code].filter(Boolean).join(', ') || '—';
+
+        // — Compliance —
+        document.getElementById('profilePan').textContent = emp.pan_no || 'Not provided';
+        document.getElementById('profileUan').textContent = emp.uan_no || 'Not linked';
+        document.getElementById('profileEsi').textContent = emp.esi_no || 'Not linked';
+
+        lucide.createIcons();
+      } catch (e) {
+        console.error('Profile load error:', e);
+        window.location.href = 'worker-login.html';
+      }
+    })();
+
+    // ============================================
+    // SIGN OUT
+    // ============================================
+    async function signOut() {
+      try { await sb.auth.signOut(); } catch (e) {}
+      window.location.href = 'worker-login.html';
+    }
+    document.getElementById('logoutBtn').addEventListener('click', signOut);
+    document.getElementById('signOutBtn').addEventListener('click', signOut);
+  </script>
 </body>
 </html>

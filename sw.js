@@ -4,7 +4,7 @@
  * and background sync for queued attendance/report submissions.
  */
 
-const CACHE_NAME = 'shramik-sathi-v1';
+const CACHE_NAME = 'shramik-sathi-v2';
 const OFFLINE_URL = '/offline.html';
 
 // Critical assets to pre-cache on install
