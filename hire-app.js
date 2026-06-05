@@ -5,71 +5,67 @@
   const sb = getSupabaseClient();
 
   // Cache DOM
-  const loginView = document.getElementById('loginView');
-  const loginForm = document.getElementById('loginForm');
   const dashboardView = document.getElementById('dashboardView');
   const navUser = document.getElementById('navUser');
   const logoutBtn = document.getElementById('logoutBtn');
 
+  let _company = null; // the signed-in employer's company
+
   // ============================================
-  // AUTH: Check session on page load
+  // AUTH: Guard the page — must be a signed-in employer
+  // with a company. Otherwise route to login / onboarding.
   // ============================================
   async function checkSession() {
     const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      navUser.classList.remove('hidden');
-      showView(dashboardView);
-      loadAllData();
+    if (!session) {
+      window.location.replace('employer-login.html');
+      return;
     }
+
+    // Load the company linked to this auth user.
+    const { data: company, error } = await sb
+      .from('companies')
+      .select('*')
+      .eq('auth_user_id', session.user.id)
+      .maybeSingle();
+
+    if (error) console.error('Company load failed:', error);
+    if (!company) {
+      // Authenticated but no company yet — finish onboarding.
+      window.location.replace('employer-register.html');
+      return;
+    }
+
+    _company = company;
+    applyCompanyToUI(company);
+    navUser.classList.remove('hidden');
+    showView(dashboardView);
+    loadAllData();
   }
   checkSession();
 
   // ============================================
-  // AUTH: Login with email/password
+  // UI: Reflect the real signed-in company
   // ============================================
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = loginForm.querySelector('input[type="email"]').value;
-    const password = loginForm.querySelector('input[type="password"]').value;
-    const btn = loginForm.querySelector('button[type="submit"]');
+  function applyCompanyToUI(company) {
+    const name = (company.name || 'Your Company').trim();
+    const initials = name.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'CO';
 
-    btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Authenticating...`;
-    lucide.createIcons();
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('navCompanyName', name);
+    set('navAvatar', initials);
+    set('welcomeCompany', name);
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      // If user doesn't exist, try signup (demo-friendly)
-      const { data: signUpData, error: signUpError } = await sb.auth.signUp({ email, password });
-      if (signUpError) {
-        btn.innerHTML = `Sign In <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-        lucide.createIcons();
-        alert('Login failed: ' + signUpError.message);
-        return;
-      }
-      // Link company to user after signup
-      await sb.from('companies').update({ auth_user_id: signUpData.user.id })
-        .eq('email', email);
-    } else {
-      // Link company if not already linked
-      await sb.from('companies').update({ auth_user_id: data.user.id })
-        .eq('email', email);
-    }
-
-    btn.innerHTML = `Sign In <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-    lucide.createIcons();
-    navUser.classList.remove('hidden');
-    showView(dashboardView);
-    loadAllData();
-  });
+    const filter = document.getElementById('companyFilter');
+    if (filter) filter.innerHTML = `<option selected>${name}</option>`;
+  }
 
   // ============================================
   // AUTH: Logout
   // ============================================
   logoutBtn.addEventListener('click', async () => {
     await sb.auth.signOut();
-    navUser.classList.add('hidden');
-    showView(loginView);
+    window.location.replace('employer-login.html');
   });
 
   // ============================================
