@@ -72,11 +72,74 @@
     <!-- Auth is handled on employer-login.html; this page is guarded by hire-app.js -->
 
     <!-- 2. EMPLOYER DASHBOARD VIEW -->
-    <div id="dashboardView" class="w-full max-w-5xl hidden flex-col gap-8">
+    <div id="dashboardView" class="w-full max-w-5xl hidden flex-col gap-6">
       
-      <div class="text-center sm:text-left mb-2 mt-4 px-1">
-        <h1 class="text-2xl sm:text-3xl font-bold text-primary">Welcome back, <span id="welcomeCompany">there</span></h1>
-        <p class="text-slate-500 mt-2 text-base sm:text-lg">Manage your workforce and compliance from one unified hub.</p>
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mt-4 px-1">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-primary">Welcome back, <span id="welcomeCompany">there</span></h1>
+          <p class="text-slate-500 mt-1.5 text-sm sm:text-base">Your workforce &amp; compliance snapshot for <span id="dashMonth" class="font-semibold text-slate-600">this month</span>.</p>
+        </div>
+        <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm flex-shrink-0">
+          <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-slate-400"></i> <span id="dashToday">—</span>
+        </span>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+
+        <!-- Total Workers -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5"></i></div>
+          <div>
+            <div id="dashWorkers" class="text-3xl font-extrabold text-primary leading-none">—</div>
+            <div class="text-[11px] font-semibold text-slate-500 mt-1.5 uppercase tracking-wide">Total Workers</div>
+          </div>
+          <div id="dashWorkersSub" class="text-[11px] text-slate-400">&nbsp;</div>
+        </div>
+
+        <!-- Active Gate Passes -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="id-card" class="w-5 h-5"></i></div>
+          <div>
+            <div id="dashGatePass" class="text-3xl font-extrabold text-primary leading-none">—</div>
+            <div class="text-[11px] font-semibold text-slate-500 mt-1.5 uppercase tracking-wide">Active Gate Passes</div>
+          </div>
+          <div id="dashGatePassSub" class="text-[11px] text-slate-400">&nbsp;</div>
+        </div>
+
+        <!-- Pending Actions -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="clock" class="w-5 h-5"></i></div>
+          <div>
+            <div id="dashPending" class="text-3xl font-extrabold text-primary leading-none">—</div>
+            <div class="text-[11px] font-semibold text-slate-500 mt-1.5 uppercase tracking-wide">Pending Actions</div>
+          </div>
+          <div id="dashPendingSub" class="text-[11px] text-slate-400">&nbsp;</div>
+        </div>
+
+        <!-- Payroll This Month -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i data-lucide="indian-rupee" class="w-5 h-5"></i></div>
+          <div>
+            <div id="dashPayroll" class="text-3xl font-extrabold text-primary leading-none">—</div>
+            <div class="text-[11px] font-semibold text-slate-500 mt-1.5 uppercase tracking-wide">Payroll This Month</div>
+          </div>
+          <div id="dashPayrollSub" class="text-[11px] text-slate-400">&nbsp;</div>
+        </div>
+
+      </div>
+
+      <!-- Compliance Health -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-sm font-semibold text-primary flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i> Compliance Health</span>
+          <span id="dashCompliancePct" class="text-sm font-bold text-emerald-600">—</span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div id="dashComplianceBar" class="h-full bg-emerald-500 rounded-full transition-all duration-700 ease-out" style="width:0%"></div>
+        </div>
+        <p id="dashComplianceNote" class="text-[11px] text-slate-400 mt-2">Share of workers with a valid, active gate pass.</p>
       </div>
 
       <!-- Main Services Cards -->

@@ -362,22 +362,69 @@
   }
 
   // ============================================
-  // COMPLIANCE STATS: Compute from live data
+  // COMPLIANCE STATS + DASHBOARD OVERVIEW
+  // Computes live counts for both the CLMS stat boxes
+  // and the dashboard landing cards / compliance bar.
   // ============================================
-  async function loadComplianceStats() {
-    const { data } = await sb.from('employees').select('status, gate_pass_valid_upto');
-    if (!data) return;
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+  async function loadComplianceStats() {
+    const now = new Date();
+    const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+    // Header date + current wage month
+    const currentMonth = `${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+    el('dashMonth', currentMonth);
+    el('dashToday', now.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }));
+
+    // Pull employees + this month's payroll in parallel
+    const [{ data: emps }, { data: wages }] = await Promise.all([
+      sb.from('employees').select('status, gate_pass_valid_upto'),
+      sb.from('wage_records').select('net_pay').eq('wage_month', currentMonth),
+    ]);
+
+    const data = emps || [];
     const total = data.length;
-    const activeGP = data.filter(e => e.gate_pass_valid_upto && new Date(e.gate_pass_valid_upto) > new Date()).length;
+    const activeGP = data.filter(e => e.gate_pass_valid_upto && new Date(e.gate_pass_valid_upto) > now).length;
     const pending = data.filter(e => e.status === 'Pending').length;
     const inactive = data.filter(e => e.status === 'Inactive').length;
+    const compliancePct = total ? Math.round((activeGP / total) * 100) : 0;
 
-    const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    const payrollTotal = (wages || []).reduce((sum, w) => sum + Number(w.net_pay || 0), 0);
+    const paidCount = wages ? wages.length : 0;
+
+    // CLMS panel stat boxes
     el('statTotal', total);
     el('statActive', activeGP);
     el('statPending', pending);
     el('statNonCompliant', inactive);
+
+    // Dashboard landing cards
+    el('dashWorkers', total);
+    el('dashWorkersSub', activeGP === total && total ? 'All gate passes active' : `${activeGP} with active gate pass`);
+    el('dashGatePass', activeGP);
+    el('dashGatePassSub', total ? `${total - activeGP} pending / expired` : 'No workers yet');
+    el('dashPending', pending);
+    el('dashPendingSub', pending ? 'Awaiting verification' : 'Nothing pending');
+    el('dashPayroll', fmtINRCompact(payrollTotal));
+    const payrollEl = document.getElementById('dashPayroll');
+    if (payrollEl) payrollEl.title = '₹' + fmtNum(payrollTotal); // exact figure on hover
+    el('dashPayrollSub', paidCount ? `${paidCount} worker${paidCount === 1 ? '' : 's'} · ${currentMonth}` : `Not run for ${MONTHS[now.getMonth()]}`);
+
+    // Compliance health bar
+    el('dashCompliancePct', compliancePct + '%');
+    const bar = document.getElementById('dashComplianceBar');
+    if (bar) {
+      bar.style.width = compliancePct + '%';
+      bar.classList.remove('bg-emerald-500', 'bg-amber-500', 'bg-red-500');
+      bar.classList.add(compliancePct >= 80 ? 'bg-emerald-500' : compliancePct >= 50 ? 'bg-amber-500' : 'bg-red-500');
+    }
+    // Keep the % text colour in sync with the bar
+    const pctEl = document.getElementById('dashCompliancePct');
+    if (pctEl) {
+      pctEl.classList.remove('text-emerald-600', 'text-amber-600', 'text-red-600');
+      pctEl.classList.add(compliancePct >= 80 ? 'text-emerald-600' : compliancePct >= 50 ? 'text-amber-600' : 'text-red-600');
+    }
   }
 
   // ============================================
@@ -391,5 +438,13 @@
   function fmtNum(n) {
     if (!n && n !== 0) return '0';
     return Number(n).toLocaleString('en-IN');
+  }
+
+  // Compact Indian currency: ₹38.4L, ₹1.25Cr, ₹4,200
+  function fmtINRCompact(n) {
+    n = Number(n || 0);
+    if (n >= 1e7) return '₹' + (n / 1e7).toFixed(2).replace(/\.?0+$/, '') + 'Cr';
+    if (n >= 1e5) return '₹' + (n / 1e5).toFixed(1).replace(/\.0$/, '') + 'L';
+    return '₹' + n.toLocaleString('en-IN');
   }
 })();
