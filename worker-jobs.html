@@ -2,155 +2,334 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Jobs | Shramik Sathi</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: {
-            emerald: { 50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857' },
-            blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb' },
-            amber: { 50: '#fffbeb', 100: '#fef3c7', 500: '#f59e0b', 600: '#d97706' },
-            gray: { 50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 800: '#1f2937', 900: '#111827' }
-          }
-        }
-      }
-    }
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } };
   </script>
   <style>
-    body { background-color: #cbd5e1; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { -webkit-tap-highlight-color: transparent; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    button, a { -webkit-tap-highlight-color: transparent; }
-    .touch-target { min-height: 48px; min-width: 48px; }
+    .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 28px; height: 28px; border: 3px solid #e5e7eb; border-top-color: #374151; border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn .35s ease-out both; }
+    /* segmented tabs */
+    .seg-tab { transition: all .15s; color: #6b7280; }
+    .seg-tab.active { background: #fff; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    /* category chips */
+    .cat-chip { transition: all .15s; }
+    .cat-chip.active { background: #1f2937; color: #fff; border-color: #1f2937; }
   </style>
 </head>
-<body class="text-gray-900 antialiased font-sans flex justify-center">
+<body class="bg-gray-200 flex justify-center font-sans text-gray-900 antialiased">
 
-  <main class="w-full max-w-md bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-hidden border-x border-gray-200">
-    
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white shadow-sm px-4 py-3 flex items-center justify-between touch-target">
-      <h1 class="font-bold text-xl text-gray-900 tracking-tight">Available Jobs</h1>
-      <button class="touch-target flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-full active:bg-gray-200" aria-label="Filter Jobs">
-        <i data-lucide="filter" class="w-6 h-6"></i>
-      </button>
-    </header>
+  <main class="w-full max-w-md bg-gray-50 min-h-[100dvh] flex flex-col relative shadow-xl border-x border-gray-200 overflow-hidden">
 
-    <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto no-scrollbar pb-24 px-4 py-4 flex flex-col gap-4">
-      
-      <!-- Search Bar -->
-      <div class="relative flex items-center bg-white rounded-xl shadow-sm border border-gray-200 p-1">
-        <div class="pl-3 text-gray-400"><i data-lucide="search" class="w-5 h-5"></i></div>
-        <input type="text" placeholder="Search Role or Location" class="w-full bg-transparent py-3 pl-3 pr-4 text-[15px] font-medium outline-none placeholder-gray-400">
-      </div>
-
-      <!-- Job Card 1 -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 active:bg-gray-50 transition-colors cursor-pointer touch-target">
-        <div class="flex justify-between items-start mb-3">
-          <div>
-            <h2 class="text-[17px] font-bold text-gray-900 leading-tight">Mechanical Fitter</h2>
-            <p class="text-sm text-gray-500 font-medium mt-1">Tata Steel Plant, Jamshedpur</p>
-          </div>
-          <span class="bg-emerald-50 text-emerald-600 text-xs font-bold px-2 py-1 rounded-md">Urgent</span>
-        </div>
-        
-        <div class="flex items-center gap-4 mb-4">
-          <div class="flex items-center gap-1.5 text-gray-600">
-            <i data-lucide="indian-rupee" class="w-4 h-4 text-emerald-600"></i>
-            <span class="text-sm font-semibold">₹650/day</span>
-          </div>
-          <div class="flex items-center gap-1.5 text-gray-600">
-            <i data-lucide="briefcase" class="w-4 h-4 text-blue-600"></i>
-            <span class="text-sm font-semibold">Skilled</span>
-          </div>
-        </div>
-
-        <button class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl touch-target active:bg-emerald-700 transition-colors shadow-sm">
-          Apply Now
-        </button>
-      </div>
-
-      <!-- Job Card 2 -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 active:bg-gray-50 transition-colors cursor-pointer touch-target">
-        <div class="flex justify-between items-start mb-3">
-          <div>
-            <h2 class="text-[17px] font-bold text-gray-900 leading-tight">General Helper</h2>
-            <p class="text-sm text-gray-500 font-medium mt-1">L&T Construction, Bokaro</p>
-          </div>
-          <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-1 rounded-md">New</span>
-        </div>
-        
-        <div class="flex items-center gap-4 mb-4">
-          <div class="flex items-center gap-1.5 text-gray-600">
-            <i data-lucide="indian-rupee" class="w-4 h-4 text-emerald-600"></i>
-            <span class="text-sm font-semibold">₹450/day</span>
-          </div>
-          <div class="flex items-center gap-1.5 text-gray-600">
-            <i data-lucide="briefcase" class="w-4 h-4 text-blue-600"></i>
-            <span class="text-sm font-semibold">Unskilled</span>
-          </div>
-        </div>
-
-        <button class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl touch-target active:bg-emerald-700 transition-colors shadow-sm">
-          Apply Now
-        </button>
-      </div>
-
-      <!-- Job Card 3 -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 active:bg-gray-50 transition-colors cursor-pointer touch-target">
-        <div class="flex justify-between items-start mb-3">
-          <div>
-            <h2 class="text-[17px] font-bold text-gray-900 leading-tight">MIG Welder</h2>
-            <p class="text-sm text-gray-500 font-medium mt-1">JSW Steel, Odisha</p>
-          </div>
-        </div>
-        
-        <div class="flex items-center gap-4 mb-4">
-          <div class="flex items-center gap-1.5 text-gray-600">
-            <i data-lucide="indian-rupee" class="w-4 h-4 text-emerald-600"></i>
-            <span class="text-sm font-semibold">₹800/day</span>
-          </div>
-          <div class="flex items-center gap-1.5 text-gray-600">
-            <i data-lucide="briefcase" class="w-4 h-4 text-blue-600"></i>
-            <span class="text-sm font-semibold">Highly Skilled</span>
-          </div>
-        </div>
-
-        <button class="w-full bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl touch-target" disabled>
-          Positions Filled
-        </button>
-      </div>
-
+    <!-- AUTH / LOADING GATE -->
+    <div id="gate" class="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
+      <div class="spinner"></div>
+      <p class="text-sm font-medium">Loading jobs…</p>
     </div>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- APP -->
+    <div id="app" class="hidden flex-1 flex-col min-h-0">
+
+      <!-- Header -->
+      <header class="sticky top-0 z-40 bg-white border-b border-gray-200 px-5 pt-5 pb-3">
+        <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Jobs</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Find and apply to verified roles</p>
+        <div class="mt-4 grid grid-cols-2 gap-1 bg-gray-100 rounded-xl p-1">
+          <button id="tabBrowse" class="seg-tab active py-2 rounded-lg text-sm font-semibold">Browse</button>
+          <button id="tabApps" class="seg-tab py-2 rounded-lg text-sm font-semibold">My Applications</button>
+        </div>
+      </header>
+
+      <!-- Scroll content -->
+      <div class="flex-1 overflow-y-auto no-scrollbar pb-28">
+
+        <!-- BROWSE -->
+        <section id="browseView" class="px-5 py-4 flex flex-col gap-4">
+          <div class="relative">
+            <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input id="jobSearch" type="text" placeholder="Search role or location"
+              class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-[15px] font-medium outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition placeholder-gray-400">
+          </div>
+
+          <div id="catChips" class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
+            <button data-cat="" class="cat-chip active flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">All</button>
+            <button data-cat="Unskilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Unskilled</button>
+            <button data-cat="Semi-skilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Semi-skilled</button>
+            <button data-cat="Skilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Skilled</button>
+            <button data-cat="Highly Skilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Highly Skilled</button>
+          </div>
+
+          <div id="browseList" class="flex flex-col gap-3"></div>
+        </section>
+
+        <!-- MY APPLICATIONS -->
+        <section id="appsView" class="hidden px-5 py-4 flex-col gap-3">
+          <div id="appsList" class="flex flex-col gap-3"></div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
     <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px]">
-      <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">Home</span>
+      <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center text-gray-400 h-full active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-semibold">Home</span>
       </a>
-      <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center touch-target text-emerald-600 h-full">
-        <i data-lucide="briefcase" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-bold">Jobs</span>
+      <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center text-gray-900 h-full">
+        <i data-lucide="briefcase" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-bold">Jobs</span>
       </a>
-      <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="newspaper" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">News</span>
+      <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center text-gray-400 h-full active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="newspaper" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-semibold">News</span>
       </a>
-      <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="user" class="w-[22px] h-[22px] mb-1"></i>
-        <span class="text-[11px] font-semibold">Profile</span>
+      <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center text-gray-400 h-full active:bg-gray-50 rounded-xl transition-colors">
+        <i data-lucide="user" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-semibold">Profile</span>
       </a>
     </nav>
   </main>
 
-  <script>lucide.createIcons();</script>
+  <script>
+    lucide.createIcons();
+    const sb = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+
+    let _empId = null;
+    let _jobs = [];           // open jobs in memory (for instant search/filter)
+    let _appliedJobIds = new Set();
+    let _cat = '';
+    let _search = '';
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const wageStr = (j) => j.wage_amount ? `₹${Number(j.wage_amount).toLocaleString('en-IN')}/${j.wage_period || 'day'}` : 'Wage on apply';
+
+    // ============================================
+    // AUTH GATE
+    // ============================================
+    (async () => {
+      if (!sb) return;
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.replace('worker-login.html'); return; }
+
+      const { data: emp } = await sb.from('employees')
+        .select('id').eq('auth_user_id', session.user.id).maybeSingle();
+      if (!emp) { window.location.replace('worker-registration.html'); return; }
+      _empId = emp.id;
+
+      $('gate').classList.add('hidden');
+      $('app').classList.remove('hidden');
+      $('app').classList.add('flex');
+      await loadBrowse();
+    })();
+
+    // ============================================
+    // TABS
+    // ============================================
+    $('tabBrowse').addEventListener('click', () => switchTab('browse'));
+    $('tabApps').addEventListener('click', () => switchTab('apps'));
+
+    function switchTab(which) {
+      const browse = which === 'browse';
+      $('tabBrowse').classList.toggle('active', browse);
+      $('tabApps').classList.toggle('active', !browse);
+      $('browseView').classList.toggle('hidden', !browse);
+      $('appsView').classList.toggle('hidden', browse);
+      $('appsView').classList.toggle('flex', !browse);
+      if (browse) loadBrowse(); else loadApps();
+    }
+
+    // ============================================
+    // BROWSE — load open jobs (+ the worker's own applications, via RLS)
+    // ============================================
+    async function loadBrowse() {
+      $('browseList').innerHTML = skeleton(3);
+      const { data, error } = await sb
+        .from('jobs')
+        .select('*, job_applications(id, status)')
+        .eq('status', 'Open')
+        .order('created_at', { ascending: false });
+
+      if (error) { console.error('[jobs] browse', error); $('browseList').innerHTML = emptyState('Could not load jobs'); return; }
+
+      _jobs = data || [];
+      _appliedJobIds = new Set(_jobs.filter(j => j.job_applications && j.job_applications.length).map(j => j.id));
+      renderBrowse();
+    }
+
+    function renderBrowse() {
+      const q = _search.trim().toLowerCase();
+      const list = _jobs.filter(j => {
+        if (_cat && j.category !== _cat) return false;
+        if (!q) return true;
+        return [j.title, j.company_name, j.location, j.designation].some(f => (f || '').toLowerCase().includes(q));
+      });
+
+      if (!list.length) {
+        $('browseList').innerHTML = emptyState(_jobs.length ? 'No jobs match your search' : 'No open jobs right now');
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      $('browseList').innerHTML = list.map(jobCard).join('');
+      if (window.lucide) lucide.createIcons();
+
+      $('browseList').querySelectorAll('[data-apply]').forEach(btn => {
+        btn.addEventListener('click', () => apply(btn.dataset.apply, btn));
+      });
+    }
+
+    function jobCard(j) {
+      const applied = _appliedJobIds.has(j.id);
+      const btn = applied
+        ? `<button disabled class="w-full mt-4 bg-gray-100 text-gray-500 font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Applied</button>`
+        : `<button data-apply="${j.id}" class="w-full mt-4 bg-gray-900 text-white font-bold py-3 rounded-xl text-sm active:bg-gray-700 transition-colors">Apply Now</button>`;
+
+      return `<div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm fade-in">
+        <div class="flex justify-between items-start gap-2">
+          <div class="min-w-0">
+            <h3 class="font-bold text-[15px] text-gray-900 leading-tight">${esc(j.title)}</h3>
+            <p class="text-sm text-gray-500 mt-0.5 truncate">${esc(j.company_name || 'Shramik Sathi')}${j.location ? ' · ' + esc(j.location) : ''}</p>
+          </div>
+          ${j.urgent ? '<span class="flex-shrink-0 bg-gray-900 text-white text-[11px] font-bold px-2 py-0.5 rounded-md">Urgent</span>' : ''}
+        </div>
+        <div class="flex items-center gap-4 mt-3 text-sm text-gray-700">
+          <span class="inline-flex items-center gap-1.5 font-semibold"><i data-lucide="indian-rupee" class="w-4 h-4 text-gray-500"></i> ${wageStr(j)}</span>
+          ${j.category ? `<span class="inline-flex items-center gap-1.5 font-medium text-gray-500"><i data-lucide="briefcase" class="w-4 h-4"></i> ${esc(j.category)}</span>` : ''}
+        </div>
+        ${btn}
+      </div>`;
+    }
+
+    async function apply(jobId, btn) {
+      btn.disabled = true;
+      btn.innerHTML = 'Applying…';
+      const { error } = await sb.from('job_applications').insert({ job_id: jobId, employee_id: _empId });
+      if (error && error.code !== '23505') { // 23505 = already applied (unique violation)
+        console.error('[jobs] apply', error);
+        btn.disabled = false; btn.textContent = 'Apply Now';
+        return;
+      }
+      _appliedJobIds.add(jobId);
+      btn.outerHTML = `<button disabled class="w-full mt-4 bg-gray-100 text-gray-500 font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Applied</button>`;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // search (debounced) + category chips
+    let _t;
+    $('jobSearch').addEventListener('input', (e) => {
+      clearTimeout(_t);
+      _t = setTimeout(() => { _search = e.target.value; renderBrowse(); }, 180);
+    });
+    $('catChips').querySelectorAll('.cat-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        _cat = chip.dataset.cat;
+        $('catChips').querySelectorAll('.cat-chip').forEach(c => c.classList.toggle('active', c === chip));
+        renderBrowse();
+      });
+    });
+
+    // ============================================
+    // MY APPLICATIONS
+    // ============================================
+    async function loadApps() {
+      $('appsList').innerHTML = skeleton(3);
+      const { data, error } = await sb
+        .from('job_applications')
+        .select('*, jobs(title, company_name, location, wage_amount, wage_period, status)')
+        .eq('employee_id', _empId)
+        .order('applied_at', { ascending: false });
+
+      if (error) { console.error('[jobs] apps', error); $('appsList').innerHTML = emptyState('Could not load applications'); return; }
+      if (!data || !data.length) {
+        $('appsList').innerHTML = emptyState('You haven’t applied to any jobs yet');
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      $('appsList').innerHTML = data.map(appCard).join('');
+      if (window.lucide) lucide.createIcons();
+
+      $('appsList').querySelectorAll('[data-confirm]').forEach(btn => {
+        btn.addEventListener('click', () => confirmOffer(btn.dataset.confirm, btn));
+      });
+    }
+
+    const APP_PILL = {
+      Applied:     ['bg-gray-100 text-gray-600', 'Applied'],
+      Shortlisted: ['bg-blue-100 text-blue-700', 'Shortlisted'],
+      Accepted:    ['bg-amber-100 text-amber-700', 'Offer received'],
+      Confirmed:   ['bg-emerald-100 text-emerald-700', 'Hired'],
+      Rejected:    ['bg-red-100 text-red-600', 'Not selected'],
+      Withdrawn:   ['bg-gray-100 text-gray-400', 'Withdrawn'],
+    };
+
+    function appCard(a) {
+      const j = a.jobs || {};
+      const [pillCls, pillTxt] = APP_PILL[a.status] || ['bg-gray-100 text-gray-600', a.status];
+      let footer = '';
+      if (a.status === 'Accepted') {
+        footer = `<button data-confirm="${a.id}" class="w-full mt-3 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm active:bg-emerald-700 transition-colors flex items-center justify-center gap-1.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4"></i> Accept Offer</button>`;
+      } else if (a.status === 'Confirmed') {
+        footer = `<p class="mt-3 text-sm font-semibold text-emerald-700 flex items-center gap-1.5"><i data-lucide="party-popper" class="w-4 h-4"></i> You’re hired at ${esc(j.company_name || 'the company')}!</p>`;
+      }
+      return `<div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm fade-in">
+        <div class="flex justify-between items-start gap-2">
+          <div class="min-w-0">
+            <h3 class="font-bold text-[15px] text-gray-900 leading-tight">${esc(j.title || 'Job')}</h3>
+            <p class="text-sm text-gray-500 mt-0.5 truncate">${esc(j.company_name || 'Shramik Sathi')}${j.location ? ' · ' + esc(j.location) : ''}</p>
+          </div>
+          <span class="${pillCls} flex-shrink-0 text-[11px] font-bold px-2 py-0.5 rounded-full">${pillTxt}</span>
+        </div>
+        ${footer}
+      </div>`;
+    }
+
+    async function confirmOffer(appId, btn) {
+      btn.disabled = true;
+      btn.innerHTML = 'Confirming…';
+      const { error } = await sb.from('job_applications').update({ status: 'Confirmed' }).eq('id', appId);
+      if (error) { console.error('[jobs] confirm', error); btn.disabled = false; btn.textContent = 'Accept Offer'; return; }
+      loadApps();
+    }
+
+    // ============================================
+    // HELPERS
+    // ============================================
+    function skeleton(n) {
+      return Array.from({ length: n }).map(() =>
+        '<div class="bg-white rounded-2xl border border-gray-200 h-28 animate-pulse"></div>').join('');
+    }
+    function emptyState(msg) {
+      return `<div class="text-center text-gray-400 py-16">
+        <i data-lucide="search-x" class="w-10 h-10 mx-auto mb-3"></i>
+        <p class="text-sm font-medium">${esc(msg)}</p></div>`;
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[PWA] SW registered, scope:', reg.scope))
+          .catch(err => console.warn('[PWA] SW registration failed:', err.message));
+      });
+    }
+  </script>
 </body>
 </html>

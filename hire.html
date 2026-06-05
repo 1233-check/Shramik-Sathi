@@ -57,9 +57,9 @@
           <span class="hidden sm:inline-block ml-4 px-3 py-1 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full border border-slate-200">Employer Portal</span>
         </div>
         <div id="navUser" class="hidden flex items-center gap-2 sm:gap-4">
-          <span class="text-sm font-medium text-slate-600 hidden sm:inline truncate max-w-[140px]">Tata Steel Ltd.</span>
-          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-            TS
+          <span id="navCompanyName" class="text-sm font-medium text-slate-600 hidden sm:inline truncate max-w-[140px]">Loading…</span>
+          <div id="navAvatar" class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+            &nbsp;
           </div>
           <button id="logoutBtn" class="text-sm text-red-600 hover:text-red-700 font-medium">Logout</button>
         </div>
@@ -69,44 +69,82 @@
 
   <main class="flex-grow flex flex-col items-center p-4 sm:p-8 relative">
 
-    <!-- 1. LOGIN / REGISTRATION VIEW -->
-    <div id="loginView" class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8 mt-10">
-      <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-primary">Company Login</h1>
-        <p class="text-slate-500 text-sm mt-2">Access your compliance and hiring dashboard.</p>
-      </div>
-
-      <form id="loginForm" class="space-y-5">
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Company Email</label>
-          <input type="email" placeholder="admin@company.com" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-          <input type="password" placeholder="Enter password" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" required>
-        </div>
-        <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-slate-800 transition shadow-md flex justify-center items-center gap-2">
-          Sign In <i data-lucide="arrow-right" class="w-4 h-4"></i>
-        </button>
-      </form>
-      
-      <div class="mt-6 text-center">
-        <p class="text-sm text-slate-500">New industry partner? <a href="#" class="text-secondary font-semibold hover:underline">Register Company</a></p>
-      </div>
-    </div>
-
+    <!-- Auth is handled on employer-login.html; this page is guarded by hire-app.js -->
 
     <!-- 2. EMPLOYER DASHBOARD VIEW -->
-    <div id="dashboardView" class="w-full max-w-5xl hidden flex-col gap-8">
+    <div id="dashboardView" class="w-full max-w-5xl hidden flex-col gap-6">
       
-      <div class="text-center sm:text-left mb-2 mt-4 px-1">
-        <h1 class="text-2xl sm:text-3xl font-bold text-primary">Welcome back, Tata Steel Ltd.</h1>
-        <p class="text-slate-500 mt-2 text-base sm:text-lg">Manage your workforce and compliance from one unified hub.</p>
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mt-4 px-1">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-primary">Welcome back, <span id="welcomeCompany">there</span></h1>
+          <p class="text-slate-500 mt-1.5 text-sm sm:text-base">Your workforce &amp; compliance snapshot for <span id="dashMonth" class="font-semibold text-slate-600">this month</span>.</p>
+        </div>
+        <span class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm flex-shrink-0">
+          <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-slate-400"></i> <span id="dashToday">—</span>
+        </span>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+
+        <!-- Total Workers -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5"></i></div>
+          <div>
+            <div id="dashWorkers" class="text-3xl font-extrabold text-primary leading-none">—</div>
+            <div class="text-[11px] font-semibold text-slate-500 mt-1.5 uppercase tracking-wide">Total Workers</div>
+          </div>
+          <div id="dashWorkersSub" class="text-[11px] text-slate-400">&nbsp;</div>
+        </div>
+
+        <!-- Active Gate Passes -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"><i data-lucide="id-card" class="w-5 h-5"></i></div>
+          <div>
+            <div id="dashGatePass" class="text-3xl font-extrabold text-primary leading-none">—</div>
+            <div class="text-[11px] font-semibold text-slate-500 mt-1.5 uppercase tracking-wide">Active Gate Passes</div>
+          </div>
+          <div id="dashGatePassSub" class="text-[11px] text-slate-400">&nbsp;</div>
+        </div>
+
+        <!-- Pending Actions -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center"><i data-lucide="clock" class="w-5 h-5"></i></div>
+          <div>
+            <div id="dashPending" class="text-3xl font-extrabold text-primary leading-none">—</div>
+            <div class="text-[11px] font-semibold text-slate-500 mt-1.5 uppercase tracking-wide">Pending Actions</div>
+          </div>
+          <div id="dashPendingSub" class="text-[11px] text-slate-400">&nbsp;</div>
+        </div>
+
+        <!-- Payroll This Month -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i data-lucide="indian-rupee" class="w-5 h-5"></i></div>
+          <div>
+            <div id="dashPayroll" class="text-3xl font-extrabold text-primary leading-none">—</div>
+            <div class="text-[11px] font-semibold text-slate-500 mt-1.5 uppercase tracking-wide">Payroll This Month</div>
+          </div>
+          <div id="dashPayrollSub" class="text-[11px] text-slate-400">&nbsp;</div>
+        </div>
+
+      </div>
+
+      <!-- Compliance Health -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-sm font-semibold text-primary flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i> Compliance Health</span>
+          <span id="dashCompliancePct" class="text-sm font-bold text-emerald-600">—</span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div id="dashComplianceBar" class="h-full bg-emerald-500 rounded-full transition-all duration-700 ease-out" style="width:0%"></div>
+        </div>
+        <p id="dashComplianceNote" class="text-[11px] text-slate-400 mt-2">Share of workers with a valid, active gate pass.</p>
       </div>
 
       <!-- Main Services Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+
         <!-- Compliance Management Card -->
         <button id="complianceBtn" class="group bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-left hover:shadow-lg hover:border-blue-200 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
           <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
@@ -123,6 +161,15 @@
           </div>
           <h2 class="text-2xl font-bold text-primary mb-3">Find an Employee</h2>
           <p class="text-slate-500 leading-relaxed">Search our database of pre-verified, KYC-compliant Shramik Sathi workers. Instantly onboard skilled labor directly to your site.</p>
+        </button>
+
+        <!-- Jobs & Hiring Card -->
+        <button id="jobsBtn" class="group bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-left hover:shadow-lg hover:border-emerald-200 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+          <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+            <i data-lucide="briefcase" class="w-7 h-7"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-primary mb-3">Jobs &amp; Hiring</h2>
+          <p class="text-slate-500 leading-relaxed">Post vacancies to the Shramik Sathi worker network, review applicants, and extend offers — straight into your workforce.</p>
         </button>
 
       </div>
@@ -163,14 +210,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Company Name</label>
-            <select class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
-              <option>-- ALL --</option>
-              <option selected>Tata Steel Ltd.</option>
-              <option>JUSCO (Jamshedpur Utilities)</option>
-              <option>L&T Construction</option>
-              <option>Adani Power</option>
-              <option>JSW Steel</option>
-              <option>Tata Projects Ltd.</option>
+            <select id="companyFilter" class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
+              <option selected>Loading…</option>
             </select>
           </div>
           <div>
@@ -592,6 +633,115 @@
     </div>
 
 
+    <!-- 5. JOBS & HIRING PANEL -->
+    <div id="jobsPanel" class="w-full max-w-5xl hidden flex-col gap-6 mt-4">
+
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-bold text-primary">Jobs &amp; Hiring</h1>
+          <p class="text-slate-500 text-sm mt-1">Post vacancies and review applicants from the worker network.</p>
+        </div>
+        <div class="flex gap-2">
+          <button id="postJobBtn" class="bg-primary text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-slate-800 transition flex items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i> Post a Job
+          </button>
+          <button class="back-to-dash text-sm text-slate-600 font-semibold border border-slate-300 px-3 py-2.5 rounded-lg bg-white hover:bg-slate-50">Back</button>
+        </div>
+      </div>
+
+      <!-- Jobs list -->
+      <div id="jobsListView" class="flex flex-col gap-4">
+        <div id="jobsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <div id="jobsEmpty" class="hidden text-center text-slate-400 py-16 bg-white rounded-2xl border border-dashed border-slate-200">
+          <i data-lucide="briefcase" class="w-10 h-10 mx-auto mb-3"></i>
+          <p class="font-semibold text-slate-500">No jobs posted yet</p>
+          <p class="text-sm mt-1">Click “Post a Job” to advertise your first vacancy.</p>
+        </div>
+      </div>
+
+      <!-- Applicants -->
+      <div id="applicantsView" class="hidden flex-col gap-4">
+        <button id="applicantsBack" class="text-sm text-slate-600 font-semibold flex items-center gap-1 self-start hover:text-primary">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> All jobs
+        </button>
+        <div id="applicantsHeader" class="bg-white rounded-2xl border border-slate-200 p-5"></div>
+        <div id="applicantsList" class="flex flex-col gap-3"></div>
+      </div>
+    </div>
+
+
+    <!-- JOB POST MODAL -->
+    <div id="jobModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white">
+          <h3 class="text-lg font-bold text-primary">Post a Job</h3>
+          <button id="jobModalClose" class="text-slate-400 hover:text-slate-700"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <form id="jobForm" class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Job Title <span class="text-red-500">*</span></label>
+            <input id="jobTitle" type="text" required placeholder="e.g. Mechanical Fitter"
+              class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Designation</label>
+              <input id="jobDesignation" type="text" placeholder="e.g. Rigger Grade-I"
+                class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Skill Category</label>
+              <select id="jobCategory" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition bg-white">
+                <option value="">— Select —</option>
+                <option>Unskilled</option>
+                <option>Semi-skilled</option>
+                <option>Skilled</option>
+                <option>Highly Skilled</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Location</label>
+            <input id="jobLocation" type="text" placeholder="e.g. Jamshedpur, Jharkhand"
+              class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Wage (₹)</label>
+              <input id="jobWage" type="number" min="0" step="1" placeholder="650"
+                class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Per</label>
+              <select id="jobWagePeriod" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition bg-white">
+                <option value="day">Day</option>
+                <option value="month">Month</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Positions</label>
+              <input id="jobPositions" type="number" min="1" step="1" value="1"
+                class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <textarea id="jobDescription" rows="3" placeholder="Role details, shift, requirements…"
+              class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition resize-none"></textarea>
+          </div>
+          <label class="flex items-center gap-2 text-sm text-slate-700">
+            <input id="jobUrgent" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary">
+            Mark as urgent
+          </label>
+          <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-slate-800 transition flex justify-center items-center gap-2">
+            Post Job <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+
     <!-- ADD EMPLOYEE MODAL (Hidden by default) -->
     <div id="addEmployeeModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform scale-95 opacity-0 transition-all duration-200" id="modalContent">
@@ -638,8 +788,6 @@
     lucide.createIcons();
 
     // DOM Elements
-    const loginView = document.getElementById('loginView');
-    const loginForm = document.getElementById('loginForm');
     const dashboardView = document.getElementById('dashboardView');
     const navUser = document.getElementById('navUser');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -649,6 +797,7 @@
     
     const compliancePanel = document.getElementById('compliancePanel');
     const findPanel = document.getElementById('findPanel');
+    const jobsPanel = document.getElementById('jobsPanel');
     const backToDashBtns = document.querySelectorAll('.back-to-dash');
 
     const addEmployeeBtn = document.getElementById('addEmployeeBtn');
@@ -660,19 +809,17 @@
     // Navigation Logic
     function showView(viewElement) {
       // Hide all main views/panels
-      loginView.classList.add('hidden');
       dashboardView.classList.add('hidden');
       dashboardView.classList.remove('flex');
       compliancePanel.classList.add('hidden');
       compliancePanel.classList.remove('flex');
       findPanel.classList.add('hidden');
       findPanel.classList.remove('flex');
+      if (jobsPanel) { jobsPanel.classList.add('hidden'); jobsPanel.classList.remove('flex'); }
 
       // Show requested view
       viewElement.classList.remove('hidden');
-      if (viewElement !== loginView) {
-        viewElement.classList.add('flex');
-      }
+      viewElement.classList.add('flex');
     }
 
     // Login & Logout handled by hire-app.js (Supabase Auth)
@@ -753,5 +900,6 @@
   <script src="wage-engine.js"></script>
   <script src="payroll.js"></script>
   <script src="hire-app.js"></script>
+  <script src="jobs-app.js"></script>
 </body>
 </html>

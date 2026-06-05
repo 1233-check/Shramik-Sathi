@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
+  <title>Register Company | Shramik Sathi</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Onboard your company to Shramik Sathi — workforce management, payroll, and statutory compliance.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: { primary: '#1e293b', secondary: '#f59e0b' }
+        }
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { -webkit-tap-highlight-color: transparent; }
+    .brand-panel {
+      background:
+        radial-gradient(900px 500px at 85% -10%, rgba(245,158,11,0.16), transparent 60%),
+        radial-gradient(700px 500px at 0% 110%, rgba(56,189,248,0.18), transparent 55%),
+        linear-gradient(160deg, #1e293b 0%, #0f172a 60%, #020617 100%);
+    }
+    .grid-overlay {
+      background-image:
+        linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at 30% 30%, black, transparent 75%);
+      -webkit-mask-image: radial-gradient(circle at 30% 30%, black, transparent 75%);
+    }
+    .float-orb { animation: floatY 9s ease-in-out infinite alternate; }
+    @keyframes floatY { from { transform: translateY(0); } to { transform: translateY(-26px); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.5s ease-out both; }
+    /* Floating-label inputs */
+    .field { position: relative; }
+    .field > input, .field > textarea {
+      width: 100%; border: 1px solid #cbd5e1; border-radius: 12px;
+      padding: 22px 14px 8px 40px; font-size: 14px; background: #fff; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field > textarea { padding-top: 24px; resize: none; }
+    .field > input:focus, .field > textarea:focus { border-color: #1e293b; box-shadow: 0 0 0 3px rgba(30,41,59,0.08); }
+    .field > .ficon { position: absolute; left: 13px; top: 16px; color: #94a3b8; pointer-events: none; }
+    .field > label {
+      position: absolute; left: 40px; top: 14px; font-size: 13px; color: #94a3b8;
+      pointer-events: none; transition: all .15s ease; transform-origin: left;
+    }
+    .field > input:focus + label, .field > input:not(:placeholder-shown) + label,
+    .field > textarea:focus + label, .field > textarea:not(:placeholder-shown) + label {
+      top: 7px; font-size: 10.5px; color: #475569; font-weight: 600; letter-spacing: .02em; text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="font-sans text-slate-900 antialiased">
+
+  <div class="min-h-screen lg:grid lg:grid-cols-[1.05fr_1fr]">
+
+    <!-- ============ LEFT: BRAND PANEL ============ -->
+    <aside class="brand-panel relative hidden lg:flex flex-col justify-between p-12 xl:p-16 text-white overflow-hidden">
+      <div class="grid-overlay absolute inset-0 pointer-events-none"></div>
+      <div class="float-orb absolute -top-20 -right-16 w-72 h-72 rounded-full bg-secondary/20 blur-3xl pointer-events-none"></div>
+      <div class="float-orb absolute bottom-10 -left-10 w-72 h-72 rounded-full bg-sky-500/20 blur-3xl pointer-events-none" style="animation-delay:-4s"></div>
+
+      <div class="relative z-10 flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-white/10 backdrop-blur ring-1 ring-white/15 flex items-center justify-center">
+          <i data-lucide="shield-check" class="w-6 h-6 text-secondary"></i>
+        </div>
+        <div>
+          <div class="font-extrabold text-lg leading-none tracking-tight">Shramik Sathi</div>
+          <div class="text-[11px] uppercase tracking-[0.2em] text-white/50 mt-1">Employer Portal</div>
+        </div>
+      </div>
+
+      <div class="relative z-10 max-w-md">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 ring-1 ring-white/10 text-[11px] uppercase tracking-[0.18em] text-white/70">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-secondary"></i> Get started
+        </span>
+        <h1 class="mt-5 text-4xl xl:text-[40px] font-extrabold leading-[1.12] tracking-tight">
+          Onboard in<br><span class="text-secondary">under a minute.</span>
+        </h1>
+        <p class="mt-5 text-white/70 text-[15px] leading-relaxed">
+          Create your company workspace and instantly unlock workforce management, automated payroll, and audit-ready compliance.
+        </p>
+
+        <ul class="mt-9 space-y-4">
+          <li class="flex items-center gap-3 text-sm text-white/80"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i> No setup fees — start managing today</li>
+          <li class="flex items-center gap-3 text-sm text-white/80"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i> Your data is isolated &amp; row-level secured</li>
+          <li class="flex items-center gap-3 text-sm text-white/80"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i> Add workers &amp; run payroll right after</li>
+        </ul>
+      </div>
+
+      <div class="relative z-10">
+        <p class="text-[11px] uppercase tracking-[0.2em] text-white/35 mb-3">Trusted by industry leaders</p>
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-white/55 font-bold text-sm tracking-wide">
+          <span>TATA STEEL</span><span>JUSCO</span><span>L&amp;T</span><span>ADANI</span><span>JSW</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============ RIGHT: FORM PANEL ============ -->
+    <main class="relative flex flex-col min-h-screen bg-slate-50">
+      <div class="lg:hidden flex items-center justify-between px-6 h-16 bg-primary text-white">
+        <div class="flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-6 h-6 text-secondary"></i>
+          <span class="font-bold">Shramik Sathi</span>
+        </div>
+        <span class="text-[10px] uppercase tracking-[0.18em] text-white/55">Employer</span>
+      </div>
+
+      <div class="flex-grow flex items-center justify-center p-6 sm:p-10">
+        <div class="w-full max-w-md">
+
+          <!-- LOADING STATE -->
+          <div id="loadingState" class="text-center text-slate-500 py-16">
+            <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600"></i>
+            <p class="text-sm">Checking your account…</p>
+          </div>
+
+          <!-- REGISTRATION CARD -->
+          <div id="registerCard" class="hidden fade-up">
+            <div class="mb-7">
+              <h2 class="text-2xl font-extrabold text-primary tracking-tight">Create your company</h2>
+              <p class="text-slate-500 text-[15px] mt-1.5">Tell us about your organisation to set up your workspace.</p>
+            </div>
+
+            <form id="registerForm" class="space-y-7">
+
+              <!-- Section: Company details -->
+              <div>
+                <div class="flex items-center gap-2 mb-3">
+                  <i data-lucide="building-2" class="w-4 h-4 text-slate-400"></i>
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Company details</span>
+                </div>
+                <div class="space-y-3">
+                  <div class="field">
+                    <i data-lucide="building" class="ficon w-4 h-4"></i>
+                    <input id="name" type="text" placeholder=" " required>
+                    <label>Company name *</label>
+                  </div>
+                  <div class="field">
+                    <i data-lucide="mail" class="ficon w-4 h-4"></i>
+                    <input id="email" type="email" placeholder=" " required>
+                    <label>Company email *</label>
+                  </div>
+                  <div class="field">
+                    <i data-lucide="phone" class="ficon w-4 h-4"></i>
+                    <input id="phone" type="tel" placeholder=" ">
+                    <label>Phone</label>
+                  </div>
+                  <div class="field">
+                    <i data-lucide="map-pin" class="ficon w-4 h-4"></i>
+                    <textarea id="address" rows="2" placeholder=" "></textarea>
+                    <label>Registered address</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section: Compliance -->
+              <div>
+                <div class="flex items-center gap-2 mb-3">
+                  <i data-lucide="file-check-2" class="w-4 h-4 text-slate-400"></i>
+                  <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Compliance <span class="font-medium normal-case tracking-normal text-slate-400">(optional — add later)</span></span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div class="field">
+                    <i data-lucide="badge-check" class="ficon w-4 h-4"></i>
+                    <input id="clra_license_no" type="text" placeholder=" ">
+                    <label>CLRA license no.</label>
+                  </div>
+                  <div class="field">
+                    <i data-lucide="calendar" class="ficon w-4 h-4"></i>
+                    <input id="license_expiry" type="date" placeholder=" ">
+                    <label>License expiry</label>
+                  </div>
+                </div>
+              </div>
+
+              <p id="formError" class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5"></p>
+
+              <button type="submit" id="submitBtn"
+                class="w-full bg-primary text-white font-semibold py-3.5 rounded-xl hover:bg-slate-800 transition shadow-md hover:shadow-lg active:scale-[0.99] flex justify-center items-center gap-2">
+                Create company &amp; continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+
+              <p class="text-center text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+                <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-500"></i>
+                Your workspace is private and row-level secured.
+              </p>
+            </form>
+
+            <div class="mt-6 pt-5 border-t border-slate-200 text-center">
+              <button id="signOutLink" class="text-xs text-slate-400 hover:text-slate-600">Sign in with a different account</button>
+            </div>
+          </div>
+
+          <!-- SUCCESS STATE -->
+          <div id="successCard" class="hidden fade-up text-center py-10">
+            <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <i data-lucide="check" class="w-8 h-8" style="stroke-width:3"></i>
+            </div>
+            <h2 class="text-xl font-extrabold text-primary">Company created 🎉</h2>
+            <p class="text-slate-500 text-sm mt-2">Taking you to your dashboard…</p>
+            <div class="mt-6 flex justify-center"><i data-lucide="loader-2" class="w-5 h-5 animate-spin text-slate-400"></i></div>
+          </div>
+
+        </div>
+      </div>
+
+      <footer class="px-6 py-5 text-center text-[11px] text-slate-400 border-t border-slate-100">
+        © <span id="year"></span> Shramik Sathi Pvt. Ltd. · Contract labour compliance, simplified.
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const sb = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+    let _userId = null;
+
+    const show = (id) => document.getElementById(id).classList.remove('hidden');
+    const hide = (id) => document.getElementById(id).classList.add('hidden');
+
+    // ============ SESSION GUARD + PREFILL ============
+    (async () => {
+      if (!sb) return;
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = 'employer-login.html'; return; }
+      _userId = session.user.id;
+
+      const { data: company } = await sb
+        .from('companies')
+        .select('id')
+        .eq('auth_user_id', _userId)
+        .maybeSingle();
+      if (company) { window.location.href = 'hire.html'; return; }
+
+      const params = new URLSearchParams(window.location.search);
+      document.getElementById('email').value = session.user.email || params.get('email') || '';
+
+      hide('loadingState');
+      show('registerCard');
+      lucide.createIcons();
+    })();
+
+    // ============ SUBMIT — create company linked to this user ============
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const errEl = document.getElementById('formError');
+      errEl.classList.add('hidden');
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      if (!name || !email) {
+        errEl.textContent = 'Company name and email are required.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Creating…`;
+      lucide.createIcons();
+
+      const payload = {
+        auth_user_id: _userId,
+        name,
+        email,
+        phone: document.getElementById('phone').value.trim() || null,
+        address: document.getElementById('address').value.trim() || null,
+        clra_license_no: document.getElementById('clra_license_no').value.trim() || null,
+        license_expiry: document.getElementById('license_expiry').value || null,
+      };
+
+      const { error } = await sb.from('companies').insert(payload);
+
+      if (error) {
+        console.error('Company insert failed:', error);
+        btn.disabled = false;
+        btn.innerHTML = `Create company &amp; continue <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+        lucide.createIcons();
+        errEl.textContent = error.message?.includes('duplicate')
+          ? 'A company with this email already exists.'
+          : 'Could not create company: ' + (error.message || 'unknown error');
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      hide('registerCard');
+      show('successCard');
+      lucide.createIcons();
+      setTimeout(() => { window.location.href = 'hire.html'; }, 1200);
+    });
+
+    // ============ SIGN OUT (switch account) ============
+    document.getElementById('signOutLink').addEventListener('click', async () => {
+      await sb.auth.signOut();
+      window.location.href = 'employer-login.html';
+    });
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('[PWA] SW registered, scope:', reg.scope))
+          .catch(err => console.warn('[PWA] SW registration failed:', err.message));
+      });
+    }
+  </script>
+</body>
+</html>

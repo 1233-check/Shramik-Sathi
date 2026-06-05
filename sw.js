@@ -4,7 +4,7 @@
  * and background sync for queued attendance/report submissions.
  */
 
-const CACHE_NAME = 'shramik-sathi-v2';
+const CACHE_NAME = 'shramik-sathi-v4';
 const OFFLINE_URL = '/offline.html';
 
 // Critical assets to pre-cache on install
@@ -12,10 +12,14 @@ const PRECACHE_ASSETS = [
   '/',
   '/worker-login.html',
   '/worker-registration.html',
+  '/worker-jobs.html',
   '/get-hired.html',
   '/hire.html',
+  '/employer-login.html',
+  '/employer-register.html',
   '/manifest.json',
   '/supabase-config.js',
+  '/jobs-app.js',
   '/payroll.js',
   '/biometric-bridge.js',
   '/offline.html',
@@ -25,7 +29,7 @@ const PRECACHE_ASSETS = [
 
 // ──────────────── INSTALL ────────────────
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing Shramik Sathi Service Worker v1');
+  console.log('[SW] Installing Shramik Sathi Service Worker v4');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {

@@ -5,71 +5,68 @@
   const sb = getSupabaseClient();
 
   // Cache DOM
-  const loginView = document.getElementById('loginView');
-  const loginForm = document.getElementById('loginForm');
   const dashboardView = document.getElementById('dashboardView');
   const navUser = document.getElementById('navUser');
   const logoutBtn = document.getElementById('logoutBtn');
 
+  let _company = null; // the signed-in employer's company
+
   // ============================================
-  // AUTH: Check session on page load
+  // AUTH: Guard the page — must be a signed-in employer
+  // with a company. Otherwise route to login / onboarding.
   // ============================================
   async function checkSession() {
     const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      navUser.classList.remove('hidden');
-      showView(dashboardView);
-      loadAllData();
+    if (!session) {
+      window.location.replace('employer-login.html');
+      return;
     }
+
+    // Load the company linked to this auth user.
+    const { data: company, error } = await sb
+      .from('companies')
+      .select('*')
+      .eq('auth_user_id', session.user.id)
+      .maybeSingle();
+
+    if (error) console.error('Company load failed:', error);
+    if (!company) {
+      // Authenticated but no company yet — finish onboarding.
+      window.location.replace('employer-register.html');
+      return;
+    }
+
+    _company = company;
+    window.SSEmployer = { companyId: company.id, companyName: company.name }; // shared with jobs-app.js
+    applyCompanyToUI(company);
+    navUser.classList.remove('hidden');
+    showView(dashboardView);
+    loadAllData();
   }
   checkSession();
 
   // ============================================
-  // AUTH: Login with email/password
+  // UI: Reflect the real signed-in company
   // ============================================
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = loginForm.querySelector('input[type="email"]').value;
-    const password = loginForm.querySelector('input[type="password"]').value;
-    const btn = loginForm.querySelector('button[type="submit"]');
+  function applyCompanyToUI(company) {
+    const name = (company.name || 'Your Company').trim();
+    const initials = name.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'CO';
 
-    btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Authenticating...`;
-    lucide.createIcons();
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('navCompanyName', name);
+    set('navAvatar', initials);
+    set('welcomeCompany', name);
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      // If user doesn't exist, try signup (demo-friendly)
-      const { data: signUpData, error: signUpError } = await sb.auth.signUp({ email, password });
-      if (signUpError) {
-        btn.innerHTML = `Sign In <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-        lucide.createIcons();
-        alert('Login failed: ' + signUpError.message);
-        return;
-      }
-      // Link company to user after signup
-      await sb.from('companies').update({ auth_user_id: signUpData.user.id })
-        .eq('email', email);
-    } else {
-      // Link company if not already linked
-      await sb.from('companies').update({ auth_user_id: data.user.id })
-        .eq('email', email);
-    }
-
-    btn.innerHTML = `Sign In <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
-    lucide.createIcons();
-    navUser.classList.remove('hidden');
-    showView(dashboardView);
-    loadAllData();
-  });
+    const filter = document.getElementById('companyFilter');
+    if (filter) filter.innerHTML = `<option selected>${name}</option>`;
+  }
 
   // ============================================
   // AUTH: Logout
   // ============================================
   logoutBtn.addEventListener('click', async () => {
     await sb.auth.signOut();
-    navUser.classList.add('hidden');
-    showView(loginView);
+    window.location.replace('employer-login.html');
   });
 
   // ============================================
@@ -366,22 +363,69 @@
   }
 
   // ============================================
-  // COMPLIANCE STATS: Compute from live data
+  // COMPLIANCE STATS + DASHBOARD OVERVIEW
+  // Computes live counts for both the CLMS stat boxes
+  // and the dashboard landing cards / compliance bar.
   // ============================================
-  async function loadComplianceStats() {
-    const { data } = await sb.from('employees').select('status, gate_pass_valid_upto');
-    if (!data) return;
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+  async function loadComplianceStats() {
+    const now = new Date();
+    const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+    // Header date + current wage month
+    const currentMonth = `${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+    el('dashMonth', currentMonth);
+    el('dashToday', now.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }));
+
+    // Pull employees + this month's payroll in parallel
+    const [{ data: emps }, { data: wages }] = await Promise.all([
+      sb.from('employees').select('status, gate_pass_valid_upto'),
+      sb.from('wage_records').select('net_pay').eq('wage_month', currentMonth),
+    ]);
+
+    const data = emps || [];
     const total = data.length;
-    const activeGP = data.filter(e => e.gate_pass_valid_upto && new Date(e.gate_pass_valid_upto) > new Date()).length;
+    const activeGP = data.filter(e => e.gate_pass_valid_upto && new Date(e.gate_pass_valid_upto) > now).length;
     const pending = data.filter(e => e.status === 'Pending').length;
     const inactive = data.filter(e => e.status === 'Inactive').length;
+    const compliancePct = total ? Math.round((activeGP / total) * 100) : 0;
 
-    const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    const payrollTotal = (wages || []).reduce((sum, w) => sum + Number(w.net_pay || 0), 0);
+    const paidCount = wages ? wages.length : 0;
+
+    // CLMS panel stat boxes
     el('statTotal', total);
     el('statActive', activeGP);
     el('statPending', pending);
     el('statNonCompliant', inactive);
+
+    // Dashboard landing cards
+    el('dashWorkers', total);
+    el('dashWorkersSub', activeGP === total && total ? 'All gate passes active' : `${activeGP} with active gate pass`);
+    el('dashGatePass', activeGP);
+    el('dashGatePassSub', total ? `${total - activeGP} pending / expired` : 'No workers yet');
+    el('dashPending', pending);
+    el('dashPendingSub', pending ? 'Awaiting verification' : 'Nothing pending');
+    el('dashPayroll', fmtINRCompact(payrollTotal));
+    const payrollEl = document.getElementById('dashPayroll');
+    if (payrollEl) payrollEl.title = '₹' + fmtNum(payrollTotal); // exact figure on hover
+    el('dashPayrollSub', paidCount ? `${paidCount} worker${paidCount === 1 ? '' : 's'} · ${currentMonth}` : `Not run for ${MONTHS[now.getMonth()]}`);
+
+    // Compliance health bar
+    el('dashCompliancePct', compliancePct + '%');
+    const bar = document.getElementById('dashComplianceBar');
+    if (bar) {
+      bar.style.width = compliancePct + '%';
+      bar.classList.remove('bg-emerald-500', 'bg-amber-500', 'bg-red-500');
+      bar.classList.add(compliancePct >= 80 ? 'bg-emerald-500' : compliancePct >= 50 ? 'bg-amber-500' : 'bg-red-500');
+    }
+    // Keep the % text colour in sync with the bar
+    const pctEl = document.getElementById('dashCompliancePct');
+    if (pctEl) {
+      pctEl.classList.remove('text-emerald-600', 'text-amber-600', 'text-red-600');
+      pctEl.classList.add(compliancePct >= 80 ? 'text-emerald-600' : compliancePct >= 50 ? 'text-amber-600' : 'text-red-600');
+    }
   }
 
   // ============================================
@@ -395,5 +439,13 @@
   function fmtNum(n) {
     if (!n && n !== 0) return '0';
     return Number(n).toLocaleString('en-IN');
+  }
+
+  // Compact Indian currency: ₹38.4L, ₹1.25Cr, ₹4,200
+  function fmtINRCompact(n) {
+    n = Number(n || 0);
+    if (n >= 1e7) return '₹' + (n / 1e7).toFixed(2).replace(/\.?0+$/, '') + 'Cr';
+    if (n >= 1e5) return '₹' + (n / 1e5).toFixed(1).replace(/\.0$/, '') + 'L';
+    return '₹' + n.toLocaleString('en-IN');
   }
 })();

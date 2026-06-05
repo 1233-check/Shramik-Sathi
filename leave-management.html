@@ -13,6 +13,13 @@
   <style>
     @media print { .no-print { display: none !important; } body { background: white; } }
     .tab-active { border-bottom: 3px solid #0055a5; color: #0055a5; font-weight: 700; }
+    /* Responsive: hide scrollbars on horizontally-scrolling rows */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    /* Data tables scroll horizontally instead of overflowing the page on small screens */
+    .lm-panel { overflow-x: auto; }
+    .lm-panel table { min-width: 680px; }
+    #panel-balance table, #panel-unavailed table { min-width: 800px; }
   </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -35,7 +42,7 @@
 
   <!-- Tabs -->
   <nav class="bg-white border-b no-print shadow-sm sticky top-0 z-10">
-    <div class="max-w-7xl mx-auto px-4 flex gap-0 text-sm">
+    <div class="max-w-7xl mx-auto px-4 flex gap-0 text-sm overflow-x-auto scrollbar-hide">
       <button class="lm-tab tab-active px-5 py-3 whitespace-nowrap" data-tab="pending">Pending Requests</button>
       <button class="lm-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="approved">Approved</button>
       <button class="lm-tab px-5 py-3 whitespace-nowrap text-slate-500 hover:text-slate-800" data-tab="advances">Advance Requests</button>
@@ -46,7 +53,7 @@
 
   <!-- Stats -->
   <div class="max-w-7xl mx-auto px-4 py-3 no-print">
-    <div class="grid grid-cols-4 gap-3">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <div class="bg-white rounded-lg border p-3 text-center">
         <p class="text-2xl font-bold text-amber-600" id="statPending">0</p>
         <p class="text-[10px] font-bold text-slate-500 uppercase">Pending</p>
