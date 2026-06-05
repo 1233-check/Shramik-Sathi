@@ -37,6 +37,7 @@
     }
 
     _company = company;
+    window.SSEmployer = { companyId: company.id, companyName: company.name }; // shared with jobs-app.js
     applyCompanyToUI(company);
     navUser.classList.remove('hidden');
     showView(dashboardView);
