@@ -14,12 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Inter', 'sans-serif'] },
-          colors: { primary: '#1e293b', secondary: '#f59e0b' }
-        }
-      }
+      theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#1e293b', secondary: '#f59e0b' } } }
     }
   </script>
   <style>
@@ -32,35 +27,38 @@
         linear-gradient(160deg, #1e293b 0%, #0f172a 60%, #020617 100%);
     }
     .grid-overlay {
-      background-image:
-        linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
       background-size: 44px 44px;
       mask-image: radial-gradient(circle at 30% 30%, black, transparent 75%);
       -webkit-mask-image: radial-gradient(circle at 30% 30%, black, transparent 75%);
     }
     .float-orb { animation: floatY 9s ease-in-out infinite alternate; }
     @keyframes floatY { from { transform: translateY(0); } to { transform: translateY(-26px); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-    .fade-up { animation: fadeUp 0.5s ease-out both; }
-    /* Floating-label inputs */
-    .field { position: relative; }
-    .field > input, .field > textarea {
-      width: 100%; border: 1px solid #cbd5e1; border-radius: 12px;
-      padding: 22px 14px 8px 40px; font-size: 14px; background: #fff; outline: none;
-      transition: border-color .15s, box-shadow .15s;
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .step-pane { animation: fadeUp .35s ease-out both; }
+
+    /* Inputs */
+    .fld label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 5px; }
+    .fld label .req { color: #ef4444; }
+    .fld input, .fld select, .fld textarea {
+      width: 100%; padding: 11px 13px; border: 1px solid #cbd5e1; border-radius: 10px;
+      font-size: 14px; background: #fff; outline: none; color: #0f172a;
+      transition: border-color .15s, box-shadow .15s; font-family: inherit;
     }
-    .field > textarea { padding-top: 24px; resize: none; }
-    .field > input:focus, .field > textarea:focus { border-color: #1e293b; box-shadow: 0 0 0 3px rgba(30,41,59,0.08); }
-    .field > .ficon { position: absolute; left: 13px; top: 16px; color: #94a3b8; pointer-events: none; }
-    .field > label {
-      position: absolute; left: 40px; top: 14px; font-size: 13px; color: #94a3b8;
-      pointer-events: none; transition: all .15s ease; transform-origin: left;
-    }
-    .field > input:focus + label, .field > input:not(:placeholder-shown) + label,
-    .field > textarea:focus + label, .field > textarea:not(:placeholder-shown) + label {
-      top: 7px; font-size: 10.5px; color: #475569; font-weight: 600; letter-spacing: .02em; text-transform: uppercase;
-    }
+    .fld textarea { resize: none; }
+    .fld select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2394a3b8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; cursor: pointer; }
+    .fld input:focus, .fld select:focus, .fld textarea:focus { border-color: #1e293b; box-shadow: 0 0 0 3px rgba(30,41,59,0.08); }
+    .fld input.invalid, .fld select.invalid { border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+
+    /* Stepper */
+    .stp-circle { width: 32px; height: 32px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 2px solid #e2e8f0; color: #94a3b8; background: #fff; transition: all .25s; flex-shrink: 0; }
+    .stp.active .stp-circle { border-color: #1e293b; background: #1e293b; color: #fff; }
+    .stp.done .stp-circle { border-color: #059669; background: #059669; color: #fff; }
+    .stp-label { font-size: 11px; font-weight: 600; color: #94a3b8; margin-top: 6px; transition: color .25s; text-align: center; }
+    .stp.active .stp-label { color: #1e293b; }
+    .stp.done .stp-label { color: #059669; }
+    .stp-line { flex: 1; height: 2px; background: #e2e8f0; margin: 0 4px; position: relative; top: -10px; transition: background .25s; }
+    .stp-line.done { background: #059669; }
   </style>
 </head>
 <body class="font-sans text-slate-900 antialiased">
@@ -85,19 +83,21 @@
 
       <div class="relative z-10 max-w-md">
         <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 ring-1 ring-white/10 text-[11px] uppercase tracking-[0.18em] text-white/70">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-secondary"></i> Get started
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-secondary"></i> Company onboarding
         </span>
         <h1 class="mt-5 text-4xl xl:text-[40px] font-extrabold leading-[1.12] tracking-tight">
-          Onboard in<br><span class="text-secondary">under a minute.</span>
+          A few details and<br><span class="text-secondary">you're set up.</span>
         </h1>
         <p class="mt-5 text-white/70 text-[15px] leading-relaxed">
-          Create your company workspace and instantly unlock workforce management, automated payroll, and audit-ready compliance.
+          Tell us about your organisation across a few quick steps. You can refine everything later from your dashboard.
         </p>
 
-        <ul class="mt-9 space-y-4">
-          <li class="flex items-center gap-3 text-sm text-white/80"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i> No setup fees — start managing today</li>
-          <li class="flex items-center gap-3 text-sm text-white/80"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i> Your data is isolated &amp; row-level secured</li>
-          <li class="flex items-center gap-3 text-sm text-white/80"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400 flex-shrink-0"></i> Add workers &amp; run payroll right after</li>
+        <!-- Live step checklist (mirrors the wizard) -->
+        <ul class="mt-9 space-y-3" id="brandSteps">
+          <li data-bs="1" class="flex items-center gap-3 text-sm text-white/60"><span class="bs-dot w-6 h-6 rounded-lg bg-white/10 ring-1 ring-white/10 flex items-center justify-center text-[11px] font-bold">1</span> Company details</li>
+          <li data-bs="2" class="flex items-center gap-3 text-sm text-white/60"><span class="bs-dot w-6 h-6 rounded-lg bg-white/10 ring-1 ring-white/10 flex items-center justify-center text-[11px] font-bold">2</span> Primary contact</li>
+          <li data-bs="3" class="flex items-center gap-3 text-sm text-white/60"><span class="bs-dot w-6 h-6 rounded-lg bg-white/10 ring-1 ring-white/10 flex items-center justify-center text-[11px] font-bold">3</span> Location &amp; compliance</li>
+          <li data-bs="4" class="flex items-center gap-3 text-sm text-white/60"><span class="bs-dot w-6 h-6 rounded-lg bg-white/10 ring-1 ring-white/10 flex items-center justify-center text-[11px] font-bold">4</span> Review &amp; confirm</li>
         </ul>
       </div>
 
@@ -109,7 +109,7 @@
       </div>
     </aside>
 
-    <!-- ============ RIGHT: FORM PANEL ============ -->
+    <!-- ============ RIGHT: WIZARD ============ -->
     <main class="relative flex flex-col min-h-screen bg-slate-50">
       <div class="lg:hidden flex items-center justify-between px-6 h-16 bg-primary text-white">
         <div class="flex items-center gap-2">
@@ -119,94 +119,168 @@
         <span class="text-[10px] uppercase tracking-[0.18em] text-white/55">Employer</span>
       </div>
 
-      <div class="flex-grow flex items-center justify-center p-6 sm:p-10">
-        <div class="w-full max-w-md">
+      <div class="flex-grow flex items-start lg:items-center justify-center p-6 sm:p-10">
+        <div class="w-full max-w-lg">
 
-          <!-- LOADING STATE -->
+          <!-- LOADING -->
           <div id="loadingState" class="text-center text-slate-500 py-16">
             <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600"></i>
             <p class="text-sm">Checking your account…</p>
           </div>
 
-          <!-- REGISTRATION CARD -->
-          <div id="registerCard" class="hidden fade-up">
-            <div class="mb-7">
-              <h2 class="text-2xl font-extrabold text-primary tracking-tight">Create your company</h2>
-              <p class="text-slate-500 text-[15px] mt-1.5">Tell us about your organisation to set up your workspace.</p>
+          <!-- WIZARD -->
+          <div id="wizard" class="hidden">
+            <div class="mb-6">
+              <h2 class="text-2xl font-extrabold text-primary tracking-tight">Register your company</h2>
+              <p class="text-slate-500 text-[15px] mt-1">Step <span id="stepNum">1</span> of 4 · <span id="stepTitle">Company details</span></p>
             </div>
 
-            <form id="registerForm" class="space-y-7">
+            <!-- Stepper -->
+            <div class="flex items-start mb-8" id="stepper" role="list" aria-label="Registration progress">
+              <div class="stp active flex flex-col items-center" data-step="1"><div class="stp-circle">1</div><div class="stp-label">Company</div></div>
+              <div class="stp-line" data-line="1"></div>
+              <div class="stp flex flex-col items-center" data-step="2"><div class="stp-circle">2</div><div class="stp-label">Contact</div></div>
+              <div class="stp-line" data-line="2"></div>
+              <div class="stp flex flex-col items-center" data-step="3"><div class="stp-circle">3</div><div class="stp-label">Location</div></div>
+              <div class="stp-line" data-line="3"></div>
+              <div class="stp flex flex-col items-center" data-step="4"><div class="stp-circle">4</div><div class="stp-label">Review</div></div>
+            </div>
 
-              <!-- Section: Company details -->
-              <div>
-                <div class="flex items-center gap-2 mb-3">
-                  <i data-lucide="building-2" class="w-4 h-4 text-slate-400"></i>
-                  <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Company details</span>
+            <form id="wizardForm" novalidate>
+
+              <!-- STEP 1 — COMPANY -->
+              <div class="step-pane space-y-4" data-pane="1">
+                <div class="fld">
+                  <label>Company name <span class="req">*</span></label>
+                  <input id="name" type="text" placeholder="e.g. Acme Industries Pvt. Ltd." autocomplete="organization">
                 </div>
-                <div class="space-y-3">
-                  <div class="field">
-                    <i data-lucide="building" class="ficon w-4 h-4"></i>
-                    <input id="name" type="text" placeholder=" " required>
-                    <label>Company name *</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="fld">
+                    <label>Industry / sector</label>
+                    <select id="industry">
+                      <option value="">— Select —</option>
+                      <option>Manufacturing</option><option>Construction</option><option>Steel &amp; Metals</option>
+                      <option>Power &amp; Energy</option><option>Oil &amp; Gas</option><option>Mining</option>
+                      <option>Infrastructure</option><option>Logistics &amp; Warehousing</option><option>Automotive</option>
+                      <option>Chemicals</option><option>Textiles</option><option>Other</option>
+                    </select>
                   </div>
-                  <div class="field">
-                    <i data-lucide="mail" class="ficon w-4 h-4"></i>
-                    <input id="email" type="email" placeholder=" " required>
-                    <label>Company email *</label>
+                  <div class="fld">
+                    <label>Company size</label>
+                    <select id="company_size">
+                      <option value="">— Select —</option>
+                      <option>1–50</option><option>51–200</option><option>201–500</option>
+                      <option>501–1000</option><option>1000+</option>
+                    </select>
                   </div>
-                  <div class="field">
-                    <i data-lucide="phone" class="ficon w-4 h-4"></i>
-                    <input id="phone" type="tel" placeholder=" ">
-                    <label>Phone</label>
+                </div>
+                <div class="fld">
+                  <label>Website <span class="text-slate-400 font-normal normal-case">(optional)</span></label>
+                  <input id="website" type="url" placeholder="https://company.com" autocomplete="url">
+                </div>
+              </div>
+
+              <!-- STEP 2 — CONTACT -->
+              <div class="step-pane space-y-4 hidden" data-pane="2">
+                <div class="fld">
+                  <label>Company email <span class="req">*</span></label>
+                  <input id="email" type="email" readonly aria-readonly="true" autocomplete="email" class="bg-slate-100 text-slate-600 cursor-not-allowed">
+                  <p class="text-[11px] text-slate-400 mt-1">Linked to your sign-in account.</p>
+                </div>
+                <div class="fld">
+                  <label>Phone</label>
+                  <input id="phone" type="tel" placeholder="+91 98765 43210" autocomplete="tel">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="fld">
+                    <label>Primary contact person</label>
+                    <input id="contact_person" type="text" placeholder="e.g. Priya Sharma" autocomplete="name">
                   </div>
-                  <div class="field">
-                    <i data-lucide="map-pin" class="ficon w-4 h-4"></i>
-                    <textarea id="address" rows="2" placeholder=" "></textarea>
-                    <label>Registered address</label>
+                  <div class="fld">
+                    <label>Designation</label>
+                    <input id="contact_designation" type="text" placeholder="e.g. HR Manager">
                   </div>
                 </div>
               </div>
 
-              <!-- Section: Compliance -->
-              <div>
-                <div class="flex items-center gap-2 mb-3">
-                  <i data-lucide="file-check-2" class="w-4 h-4 text-slate-400"></i>
-                  <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Compliance <span class="font-medium normal-case tracking-normal text-slate-400">(optional — add later)</span></span>
+              <!-- STEP 3 — LOCATION & COMPLIANCE -->
+              <div class="step-pane space-y-4 hidden" data-pane="3">
+                <div class="fld">
+                  <label>Registered address</label>
+                  <textarea id="address" rows="2" placeholder="Building, street, area"></textarea>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="field">
-                    <i data-lucide="badge-check" class="ficon w-4 h-4"></i>
-                    <input id="clra_license_no" type="text" placeholder=" ">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div class="fld">
+                    <label>City</label>
+                    <input id="city" type="text" placeholder="Jamshedpur">
+                  </div>
+                  <div class="fld">
+                    <label>State</label>
+                    <select id="state">
+                      <option value="">— Select —</option>
+                      <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+                      <option>Delhi</option><option>Gujarat</option><option>Haryana</option><option>Jharkhand</option>
+                      <option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option>
+                      <option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Tamil Nadu</option>
+                      <option>Telangana</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="fld">
+                    <label>PIN code</label>
+                    <input id="pin_code" type="text" inputmode="numeric" maxlength="6" placeholder="831001">
+                  </div>
+                </div>
+                <div class="fld">
+                  <label>GST number <span class="text-slate-400 font-normal normal-case">(optional)</span></label>
+                  <input id="gst_no" type="text" maxlength="15" placeholder="22AAAAA0000A1Z5" class="uppercase">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="fld">
                     <label>CLRA license no.</label>
+                    <input id="clra_license_no" type="text" placeholder="Contract Labour license">
                   </div>
-                  <div class="field">
-                    <i data-lucide="calendar" class="ficon w-4 h-4"></i>
-                    <input id="license_expiry" type="date" placeholder=" ">
+                  <div class="fld">
                     <label>License expiry</label>
+                    <input id="license_expiry" type="date">
                   </div>
                 </div>
               </div>
 
-              <p id="formError" class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5"></p>
+              <!-- STEP 4 — REVIEW -->
+              <div class="step-pane hidden" data-pane="4">
+                <div class="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100" id="reviewBox">
+                  <!-- filled by JS -->
+                </div>
+                <label class="flex items-start gap-2.5 mt-4 text-sm text-slate-600">
+                  <input id="agree" type="checkbox" class="mt-0.5 w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary">
+                  <span>I confirm the details above are accurate and I'm authorised to register this company.</span>
+                </label>
+              </div>
 
-              <button type="submit" id="submitBtn"
-                class="w-full bg-primary text-white font-semibold py-3.5 rounded-xl hover:bg-slate-800 transition shadow-md hover:shadow-lg active:scale-[0.99] flex justify-center items-center gap-2">
-                Create company &amp; continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </button>
+              <p id="formError" role="alert" aria-live="assertive" class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5 mt-4"></p>
 
-              <p class="text-center text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
-                <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-500"></i>
-                Your workspace is private and row-level secured.
-              </p>
+              <!-- Nav buttons -->
+              <div class="flex items-center gap-3 mt-7">
+                <button type="button" id="backBtn" class="hidden px-4 py-3 rounded-xl border border-slate-300 text-slate-600 font-semibold hover:bg-slate-100 transition flex items-center gap-2">
+                  <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+                </button>
+                <button type="button" id="nextBtn" class="flex-1 bg-primary text-white font-semibold py-3 rounded-xl hover:bg-slate-800 transition shadow-md active:scale-[0.99] flex justify-center items-center gap-2">
+                  Continue <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+                <button type="submit" id="submitBtn" class="hidden flex-1 bg-emerald-600 text-white font-semibold py-3 rounded-xl hover:bg-emerald-700 transition shadow-md active:scale-[0.99] justify-center items-center gap-2">
+                  Create company <i data-lucide="check" class="w-4 h-4"></i>
+                </button>
+              </div>
             </form>
 
-            <div class="mt-6 pt-5 border-t border-slate-200 text-center">
+            <div class="mt-6 text-center">
               <button id="signOutLink" class="text-xs text-slate-400 hover:text-slate-600">Sign in with a different account</button>
             </div>
           </div>
 
-          <!-- SUCCESS STATE -->
-          <div id="successCard" class="hidden fade-up text-center py-10">
+          <!-- SUCCESS -->
+          <div id="successCard" class="hidden text-center py-12" role="status" aria-live="polite">
             <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
               <i data-lucide="check" class="w-8 h-8" style="stroke-width:3"></i>
             </div>
@@ -229,59 +303,226 @@
     document.getElementById('year').textContent = new Date().getFullYear();
     const sb = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
     let _userId = null;
+    let step = 1;
+    const TOTAL = 4;
+    const STEP_TITLES = { 1: 'Company details', 2: 'Primary contact', 3: 'Location & compliance', 4: 'Review & confirm' };
+    const FIELDS = ['name','industry','company_size','website','phone','contact_person','contact_designation','address','city','state','pin_code','gst_no','clra_license_no','license_expiry'];
+    const DRAFT_KEY = 'ss_employer_draft';
 
-    const show = (id) => document.getElementById(id).classList.remove('hidden');
-    const hide = (id) => document.getElementById(id).classList.add('hidden');
+    const $ = (id) => document.getElementById(id);
+    const show = (id) => $(id).classList.remove('hidden');
+    const hide = (id) => $(id).classList.add('hidden');
+    const val = (id) => { const e = $(id); return e ? e.value.trim() : ''; };
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
-    // ============ SESSION GUARD + PREFILL ============
+    // ============================================
+    // SESSION GUARD + PREFILL
+    // ============================================
     (async () => {
       if (!sb) return;
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = 'employer-login.html'; return; }
       _userId = session.user.id;
 
-      const { data: company } = await sb
-        .from('companies')
-        .select('id')
-        .eq('auth_user_id', _userId)
-        .maybeSingle();
+      const { data: company } = await sb.from('companies').select('id').eq('auth_user_id', _userId).maybeSingle();
       if (company) { window.location.href = 'hire.html'; return; }
 
       const params = new URLSearchParams(window.location.search);
-      document.getElementById('email').value = session.user.email || params.get('email') || '';
+      restoreDraft();
+      // Email is authoritative from the session and read-only.
+      $('email').value = session.user.email || params.get('email') || '';
+      const contact = session.user.user_metadata?.full_name || session.user.user_metadata?.name || params.get('contact') || '';
+      if (contact && !$('contact_person').value) $('contact_person').value = contact;
+
+      associateLabels();
+      $('name').setAttribute('aria-required', 'true');
+      $('email').setAttribute('aria-required', 'true');
+      document.querySelectorAll('.req').forEach(r => r.setAttribute('aria-hidden', 'true'));
+      FIELDS.forEach(id => { const e = $(id); if (e) e.addEventListener('input', saveDraft); });
 
       hide('loadingState');
-      show('registerCard');
+      show('wizard');
+      renderStep();          // DOM becomes a pure function of `step` from first paint
       lucide.createIcons();
     })();
 
-    // ============ SUBMIT — create company linked to this user ============
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      const errEl = document.getElementById('formError');
-      errEl.classList.add('hidden');
+    // a11y: pair each <label> with its control
+    function associateLabels() {
+      document.querySelectorAll('.fld').forEach(f => {
+        const lbl = f.querySelector('label');
+        const ctrl = f.querySelector('input, select, textarea');
+        if (lbl && ctrl && ctrl.id && !lbl.htmlFor) lbl.htmlFor = ctrl.id;
+      });
+    }
 
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      if (!name || !email) {
-        errEl.textContent = 'Company name and email are required.';
-        errEl.classList.remove('hidden');
-        return;
+    // Draft persistence — survive refresh / accidental navigation
+    function saveDraft() {
+      try {
+        const d = {}; FIELDS.forEach(id => { const e = $(id); if (e && e.value) d[id] = e.value; });
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+      } catch (_) {}
+    }
+    function restoreDraft() {
+      try {
+        const d = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || '{}');
+        FIELDS.forEach(id => { const e = $(id); if (e && d[id] != null && !e.value) e.value = d[id]; });
+      } catch (_) {}
+    }
+    function clearDraft() { try { sessionStorage.removeItem(DRAFT_KEY); } catch (_) {} }
+
+    // ============================================
+    // STEP NAVIGATION
+    // ============================================
+    function renderStep(focusFirst = false) {
+      document.querySelectorAll('.step-pane').forEach(p => p.classList.toggle('hidden', +p.dataset.pane !== step));
+      // stepper state
+      document.querySelectorAll('.stp').forEach(s => {
+        const n = +s.dataset.step;
+        s.classList.toggle('active', n === step);
+        s.classList.toggle('done', n < step);
+        s.setAttribute('aria-current', n === step ? 'step' : 'false');
+        const c = s.querySelector('.stp-circle');
+        c.innerHTML = n < step ? '<i data-lucide="check" class="w-4 h-4"></i>' : n;
+      });
+      document.querySelectorAll('.stp-line').forEach(l => l.classList.toggle('done', +l.dataset.line < step));
+      // brand checklist (single source of truth for the dot background)
+      document.querySelectorAll('#brandSteps li').forEach(li => {
+        const n = +li.dataset.bs;
+        li.classList.toggle('text-white', n === step);
+        li.classList.toggle('text-white/60', n !== step);
+        const dot = li.querySelector('.bs-dot');
+        dot.classList.remove('bg-white/10', 'bg-white/25', 'bg-emerald-500');
+        dot.classList.add(n < step ? 'bg-emerald-500' : n === step ? 'bg-white/25' : 'bg-white/10');
+        dot.classList.toggle('text-white', n <= step);
+        dot.innerHTML = n < step ? '✓' : n;
+      });
+
+      $('stepNum').textContent = step;
+      $('stepTitle').textContent = STEP_TITLES[step];
+
+      $('backBtn').classList.toggle('hidden', step === 1);
+      const onReview = step === TOTAL;
+      $('nextBtn').classList.toggle('hidden', onReview);
+      $('submitBtn').classList.toggle('hidden', !onReview);
+      $('submitBtn').classList.toggle('flex', onReview);
+
+      if (onReview) buildReview();
+      $('formError').classList.add('hidden');
+      lucide.createIcons();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (focusFirst) {
+        const pane = document.querySelector(`.step-pane[data-pane="${step}"]`);
+        const first = pane && pane.querySelector('input:not([readonly]), select, textarea, input[type="checkbox"]');
+        if (first) first.focus({ preventScroll: true });
+      }
+    }
+
+    function clearInvalid(scope) { scope.querySelectorAll('.invalid').forEach(e => { e.classList.remove('invalid'); e.removeAttribute('aria-invalid'); }); }
+
+    function validateStep(n) {
+      const pane = document.querySelector(`.step-pane[data-pane="${n}"]`);
+      clearInvalid(pane);
+      const errs = [];
+
+      if (n === 1) {
+        if (!val('name')) { mark('name'); errs.push('Company name is required.'); }
+        if (val('website') && !/^https?:\/\/.+\..+/.test(val('website'))) { mark('website'); errs.push('Enter a valid website URL (https://…).'); }
+      }
+      if (n === 2) {
+        if (!val('email')) { mark('email'); errs.push('Company email is required.'); }
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('email'))) { mark('email'); errs.push('Enter a valid email address.'); }
+      }
+      if (n === 3) {
+        if (val('pin_code') && !/^\d{6}$/.test(val('pin_code'))) { mark('pin_code'); errs.push('PIN code must be 6 digits.'); }
+        if (val('gst_no') && val('gst_no').length !== 15) { mark('gst_no'); errs.push('GST number must be 15 characters.'); }
       }
 
+      if (errs.length) { showError(errs[0]); return false; }
+      $('formError').classList.add('hidden');
+      return true;
+    }
+    function mark(id) { const e = $(id); e.classList.add('invalid'); e.setAttribute('aria-invalid', 'true'); }
+    function showError(msg) { const e = $('formError'); e.textContent = msg; e.classList.remove('hidden'); }
+
+    $('nextBtn').addEventListener('click', () => {
+      if (!validateStep(step)) {
+        const pane = document.querySelector(`.step-pane[data-pane="${step}"]`);
+        const bad = pane && pane.querySelector('.invalid');
+        if (bad) bad.focus({ preventScroll: true });
+        return;
+      }
+      if (step < TOTAL) { step++; renderStep(true); }
+    });
+    $('backBtn').addEventListener('click', () => { if (step > 1) { step--; renderStep(true); } });
+
+    // Enter key advances (but not from a textarea or an open select)
+    $('wizardForm').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT' && step < TOTAL) {
+        e.preventDefault(); $('nextBtn').click();
+      }
+    });
+
+    // PIN numeric only
+    $('pin_code').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 6); });
+    $('gst_no').addEventListener('input', function () { this.value = this.value.toUpperCase().slice(0, 15); });
+
+    // ============================================
+    // REVIEW
+    // ============================================
+    function reviewRow(label, value) {
+      return `<div class="flex items-start justify-between gap-4 px-4 py-3 min-w-0">
+        <span class="text-xs font-semibold uppercase tracking-wide text-slate-400 shrink-0">${label}</span>
+        <span class="text-sm font-medium text-slate-800 text-right break-words min-w-0">${value ? esc(value) : '<span class="text-slate-300">—</span>'}</span>
+      </div>`;
+    }
+    function buildReview() {
+      const loc = [val('city'), val('state'), val('pin_code')].filter(Boolean).join(', ');
+      $('reviewBox').innerHTML = [
+        reviewRow('Company', val('name')),
+        reviewRow('Industry', [val('industry'), val('company_size')].filter(Boolean).join(' · ')),
+        reviewRow('Email', val('email')),
+        reviewRow('Phone', val('phone')),
+        reviewRow('Contact', [val('contact_person'), val('contact_designation')].filter(Boolean).join(' · ')),
+        reviewRow('Address', [val('address'), loc].filter(Boolean).join(', ')),
+        reviewRow('GST', val('gst_no')),
+        reviewRow('CLRA license', [val('clra_license_no'), val('license_expiry')].filter(Boolean).join(' · ')),
+        reviewRow('Website', val('website')),
+      ].join('');
+    }
+
+    // ============================================
+    // SUBMIT
+    // ============================================
+    $('wizardForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      // Re-validate the required earlier steps defensively.
+      if (!val('name')) { step = 1; renderStep(); validateStep(1); return; }
+      if (!val('email')) { step = 2; renderStep(); validateStep(2); return; }
+      if (!$('agree').checked) { showError('Please confirm the details to continue.'); return; }
+
+      const btn = $('submitBtn');
       btn.disabled = true;
       btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Creating…`;
       lucide.createIcons();
 
       const payload = {
         auth_user_id: _userId,
-        name,
-        email,
-        phone: document.getElementById('phone').value.trim() || null,
-        address: document.getElementById('address').value.trim() || null,
-        clra_license_no: document.getElementById('clra_license_no').value.trim() || null,
-        license_expiry: document.getElementById('license_expiry').value || null,
+        name: val('name'),
+        email: val('email'),
+        phone: val('phone') || null,
+        industry: val('industry') || null,
+        company_size: val('company_size') || null,
+        website: val('website') || null,
+        contact_person: val('contact_person') || null,
+        contact_designation: val('contact_designation') || null,
+        address: val('address') || null,
+        city: val('city') || null,
+        state: val('state') || null,
+        pin_code: val('pin_code') || null,
+        gst_no: val('gst_no') || null,
+        clra_license_no: val('clra_license_no') || null,
+        license_expiry: val('license_expiry') || null,
       };
 
       const { error } = await sb.from('companies').insert(payload);
@@ -289,23 +530,33 @@
       if (error) {
         console.error('Company insert failed:', error);
         btn.disabled = false;
-        btn.innerHTML = `Create company &amp; continue <i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+        btn.innerHTML = `Create company <i data-lucide="check" class="w-4 h-4"></i>`;
         lucide.createIcons();
-        errEl.textContent = error.message?.includes('duplicate')
-          ? 'A company with this email already exists.'
-          : 'Could not create company: ' + (error.message || 'unknown error');
-        errEl.classList.remove('hidden');
+        const code = error.code || '';
+        showError(
+          code === '23505' || /duplicate/i.test(error.message || '')
+            ? 'A company is already registered under this account.'
+            : code === 'PGRST204' || /column/i.test(error.message || '')
+              ? 'Database not migrated yet — run migration 008 in Supabase, then try again.'
+              : 'Could not create company: ' + (error.message || 'unknown error')
+        );
         return;
       }
 
-      hide('registerCard');
+      clearDraft();
+      hide('wizard');
       show('successCard');
+      $('successCard').focus && $('successCard').setAttribute('tabindex', '-1');
+      $('successCard').focus && $('successCard').focus({ preventScroll: true });
       lucide.createIcons();
       setTimeout(() => { window.location.href = 'hire.html'; }, 1200);
     });
 
-    // ============ SIGN OUT (switch account) ============
-    document.getElementById('signOutLink').addEventListener('click', async () => {
+    // ============================================
+    // SIGN OUT
+    // ============================================
+    $('signOutLink').addEventListener('click', async () => {
+      clearDraft();
       await sb.auth.signOut();
       window.location.href = 'employer-login.html';
     });
