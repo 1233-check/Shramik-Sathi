@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
   <title>Employee Portal | Shramik Sathi</title>
   <meta name="description" content="Shramik Sathi Worker Dashboard — Attendance, Leave, Salary, Reports">
   <link rel="manifest" href="manifest.json">
@@ -41,11 +41,12 @@
 </head>
 <body class="text-gray-900 antialiased font-sans flex justify-center">
 
-  <!-- Mobile App Frame -->
-  <main class="w-full max-w-md bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-hidden border-x border-gray-200">
+  <!-- App frame: phone-style on mobile, full dashboard on lg+ -->
+  <main class="w-full max-w-md lg:max-w-6xl bg-gray-50 min-h-screen relative shadow-2xl lg:shadow-none flex flex-col overflow-hidden lg:overflow-visible border-x border-gray-200 lg:border-x-0">
 
     <!-- Header — Dynamic -->
-    <header class="sticky top-0 z-50 bg-[#f4f5f4] px-4 py-4 border-b border-[#e2e4e2]">
+    <header class="sticky top-0 z-50 bg-[#f4f5f4] px-4 py-4 border-b border-[#e2e4e2] lg:px-6">
+      <div class="lg:max-w-6xl lg:mx-auto">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-full bg-[#4a5c54] text-white flex items-center justify-center font-bold text-base shadow-sm" id="avatarInitials">
@@ -59,6 +60,13 @@
             </span>
           </div>
         </div>
+        <!-- Desktop nav (replaces bottom nav on lg+) -->
+        <nav class="hidden lg:flex items-center gap-1" aria-label="Primary">
+          <a href="get-hired.html" class="px-3.5 py-2 rounded-lg text-sm font-bold text-[#4a5c54] bg-white shadow-sm">Home</a>
+          <a href="worker-jobs.html" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-[#4a5c54] hover:bg-white transition-colors">Jobs</a>
+          <a href="worker-news.html" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-[#4a5c54] hover:bg-white transition-colors">News</a>
+          <a href="worker-profile.html" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-[#4a5c54] hover:bg-white transition-colors">Profile</a>
+        </nav>
         <div class="flex items-center gap-0.5">
           <button class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#1c211f] hover:bg-white rounded-full transition-colors" aria-label="Notifications">
             <i data-lucide="bell" class="w-5 h-5"></i>
@@ -88,13 +96,14 @@
           <p class="text-[9px] font-semibold text-[#8b928f] uppercase tracking-wider">Reports</p>
         </div>
       </div>
+      </div>
     </header>
 
-    <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto no-scrollbar pb-24">
+    <!-- Scrollable Content (single column on mobile, bento grid on lg+) -->
+    <div class="flex-1 overflow-y-auto no-scrollbar pb-24 lg:overflow-visible lg:pb-12 lg:pt-6 lg:px-6 lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start lg:max-w-6xl lg:mx-auto lg:w-full">
 
       <!-- Earnings Card -->
-      <section class="p-4 pt-5 fade-in">
+      <section class="p-4 pt-5 fade-in lg:col-span-3 lg:p-0">
         <div class="bg-[#4a5c54] rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
           <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div class="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
@@ -116,7 +125,7 @@
       </section>
 
       <!-- Action Grid -->
-      <section class="px-4 py-2 fade-in" style="animation-delay:0.1s">
+      <section class="px-4 py-2 fade-in lg:col-span-2 lg:p-0" style="animation-delay:0.1s">
         <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
           <i data-lucide="grid-3x3" class="w-4 h-4 text-slate-400"></i>
           Quick Actions
@@ -169,7 +178,7 @@
       </section>
 
       <!-- Attendance Streak -->
-      <section class="px-4 py-4 fade-in" style="animation-delay:0.15s">
+      <section class="px-4 py-4 fade-in lg:col-span-1 lg:p-0" style="animation-delay:0.15s">
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
@@ -186,7 +195,7 @@
       </section>
 
       <!-- Recent Activity -->
-      <section class="px-4 py-2 pb-6 fade-in" style="animation-delay:0.2s">
+      <section class="px-4 py-2 pb-6 fade-in lg:col-span-2 lg:p-0" style="animation-delay:0.2s">
         <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
           <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
           Recent Activity
@@ -210,7 +219,7 @@
       </section>
 
       <!-- Trust Profile -->
-      <section class="px-4 py-2 pb-6 fade-in" style="animation-delay:0.25s">
+      <section class="px-4 py-2 pb-6 fade-in lg:col-span-1 lg:p-0" style="animation-delay:0.25s">
         <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
           <i data-lucide="shield-check" class="w-4 h-4 text-slate-400"></i>
           Compliance Status
@@ -247,8 +256,8 @@
       </section>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="absolute bottom-0 w-full bg-[#f4f5f4] border-t border-[#e2e4e2] flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-sm">
+    <!-- Bottom Navigation (mobile only; desktop uses the header nav) -->
+    <nav class="absolute bottom-0 w-full bg-[#f4f5f4] border-t border-[#e2e4e2] flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-sm lg:hidden">
       <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center h-full text-[#4a5c54]">
         <i data-lucide="layout-dashboard" class="w-[20px] h-[20px] mb-0.5"></i>
         <span class="text-[10px] font-bold">Home</span>
