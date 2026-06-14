@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
   <title>Jobs | Shramik Sathi</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1f2937">
@@ -35,7 +35,7 @@
 </head>
 <body class="bg-gray-200 flex justify-center font-sans text-gray-900 antialiased">
 
-  <main class="w-full max-w-md bg-gray-50 min-h-[100dvh] flex flex-col relative shadow-xl border-x border-gray-200 overflow-hidden">
+  <main class="w-full max-w-md lg:max-w-5xl bg-gray-50 min-h-[100dvh] flex flex-col relative shadow-xl lg:shadow-none border-x border-gray-200 lg:border-x-0 overflow-hidden lg:overflow-visible">
 
     <!-- AUTH / LOADING GATE -->
     <div id="gate" class="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
@@ -47,17 +47,26 @@
     <div id="app" class="hidden flex-1 flex-col min-h-0">
 
       <!-- Header -->
-      <header class="sticky top-0 z-40 bg-white border-b border-gray-200 px-5 pt-5 pb-3">
-        <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Jobs</h1>
-        <p class="text-sm text-gray-500 mt-0.5">Find and apply to verified roles</p>
-        <div class="mt-4 grid grid-cols-2 gap-1 bg-gray-100 rounded-xl p-1">
-          <button id="tabBrowse" class="seg-tab active py-2 rounded-lg text-sm font-semibold">Browse</button>
-          <button id="tabApps" class="seg-tab py-2 rounded-lg text-sm font-semibold">My Applications</button>
+      <header class="sticky top-0 z-40 bg-white border-b border-gray-200 px-5 pt-5 pb-3 lg:px-8">
+        <div class="lg:max-w-5xl lg:mx-auto lg:w-full">
+          <nav class="hidden lg:flex items-center gap-1 mb-4" aria-label="Primary">
+            <a href="get-hired.html" class="flex items-center gap-2 mr-auto font-extrabold text-gray-900"><i data-lucide="hard-hat" class="w-5 h-5 text-gray-700"></i> Shramik Sathi</a>
+            <a href="get-hired.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Home</a>
+            <a href="worker-jobs.html" class="px-3 py-2 rounded-lg text-sm font-bold text-gray-900 bg-gray-100">Jobs</a>
+            <a href="worker-news.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">News</a>
+            <a href="worker-profile.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Profile</a>
+          </nav>
+          <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Jobs</h1>
+          <p class="text-sm text-gray-500 mt-0.5">Find and apply to verified roles</p>
+          <div class="mt-4 grid grid-cols-2 gap-1 bg-gray-100 rounded-xl p-1 lg:max-w-sm">
+            <button id="tabBrowse" class="seg-tab active py-2 rounded-lg text-sm font-semibold">Browse</button>
+            <button id="tabApps" class="seg-tab py-2 rounded-lg text-sm font-semibold">My Applications</button>
+          </div>
         </div>
       </header>
 
       <!-- Scroll content -->
-      <div class="flex-1 overflow-y-auto no-scrollbar pb-28">
+      <div class="flex-1 overflow-y-auto no-scrollbar pb-28 lg:overflow-visible lg:pb-12 lg:max-w-5xl lg:mx-auto lg:w-full">
 
         <!-- BROWSE -->
         <section id="browseView" class="px-5 py-4 flex flex-col gap-4">
@@ -75,19 +84,19 @@
             <button data-cat="Highly Skilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Highly Skilled</button>
           </div>
 
-          <div id="browseList" class="flex flex-col gap-3"></div>
+          <div id="browseList" class="flex flex-col gap-3 lg:grid lg:grid-cols-2 xl:grid-cols-3"></div>
         </section>
 
         <!-- MY APPLICATIONS -->
         <section id="appsView" class="hidden px-5 py-4 flex-col gap-3">
-          <div id="appsList" class="flex flex-col gap-3"></div>
+          <div id="appsList" class="flex flex-col gap-3 lg:grid lg:grid-cols-2"></div>
         </section>
 
       </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px]">
+    <!-- Bottom Navigation (mobile only) -->
+    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px] lg:hidden">
       <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center text-gray-400 h-full active:bg-gray-50 rounded-xl transition-colors">
         <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-semibold">Home</span>
       </a>
