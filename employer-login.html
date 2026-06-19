@@ -218,39 +218,59 @@
     });
 
     // ============ OAUTH CALLBACK / AUTO-REDIRECT ============
+    // Route exactly once, whether the session is already present OR arrives
+    // asynchronously after Supabase finishes exchanging the Google code.
+    let _routed = false;
+    async function routeFromSession(session) {
+      if (_routed || !session) return;
+      _routed = true;
+
+      document.getElementById('loginCard').classList.add('hidden');
+      document.getElementById('successCard').classList.remove('hidden');
+      lucide.createIcons();
+
+      let company = null;
+      try {
+        const { data } = await sb.from('companies')
+          .select('id, name').eq('auth_user_id', session.user.id).maybeSingle();
+        company = data;
+      } catch (e) { console.warn('[auth] company lookup failed:', e); }
+
+      const sub = document.getElementById('successSub');
+      if (company) {
+        sub.textContent = 'Loading your dashboard…';
+        window.location.replace('hire.html');
+      } else {
+        sub.textContent = 'Setting up your company…';
+        const params = new URLSearchParams();
+        const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || '';
+        if (name) params.set('contact', name);
+        if (session.user.email) params.set('email', session.user.email);
+        window.location.replace('employer-register.html' + (params.toString() ? '?' + params.toString() : ''));
+      }
+    }
+
     (async () => {
       if (!sb) return;
+
+      // If Google/Supabase returned an error in the URL, show it (don't fail silently).
+      const hp = new URLSearchParams(location.hash.replace(/^#/, ''));
+      const qp = new URLSearchParams(location.search);
+      const oauthErr = hp.get('error_description') || hp.get('error') || qp.get('error_description') || qp.get('error');
+      if (oauthErr) {
+        const note = document.getElementById('loginNote');
+        note.textContent = '✗ ' + decodeURIComponent(oauthErr).replace(/\+/g, ' ');
+        note.classList.remove('text-slate-400'); note.classList.add('text-red-500');
+      }
+
+      // Catch the sign-in even if the code exchange completes AFTER this runs.
+      sb.auth.onAuthStateChange((_event, session) => { if (session) routeFromSession(session); });
+
+      // Already signed in → route immediately.
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) return;
-
-        document.getElementById('loginCard').classList.add('hidden');
-        document.getElementById('successCard').classList.remove('hidden');
-        lucide.createIcons();
-
-        const { data: company } = await sb
-          .from('companies')
-          .select('id, name')
-          .eq('auth_user_id', session.user.id)
-          .maybeSingle();
-
-        const sub = document.getElementById('successSub');
-        setTimeout(() => {
-          if (company) {
-            sub.textContent = 'Loading your dashboard…';
-            window.location.href = 'hire.html';
-          } else {
-            sub.textContent = 'Setting up your company…';
-            const params = new URLSearchParams();
-            const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || '';
-            if (name) params.set('contact', name);
-            if (session.user.email) params.set('email', session.user.email);
-            window.location.href = 'employer-register.html' + (params.toString() ? '?' + params.toString() : '');
-          }
-        }, 1000);
-      } catch (e) {
-        console.log('No active session, showing login page.');
-      }
+        if (session) routeFromSession(session);
+      } catch (e) { console.log('[auth] no active session yet'); }
     })();
   </script>
 
