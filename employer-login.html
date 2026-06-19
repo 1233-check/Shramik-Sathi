@@ -154,7 +154,7 @@
 
             <div class="mt-10 pt-6 border-t border-slate-200 text-center space-y-2">
               <p class="text-sm text-slate-600">New industry partner?
-                <a href="employer-register.html" class="text-secondary font-semibold hover:underline">Register your company →</a>
+                <a href="employer-register.html" id="registerLink" class="text-secondary font-semibold hover:underline">Register your company →</a>
               </p>
               <p class="text-xs text-slate-400">Looking for work? <a href="worker-login.html" class="text-blue-600 hover:underline">Worker login</a></p>
             </div>
@@ -215,6 +215,13 @@
           note.classList.remove('text-red-500');
         }, 3500);
       }
+    });
+
+    // "Register your company" needs auth first → start Google sign-in.
+    // New employers (no company yet) are routed to the wizard after login.
+    document.getElementById('registerLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('googleSignInBtn').click();
     });
 
     // ============ OAUTH CALLBACK / AUTO-REDIRECT ============
