@@ -371,42 +371,58 @@
   const successScreen = document.getElementById('successScreen');
   const trustFooter = document.getElementById('trustFooter');
 
+  // Route exactly once — whether the session is already present OR arrives
+  // asynchronously after Supabase finishes exchanging the Google code.
+  let _routed = false;
+  async function routeFromSession(session) {
+    if (_routed || !session) return;
+    _routed = true;
+
+    document.getElementById('signinSection').style.display = 'none';
+    document.getElementById('heroTitle').innerHTML =
+      currentLang === 'hi' ? 'सत्यापित<br><span>हो गया!</span>' : 'Verified<br><span>Successfully!</span>';
+    document.getElementById('heroSub').textContent =
+      currentLang === 'hi' ? 'आपके डैशबोर्ड पर ले जा रहे हैं...' : 'Taking you to your dashboard...';
+    successScreen.classList.add('active');
+    trustFooter.style.display = 'none';
+    lucide.createIcons();
+
+    let emp = null;
+    try {
+      const { data } = await sb.from('employees').select('id').eq('auth_user_id', session.user.id).maybeSingle();
+      emp = data;
+    } catch (e) { console.warn('[auth] employee lookup failed:', e); }
+
+    setTimeout(() => {
+      if (emp) {
+        window.location.replace('get-hired.html');
+      } else {
+        const params = new URLSearchParams();
+        const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || '';
+        if (name) params.set('name', name);
+        if (session.user.email) params.set('email', session.user.email);
+        window.location.replace('worker-registration.html' + (params.toString() ? '?' + params.toString() : ''));
+      }
+    }, 1200);
+  }
+
   (async () => {
+    // Surface any OAuth error returned in the URL instead of failing silently.
+    const hp = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const qp = new URLSearchParams(location.search);
+    const oauthErr = hp.get('error_description') || hp.get('error') || qp.get('error_description') || qp.get('error');
+    if (oauthErr) {
+      const note = document.getElementById('signinNote');
+      if (note) { note.textContent = '✗ ' + decodeURIComponent(oauthErr).replace(/\+/g, ' '); note.style.color = '#e76f51'; }
+    }
+
+    // Catch the sign-in even if the code exchange completes AFTER this runs.
+    sb.auth.onAuthStateChange((_event, session) => { if (session) routeFromSession(session); });
+
     try {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) {
-        // User is authenticated — show success and redirect
-        document.getElementById('signinSection').style.display = 'none';
-        document.getElementById('heroTitle').innerHTML =
-          currentLang === 'hi' ? 'सत्यापित<br><span>हो गया!</span>' : 'Verified<br><span>Successfully!</span>';
-        document.getElementById('heroSub').textContent =
-          currentLang === 'hi' ? 'आपके डैशबोर्ड पर ले जा रहे हैं...' : 'Taking you to your dashboard...';
-
-        successScreen.classList.add('active');
-        trustFooter.style.display = 'none';
-        lucide.createIcons();
-
-        // Check if employee profile exists
-        const { data: emp } = await sb.from('employees').select('id').eq('auth_user_id', session.user.id).single();
-
-        setTimeout(() => {
-          if (emp) {
-            window.location.href = 'get-hired.html';
-          } else {
-            // Pass Google profile data to registration page
-            const params = new URLSearchParams();
-            const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || '';
-            if (name) params.set('name', name);
-            const email = session.user.email || '';
-            if (email) params.set('email', email);
-            window.location.href = 'worker-registration.html' + (params.toString() ? '?' + params.toString() : '');
-          }
-        }, 1500);
-      }
-    } catch (e) {
-      // Not logged in — stay on login page
-      console.log('No active session, showing login page.');
-    }
+      if (session) routeFromSession(session);
+    } catch (e) { console.log('[auth] no active session yet'); }
   })();
 
   // ============================================
