@@ -53,16 +53,25 @@
       <!-- Profile Header Card -->
       <div class="bg-white border-b border-gray-200 p-6 flex flex-col items-center justify-center fade-in lg:col-span-2 lg:rounded-2xl lg:border lg:mt-4">
         <div class="relative mb-4">
-          <div class="w-24 h-24 rounded-full bg-[#4a5c54] text-white flex items-center justify-center font-bold text-3xl shadow-sm border-4 border-white" id="avatarInitials">
+          <div class="w-24 h-24 rounded-full bg-[#4a5c54] text-white flex items-center justify-center font-bold text-3xl shadow-sm border-4 border-white bg-cover bg-center" id="avatarInitials">
             SS
           </div>
-          <div class="absolute bottom-0 right-0 w-6 h-6 border-2 border-white rounded-full flex items-center justify-center" id="verifiedBadge" style="background:#5d7369;">
-            <i data-lucide="check" class="w-3 h-3 text-white"></i>
-          </div>
+          <label for="avatarInput" id="avatarBtn" title="Change photo" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#4a5c54] text-white flex items-center justify-center border-2 border-white shadow cursor-pointer active:scale-95 transition">
+            <i data-lucide="camera" class="w-4 h-4"></i>
+          </label>
+          <input type="file" id="avatarInput" accept="image/*" class="hidden">
         </div>
         <h2 class="text-2xl font-bold text-[#1c211f]" id="profileName">Loading...</h2>
         <p class="text-[#4a514e] font-medium mt-1 text-[15px]" id="profileDesignation">—</p>
+        <div class="mt-2 inline-flex items-center gap-1.5 bg-[#f4f5f4] border border-[#e2e4e2] rounded-full px-3 py-1">
+          <i data-lucide="badge-check" class="w-3.5 h-3.5 text-[#5d7369]"></i>
+          <span class="text-[11px] font-bold text-[#1c211f]" id="profileSsUid">—</span>
+        </div>
         <span class="mt-3 px-3 py-1 text-xs font-bold rounded-full" id="profileStatus">—</span>
+        <p id="avatarStatus" class="text-[11px] text-[#8b928f] mt-2 h-4"></p>
+        <button id="editProfileBtn" class="mt-1 text-sm font-semibold text-[#4a5c54] border border-[#cdd5d1] rounded-lg px-4 py-2 hover:bg-[#eef1ee] transition flex items-center gap-2">
+          <i data-lucide="pencil" class="w-4 h-4"></i> Edit profile
+        </button>
       </div>
 
       <!-- Identity Details -->
@@ -226,9 +235,37 @@
     </nav>
   </main>
 
+  <!-- EDIT PROFILE MODAL -->
+  <div id="editModal" class="hidden fixed inset-0 z-[100] bg-black/40 flex items-end sm:items-center justify-center sm:p-4">
+    <div class="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 sticky top-0 bg-white">
+        <h3 class="font-bold text-lg text-[#1c211f]">Edit profile</h3>
+        <button id="editClose" class="text-[#8b928f] hover:text-[#1c211f]"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form id="editForm" class="p-5 space-y-3.5">
+        <div><label class="block text-xs font-semibold text-[#4a514e] mb-1">Mobile</label><input id="ef_mobile" type="tel" inputmode="numeric" maxlength="10" class="w-full px-3 py-2.5 rounded-lg border border-[#cdd5d1] text-sm outline-none focus:border-[#4a5c54]"></div>
+        <div><label class="block text-xs font-semibold text-[#4a514e] mb-1">Emergency contact</label><input id="ef_emergency" type="tel" inputmode="numeric" maxlength="10" class="w-full px-3 py-2.5 rounded-lg border border-[#cdd5d1] text-sm outline-none focus:border-[#4a5c54]"></div>
+        <div><label class="block text-xs font-semibold text-[#4a514e] mb-1">Address</label><textarea id="ef_address" rows="2" class="w-full px-3 py-2.5 rounded-lg border border-[#cdd5d1] text-sm outline-none focus:border-[#4a5c54] resize-none"></textarea></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-xs font-semibold text-[#4a514e] mb-1">State</label><input id="ef_state" type="text" class="w-full px-3 py-2.5 rounded-lg border border-[#cdd5d1] text-sm outline-none focus:border-[#4a5c54]"></div>
+          <div><label class="block text-xs font-semibold text-[#4a514e] mb-1">PIN code</label><input id="ef_pin" type="text" inputmode="numeric" maxlength="6" class="w-full px-3 py-2.5 rounded-lg border border-[#cdd5d1] text-sm outline-none focus:border-[#4a5c54]"></div>
+        </div>
+        <div><label class="block text-xs font-semibold text-[#4a514e] mb-1">Bank name</label><input id="ef_bank" type="text" class="w-full px-3 py-2.5 rounded-lg border border-[#cdd5d1] text-sm outline-none focus:border-[#4a5c54]"></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-xs font-semibold text-[#4a514e] mb-1">Account no.</label><input id="ef_account" type="text" inputmode="numeric" class="w-full px-3 py-2.5 rounded-lg border border-[#cdd5d1] text-sm outline-none focus:border-[#4a5c54]"></div>
+          <div><label class="block text-xs font-semibold text-[#4a514e] mb-1">IFSC</label><input id="ef_ifsc" type="text" maxlength="11" class="w-full px-3 py-2.5 rounded-lg border border-[#cdd5d1] text-sm outline-none focus:border-[#4a5c54] uppercase"></div>
+        </div>
+        <p class="text-[11px] text-[#8b928f]">Aadhaar &amp; PAN can't be edited here (they're verified KYC).</p>
+        <p id="ef_error" class="hidden text-sm text-[#e76f51] font-medium"></p>
+        <button type="submit" id="ef_save" class="w-full bg-[#4a5c54] text-white font-bold py-3 rounded-xl active:bg-[#3a4a43] transition">Save changes</button>
+      </form>
+    </div>
+  </div>
+
   <script>
     lucide.createIcons();
     const sb = getSupabaseClient();
+    let _emp = null, _uid = null;
 
     // ============================================
     // HELPERS
@@ -258,12 +295,15 @@
         const { data: emp } = await sb.from('employees')
           .select('*')
           .eq('auth_user_id', session.user.id)
-          .single();
+          .maybeSingle();
 
         if (!emp) { window.location.href = 'worker-registration.html'; return; }
+        _emp = emp; _uid = session.user.id;
 
-        // — Header avatar & name —
-        document.getElementById('avatarInitials').textContent = getInitials(emp.full_name);
+        // — Header avatar, name & unique ID —
+        if (emp.photo_url) setAvatar(emp.photo_url);
+        else document.getElementById('avatarInitials').textContent = getInitials(emp.full_name);
+        document.getElementById('profileSsUid').textContent = emp.ss_uid || '—';
         document.getElementById('profileName').textContent = emp.full_name || 'Worker';
         document.getElementById('profileDesignation').textContent =
           [emp.designation, emp.emp_id ? `ID: ${emp.emp_id}` : null].filter(Boolean).join(' | ') || 'Employee';
@@ -311,6 +351,106 @@
         window.location.href = 'worker-login.html';
       }
     })();
+
+    // ============================================
+    // PROFILE PHOTO UPLOAD
+    // ============================================
+    function setAvatar(url) {
+      const av = document.getElementById('avatarInitials');
+      av.textContent = '';
+      av.style.backgroundImage = `url("${url}")`;
+    }
+    function downscale(file, max) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            let { width: w, height: h } = img;
+            const scale = Math.min(1, max / Math.max(w, h));
+            w = Math.round(w * scale); h = Math.round(h * scale);
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            c.getContext('2d').drawImage(img, 0, 0, w, h);
+            c.toBlob(b => b ? resolve(b) : reject(new Error('encode failed')), 'image/jpeg', 0.85);
+          };
+          img.onerror = reject; img.src = reader.result;
+        };
+        reader.onerror = reject; reader.readAsDataURL(file);
+      });
+    }
+    document.getElementById('avatarInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file || !_uid || !_emp) return;
+      const st = document.getElementById('avatarStatus');
+      if (!file.type.startsWith('image/')) { st.textContent = 'Please choose an image.'; return; }
+      if (file.size > 2 * 1024 * 1024) { st.textContent = 'Image must be under 2 MB.'; return; }
+      st.textContent = 'Uploading…';
+      try {
+        const blob = await downscale(file, 512);
+        const path = `${_uid}/avatar.jpg`;
+        const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+        if (upErr) throw upErr;
+        const { data: pub } = sb.storage.from('avatars').getPublicUrl(path);
+        const { error: updErr } = await sb.from('employees').update({ photo_url: pub.publicUrl }).eq('id', _emp.id);
+        if (updErr) throw updErr;
+        _emp.photo_url = pub.publicUrl;
+        setAvatar(pub.publicUrl + '?t=' + Date.now());   // cache-bust the just-updated image
+        st.textContent = 'Photo updated ✓';
+        setTimeout(() => { st.textContent = ''; }, 2500);
+      } catch (err) {
+        console.error('avatar upload failed:', err);
+        st.textContent = 'Upload failed: ' + (err.message || 'try again');
+      }
+    });
+
+    // ============================================
+    // EDIT PROFILE
+    // ============================================
+    const editModal = document.getElementById('editModal');
+    document.getElementById('editProfileBtn').addEventListener('click', () => {
+      if (!_emp) return;
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+      set('ef_mobile', _emp.mobile); set('ef_emergency', _emp.emergency_contact); set('ef_address', _emp.address);
+      set('ef_state', _emp.state); set('ef_pin', _emp.pin_code); set('ef_bank', _emp.bank_name);
+      set('ef_account', _emp.account_no); set('ef_ifsc', _emp.ifsc_code);
+      document.getElementById('ef_error').classList.add('hidden');
+      editModal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    });
+    document.getElementById('editClose').addEventListener('click', () => editModal.classList.add('hidden'));
+    editModal.addEventListener('click', (e) => { if (e.target === editModal) editModal.classList.add('hidden'); });
+
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const g = (id) => document.getElementById(id).value.trim();
+      const err = document.getElementById('ef_error');
+      const showErr = (m) => { err.textContent = m; err.classList.remove('hidden'); };
+      err.classList.add('hidden');
+
+      const mobile = g('ef_mobile'), emer = g('ef_emergency'), pin = g('ef_pin'), ifsc = g('ef_ifsc').toUpperCase();
+      if (mobile && !/^\d{10}$/.test(mobile)) return showErr('Mobile must be 10 digits.');
+      if (emer && !/^\d{10}$/.test(emer)) return showErr('Emergency contact must be 10 digits.');
+      if (pin && !/^\d{6}$/.test(pin)) return showErr('PIN code must be 6 digits.');
+      if (ifsc && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) return showErr('Invalid IFSC code.');
+
+      const btn = document.getElementById('ef_save'); btn.disabled = true; const orig = btn.textContent; btn.textContent = 'Saving…';
+      const payload = {
+        mobile: mobile || null, emergency_contact: emer || null, address: g('ef_address') || null,
+        state: g('ef_state') || null, pin_code: pin || null, bank_name: g('ef_bank') || null,
+        account_no: g('ef_account') || null, ifsc_code: ifsc || null,
+      };
+      const { error } = await sb.from('employees').update(payload).eq('id', _emp.id);
+      btn.disabled = false; btn.textContent = orig;
+      if (error) { showErr('Could not save: ' + error.message); return; }
+
+      Object.assign(_emp, payload);
+      document.getElementById('profileMobile').textContent = payload.mobile ? `+91 ${payload.mobile}` : '—';
+      document.getElementById('profileEmergency').textContent = payload.emergency_contact ? `+91 ${payload.emergency_contact}` : '—';
+      document.getElementById('profileAddress').textContent = [payload.address, payload.state, payload.pin_code].filter(Boolean).join(', ') || '—';
+      document.getElementById('profileBank').textContent = payload.bank_name || 'Not linked';
+      document.getElementById('profileAccountNo').textContent = payload.account_no ? maskNumber(payload.account_no, 4) : '—';
+      document.getElementById('profileIfsc').textContent = payload.ifsc_code || '—';
+      editModal.classList.add('hidden');
+    });
 
     // ============================================
     // SIGN OUT

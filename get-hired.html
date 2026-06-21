@@ -78,7 +78,7 @@
       </div>
 
       <!-- Quick Stats Row -->
-      <div class="grid grid-cols-4 gap-2 mt-4">
+      <div id="quickStats" class="grid grid-cols-4 gap-2 mt-4">
         <div class="glass rounded-xl px-2 py-2.5 text-center">
           <p class="text-lg font-bold text-[#4a5c54]" id="statDays">—</p>
           <p class="text-[9px] font-semibold text-[#8b928f] uppercase tracking-wider">Days</p>
@@ -99,8 +99,28 @@
       </div>
     </header>
 
+    <!-- Awaiting onboarding (shown until an employer hires this worker) -->
+    <div id="awaitingOnboarding" class="hidden flex-1 flex-col items-center justify-center px-6 pb-28 lg:pb-12">
+      <div class="w-full max-w-md bg-white rounded-2xl border border-[#e2e4e2] shadow-sm p-7 mt-6 text-center fade-in">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-[#eef1ee] text-[#4a5c54] flex items-center justify-center mb-4">
+          <i data-lucide="briefcase-business" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-xl font-extrabold text-[#1c211f]">You're registered, <span id="aoName">there</span>!</h2>
+        <p class="text-sm text-[#4a514e] mt-2 leading-relaxed">You're not assigned to an employer yet. Browse verified jobs and apply — your dashboard, attendance and payslips unlock once an employer hires you.</p>
+        <div class="mt-4 inline-flex items-center gap-2 bg-[#f4f5f4] border border-[#e2e4e2] rounded-full px-3 py-1.5">
+          <i data-lucide="badge-check" class="w-4 h-4 text-[#5d7369]"></i>
+          <span class="text-[11px] font-semibold text-[#4a514e]">Your ID:</span>
+          <span class="text-[12px] font-bold text-[#1c211f]" id="aoUid">—</span>
+        </div>
+        <a href="worker-jobs.html" class="mt-6 w-full bg-[#4a5c54] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:bg-[#3a4a43] transition-colors">
+          <i data-lucide="search" class="w-5 h-5"></i> Browse Jobs
+        </a>
+        <a href="worker-jobs.html" class="mt-3 inline-block text-sm font-semibold text-[#4a5c54]">Track my applications →</a>
+      </div>
+    </div>
+
     <!-- Scrollable Content (single column on mobile, bento grid on lg+) -->
-    <div class="flex-1 overflow-y-auto no-scrollbar pb-24 lg:overflow-visible lg:pb-12 lg:pt-6 lg:px-6 lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start lg:max-w-6xl lg:mx-auto lg:w-full">
+    <div id="dashboardContent" class="flex-1 overflow-y-auto no-scrollbar pb-24 lg:overflow-visible lg:pb-12 lg:pt-6 lg:px-6 lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start lg:max-w-6xl lg:mx-auto lg:w-full">
 
       <!-- Earnings Card -->
       <section class="p-4 pt-5 fade-in lg:col-span-3 lg:p-0">
@@ -299,7 +319,9 @@
 
         // Resolve employee profile from auth user
         const userId = session.user.id;
-        const { data: emp } = await sb.from('employees').select('id, full_name, mobile').eq('auth_user_id', userId).single();
+        const { data: emp } = await sb.from('employees')
+          .select('id, full_name, mobile, company_id, onboarded_at, ss_uid, photo_url')
+          .eq('auth_user_id', userId).single();
 
         if (!emp) {
           // No employee profile — redirect to registration
@@ -315,10 +337,31 @@
         const name = _userName || 'Worker';
         const firstName = name.split(' ')[0];
         document.getElementById('greetingName').textContent = getGreeting() + ', ' + firstName;
-        document.getElementById('avatarInitials').textContent = getInitials(name);
-        document.getElementById('headerPhone').textContent = _userPhone ? `+91 ${_userPhone.slice(0,5)}•••••` : 'Active';
+        document.getElementById('headerPhone').textContent = emp.ss_uid || 'Active';
+        // Avatar: photo if uploaded, else initials
+        const av = document.getElementById('avatarInitials');
+        if (emp.photo_url) {
+          av.textContent = '';
+          av.style.backgroundImage = `url("${emp.photo_url}")`;
+          av.style.backgroundSize = 'cover';
+          av.style.backgroundPosition = 'center';
+        } else {
+          av.textContent = getInitials(name);
+        }
 
-        // Load dashboard data
+        // ── Onboarding gate: the dashboard only applies once an employer hires the worker ──
+        if (!emp.company_id) {
+          document.getElementById('quickStats').classList.add('hidden');
+          document.getElementById('dashboardContent').classList.add('hidden');
+          const ao = document.getElementById('awaitingOnboarding');
+          ao.classList.remove('hidden'); ao.classList.add('flex');
+          document.getElementById('aoName').textContent = firstName;
+          document.getElementById('aoUid').textContent = emp.ss_uid || '—';
+          if (window.lucide) lucide.createIcons();
+          return; // skip dashboard data loads
+        }
+
+        // Onboarded → full dashboard
         loadDashboardStats();
         loadActivityFeed();
         loadComplianceStatus();

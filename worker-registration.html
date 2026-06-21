@@ -441,7 +441,12 @@
     <div class="success-screen" id="successScreen">
       <div class="success-check"><i data-lucide="check" style="width:40px;height:40px;color:white;stroke-width:3"></i></div>
       <h2>Registration Complete!</h2>
-      <p>Your profile has been saved. Redirecting to your dashboard...</p>
+      <p>Your profile is saved. This is your permanent Shramik Sathi ID:</p>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--border);border-radius:9999px;padding:8px 16px;">
+        <i data-lucide="badge-check" style="width:16px;height:16px;color:var(--emerald-light)"></i>
+        <span id="successUid" style="font-size:16px;font-weight:800;color:var(--text);letter-spacing:0.5px;">—</span>
+      </div>
+      <p style="font-size:12px;">Taking you to your dashboard…</p>
     </div>
   </div>
 </div>
@@ -638,9 +643,14 @@
       document.getElementById('progressBar').style.display = 'none';
       document.getElementById('regHeader').style.display = 'none';
       document.getElementById('successScreen').classList.add('active');
+      // Show the DB-assigned permanent worker ID
+      try {
+        const { data: me } = await sb.from('employees').select('ss_uid').eq('auth_user_id', _userId).maybeSingle();
+        if (me && me.ss_uid) document.getElementById('successUid').textContent = me.ss_uid;
+      } catch (_) {}
       lucide.createIcons();
 
-      setTimeout(() => { window.location.href = 'get-hired.html'; }, 2000);
+      setTimeout(() => { window.location.href = 'get-hired.html'; }, 3500);
     } catch (err) {
       console.error('Registration error:', err);
       btn.disabled = false;
