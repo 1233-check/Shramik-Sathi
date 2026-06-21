@@ -320,7 +320,10 @@ body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--b
   .form-grid { grid-template-columns: 1fr; gap: 1.25rem; }
   .stepper { padding: 0; }
   .step-label { display: none; } /* Hide text on mobile */
-  .step-line { margin: 0 -15px; /* ========== GET HIRED DASHBOARD STYLES ========== */
+  .step-line { margin: 0 -15px; }
+}
+
+/* ========== GET HIRED DASHBOARD STYLES ========== */
 
 .dashboard-bg { background-color: #f8fafc; min-height: 100vh; }
 .dash-header { background-color: var(--primary); padding: 7rem 2rem 3rem; color: white; }
@@ -379,5 +382,6 @@ body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--b
   .search-icon-box { display: none; }
   .job-search-input { padding: 1rem; }
 }
+@media (max-width: 768px) {
   .page-header { padding: 5rem 1rem 3rem; }
 }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
   <title>News & Updates | Shramik Sathi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -32,18 +32,26 @@
 </head>
 <body class="text-gray-900 antialiased font-sans flex justify-center">
 
-  <main class="w-full max-w-md bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-hidden border-x border-gray-200">
-    
+  <main class="w-full max-w-md lg:max-w-5xl bg-gray-50 min-h-screen relative shadow-2xl lg:shadow-none flex flex-col overflow-hidden lg:overflow-visible border-x border-gray-200 lg:border-x-0">
+
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white shadow-sm px-4 py-3 flex items-center justify-between touch-target">
-      <h1 class="font-bold text-xl text-gray-900 tracking-tight">Company News</h1>
-      <button class="touch-target flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-full active:bg-gray-200" aria-label="Settings">
-        <i data-lucide="settings" class="w-6 h-6"></i>
-      </button>
+    <header class="sticky top-0 z-50 bg-white shadow-sm px-4 py-3 lg:px-8">
+      <div class="flex items-center justify-between gap-4 touch-target lg:max-w-5xl lg:mx-auto lg:w-full">
+        <h1 class="font-bold text-xl text-gray-900 tracking-tight">Company News</h1>
+        <nav class="hidden lg:flex items-center gap-1 mr-auto ml-6" aria-label="Primary">
+          <a href="get-hired.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Home</a>
+          <a href="worker-jobs.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Jobs</a>
+          <a href="worker-news.html" class="px-3 py-2 rounded-lg text-sm font-bold text-gray-900 bg-gray-100">News</a>
+          <a href="worker-profile.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Profile</a>
+        </nav>
+        <button class="touch-target flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-full active:bg-gray-200" aria-label="Settings">
+          <i data-lucide="settings" class="w-6 h-6"></i>
+        </button>
+      </div>
     </header>
 
     <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto no-scrollbar pb-24 px-4 py-6 flex flex-col gap-4">
+    <div class="flex-1 overflow-y-auto no-scrollbar pb-24 px-4 py-6 flex flex-col gap-4 lg:overflow-visible lg:pb-12 lg:px-8 lg:max-w-5xl lg:mx-auto lg:w-full lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-5 lg:content-start">
       
       <!-- News Item 1 -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden active:bg-gray-50 transition-colors cursor-pointer">
@@ -95,8 +103,8 @@
 
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px]">
+    <!-- Bottom Navigation Bar (mobile only) -->
+    <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px] lg:hidden">
       <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center touch-target text-gray-400 hover:text-gray-600 h-full active:bg-gray-50 rounded-xl transition-colors">
         <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i>
         <span class="text-[11px] font-semibold">Home</span>

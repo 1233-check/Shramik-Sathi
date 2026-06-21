@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5">
   <title>My Profile | Shramik Sathi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -29,21 +29,29 @@
 </head>
 <body class="text-gray-900 antialiased font-sans flex justify-center">
 
-  <main class="w-full max-w-md bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-hidden border-x border-gray-200">
+  <main class="w-full max-w-md lg:max-w-5xl bg-gray-50 min-h-screen relative shadow-2xl lg:shadow-none flex flex-col overflow-hidden lg:overflow-visible border-x border-gray-200 lg:border-x-0">
 
     <!-- Header -->
-    <header class="sticky top-0 z-50 bg-[#f4f5f4] px-4 py-3 flex items-center justify-between border-b border-[#e2e4e2]">
-      <h1 class="font-bold text-xl text-[#1c211f] tracking-tight">My Profile</h1>
-      <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#e76f51] hover:bg-white rounded-full transition-colors" aria-label="Logout">
-        <i data-lucide="log-out" class="w-5 h-5"></i>
-      </button>
+    <header class="sticky top-0 z-50 bg-[#f4f5f4] px-4 py-3 border-b border-[#e2e4e2] lg:px-8">
+      <div class="flex items-center justify-between lg:max-w-5xl lg:mx-auto lg:w-full">
+        <h1 class="font-bold text-xl text-[#1c211f] tracking-tight">My Profile</h1>
+        <nav class="hidden lg:flex items-center gap-1 mr-auto ml-6" aria-label="Primary">
+          <a href="get-hired.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">Home</a>
+          <a href="worker-jobs.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">Jobs</a>
+          <a href="worker-news.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">News</a>
+          <a href="worker-profile.html" class="px-3 py-2 rounded-lg text-sm font-bold text-[#1c211f] bg-white shadow-sm">Profile</a>
+        </nav>
+        <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#e76f51] hover:bg-white rounded-full transition-colors" aria-label="Logout">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
+      </div>
     </header>
 
     <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto no-scrollbar pb-24">
+    <div class="flex-1 overflow-y-auto no-scrollbar pb-24 lg:overflow-visible lg:pb-12 lg:pt-4 lg:px-4 lg:max-w-5xl lg:mx-auto lg:w-full lg:grid lg:grid-cols-2 lg:gap-x-6 lg:items-start">
 
       <!-- Profile Header Card -->
-      <div class="bg-white border-b border-gray-200 p-6 flex flex-col items-center justify-center fade-in">
+      <div class="bg-white border-b border-gray-200 p-6 flex flex-col items-center justify-center fade-in lg:col-span-2 lg:rounded-2xl lg:border lg:mt-4">
         <div class="relative mb-4">
           <div class="w-24 h-24 rounded-full bg-[#4a5c54] text-white flex items-center justify-center font-bold text-3xl shadow-sm border-4 border-white" id="avatarInitials">
             SS
@@ -189,7 +197,7 @@
       </section>
 
       <!-- Sign Out -->
-      <div class="p-4 mt-2 mb-6 fade-in" style="animation-delay:0.25s">
+      <div class="p-4 mt-2 mb-6 fade-in lg:col-span-2" style="animation-delay:0.25s">
         <button id="signOutBtn" class="w-full bg-white border border-red-200 text-red-600 font-bold py-3.5 rounded-xl active:bg-red-50 transition-colors shadow-sm flex items-center justify-center gap-2">
           <i data-lucide="log-out" class="w-5 h-5"></i> Sign Out
         </button>
@@ -197,8 +205,8 @@
 
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="absolute bottom-0 w-full bg-[#f4f5f4] border-t border-[#e2e4e2] flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-sm">
+    <!-- Bottom Navigation Bar (mobile only) -->
+    <nav class="absolute bottom-0 w-full bg-[#f4f5f4] border-t border-[#e2e4e2] flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-sm lg:hidden">
       <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
         <i data-lucide="layout-dashboard" class="w-[20px] h-[20px] mb-0.5"></i>
         <span class="text-[10px] font-semibold">Home</span>
