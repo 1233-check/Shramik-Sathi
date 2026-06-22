@@ -5,6 +5,19 @@ const SUPABASE_URL = 'https://ecplvcnaonnxzpwbzrix.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_0_yjdT7oF0kJOCXxUztaeQ_M8YK3X3P';
 
 // ─────────────────────────────────────────────────────────────
+// Shared HTML-escape helper. Use whenever a DB / user-supplied value is
+// interpolated into an innerHTML string, to prevent stored / DOM XSS
+// (e.g. a worker whose name is `<img src=x onerror=...>` rendered in an
+// employer's session). Safe for text, double-quoted attributes, and
+// single-quoted inline-JS string contexts (escapes & < > " ').
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+if (typeof window !== 'undefined') window.escapeHtml = escapeHtml;
+
+// ─────────────────────────────────────────────────────────────
 // Session policy:
 //   • Employer pages → sessionStorage. The login is cleared when the browser
 //     session ends, so starting a NEW browser session requires a fresh login

@@ -144,26 +144,29 @@
           : 'bg-red-100 text-red-800 border-red-300';
         const bg = i % 2 === 1 ? 'bg-[#f9f9f9]' : '';
 
-        return `<tr class="${bg} border-b border-slate-200 hover:bg-blue-50 cursor-pointer" onclick="showIndividual('${e.emp_id}')">
+        return `<tr class="${bg} border-b border-slate-200 hover:bg-blue-50 cursor-pointer" data-empid="${escapeHtml(e.emp_id)}">
           <td class="p-1.5 border-r border-slate-200 text-center">${i+1}</td>
-          <td class="p-1.5 border-r border-slate-200 font-semibold">${e.emp_id}</td>
-          <td class="p-1.5 border-r border-slate-200 font-bold">${e.full_name}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.father_name || '—'}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.aadhar_no || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200 font-semibold">${escapeHtml(e.emp_id)}</td>
+          <td class="p-1.5 border-r border-slate-200 font-bold">${escapeHtml(e.full_name)}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.father_name || '—')}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.aadhar_no || '—')}</td>
           <td class="p-1.5 border-r border-slate-200">${fmtD(e.dob)}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.gender || '—'}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.designation || '—'}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.category || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.gender || '—')}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.designation || '—')}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.category || '—')}</td>
           <td class="p-1.5 border-r border-slate-200">${fmtD(e.date_of_joining)}</td>
           <td class="p-1.5 border-r border-slate-200 text-right">${fmtN(e.basic_wage)}</td>
           <td class="p-1.5 border-r border-slate-200 text-right">${fmtN(e.da_allowance)}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.uan_no || '—'}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.esi_no || '—'}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.mobile || '—'}</td>
-          <td class="p-1.5 border-r border-slate-200">${e.state || '—'}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.uan_no || '—')}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.esi_no || '—')}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.mobile || '—')}</td>
+          <td class="p-1.5 border-r border-slate-200">${escapeHtml(e.state || '—')}</td>
           <td class="p-1.5 text-center"><span class="${sc} px-1.5 py-0.5 rounded text-[10px] border">${e.status}</span></td>
         </tr>`;
       }).join('');
+      // Delegated row click (replaces inline onclick — avoids JS-context injection via emp_id)
+      tbody.querySelectorAll('tr[data-empid]').forEach(tr =>
+        tr.addEventListener('click', () => showIndividual(tr.dataset.empid)));
       document.getElementById('registerCount').textContent = `Total: ${data.length} workmen registered`;
     }
 
@@ -192,7 +195,7 @@
       const qrDiv = document.getElementById('individualQR');
       panel.classList.remove('hidden');
 
-      const field = (label, val) => `<div><div class="text-[10px] font-bold text-slate-500 uppercase">${label}</div><div class="font-semibold">${val || '—'}</div></div>`;
+      const field = (label, val) => `<div><div class="text-[10px] font-bold text-slate-500 uppercase">${label}</div><div class="font-semibold">${escapeHtml(val == null || val === '' ? '—' : val)}</div></div>`;
       const fmtD = d => d ? new Date(d).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : '—';
 
       content.innerHTML = [
@@ -205,7 +208,7 @@
         field('A/C No.', emp.account_no), field('IFSC', emp.ifsc_code), field('Mobile', emp.mobile),
         field('Emergency Contact', emp.emergency_contact), field('Address', emp.address), field('State / PIN', `${emp.state || '—'} / ${emp.pin_code || '—'}`),
         field('Gate Pass', emp.gate_pass_no || 'Pending'), field('Gate Pass Valid', fmtD(emp.gate_pass_valid_upto)), field('Medical Fitness', emp.medical_fitness),
-        field('Status', `<span class="px-2 py-0.5 rounded text-xs ${emp.status==='Active'?'bg-green-100 text-green-800':'bg-amber-100 text-amber-800'}">${emp.status}</span>`),
+        `<div><div class="text-[10px] font-bold text-slate-500 uppercase">Status</div><div class="font-semibold"><span class="px-2 py-0.5 rounded text-xs ${emp.status==='Active'?'bg-green-100 text-green-800':'bg-amber-100 text-amber-800'}">${escapeHtml(emp.status)}</span></div></div>`,
       ].join('');
 
       // QR code
@@ -218,9 +221,9 @@
         img.innerHTML = qr.createImgTag(3, 8);
         qrDiv.innerHTML = '';
         qrDiv.appendChild(img);
-        qrDiv.insertAdjacentHTML('beforeend', `<div class="text-xs text-slate-500">Scan to view worker profile<br><span class="font-mono text-[10px]">${qrUrl}</span></div>`);
+        qrDiv.insertAdjacentHTML('beforeend', `<div class="text-xs text-slate-500">Scan to view worker profile<br><span class="font-mono text-[10px]">${escapeHtml(qrUrl)}</span></div>`);
       } catch(e) {
-        qrDiv.innerHTML = '<span class="text-red-500 text-xs">QR generation failed: ' + e.message + '</span>';
+        qrDiv.innerHTML = '<span class="text-red-500 text-xs">QR generation failed: ' + escapeHtml(e.message) + '</span>';
       }
 
       panel.scrollIntoView({ behavior: 'smooth' });

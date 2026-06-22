@@ -191,13 +191,13 @@
     document.getElementById('tbody-pending').innerHTML = (data || []).map((l, i) => {
       const bg = i % 2 ? 'bg-slate-50' : '';
       return `<tr class="${bg} border-b hover:bg-slate-100">
-        <td class="p-2">${l.employees.emp_id}</td>
-        <td class="p-2 font-bold">${l.employees.full_name}</td>
-        <td class="p-2"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">${l.leave_type}</span></td>
+        <td class="p-2">${escapeHtml(l.employees.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(l.employees.full_name)}</td>
+        <td class="p-2"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">${escapeHtml(l.leave_type)}</span></td>
         <td class="p-2">${fmtDate(l.from_date)}</td>
         <td class="p-2">${fmtDate(l.to_date)}</td>
         <td class="p-2 text-center font-semibold">${l.days}</td>
-        <td class="p-2 max-w-[200px] truncate">${l.reason || '—'}</td>
+        <td class="p-2 max-w-[200px] truncate">${escapeHtml(l.reason || '—')}</td>
         <td class="p-2 text-center whitespace-nowrap">
           <button class="approve-btn px-2 py-1 bg-green-600 text-white text-[10px] rounded font-bold hover:bg-green-700 mr-1" data-id="${l.id}">✓ Approve</button>
           <button class="reject-btn px-2 py-1 bg-red-500 text-white text-[10px] rounded font-bold hover:bg-red-600" data-id="${l.id}">✗ Reject</button>
@@ -232,9 +232,9 @@
       const bg = i % 2 ? 'bg-slate-50' : '';
       const sc = l.status === 'Approved' ? 'bg-green-100 text-green-700 border-green-300' : 'bg-red-100 text-red-700 border-red-300';
       return `<tr class="${bg} border-b">
-        <td class="p-2">${l.employees.emp_id}</td>
-        <td class="p-2 font-bold">${l.employees.full_name}</td>
-        <td class="p-2">${l.leave_type}</td>
+        <td class="p-2">${escapeHtml(l.employees.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(l.employees.full_name)}</td>
+        <td class="p-2">${escapeHtml(l.leave_type)}</td>
         <td class="p-2">${fmtDate(l.from_date)}</td>
         <td class="p-2">${fmtDate(l.to_date)}</td>
         <td class="p-2 text-center">${l.days}</td>
@@ -255,10 +255,10 @@
       const bg = i % 2 ? 'bg-slate-50' : '';
       const sc = l.status === 'Approved' ? 'bg-green-100 text-green-700' : l.status === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700';
       return `<tr class="${bg} border-b hover:bg-slate-100">
-        <td class="p-2">${l.employees.emp_id}</td>
-        <td class="p-2 font-bold">${l.employees.full_name}</td>
-        <td class="p-2">${l.reason || '—'}</td>
-        <td class="p-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${l.status}</span></td>
+        <td class="p-2">${escapeHtml(l.employees.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(l.employees.full_name)}</td>
+        <td class="p-2">${escapeHtml(l.reason || '—')}</td>
+        <td class="p-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${escapeHtml(l.status)}</span></td>
         <td class="p-2 text-center whitespace-nowrap">${l.status === 'Pending' ? `
           <button class="adv-approve px-2 py-1 bg-green-600 text-white text-[10px] rounded font-bold mr-1" data-id="${l.id}">✓</button>
           <button class="adv-reject px-2 py-1 bg-red-500 text-white text-[10px] rounded font-bold" data-id="${l.id}">✗</button>
@@ -307,9 +307,9 @@
       const total = clBal + slBal + elBal;
       const bg = i % 2 ? 'bg-slate-50' : '';
       return `<tr class="${bg} border-b">
-        <td class="p-2">${e.emp_id}</td>
-        <td class="p-2 font-bold">${e.full_name}</td>
-        <td class="p-2">${e.designation || '—'}</td>
+        <td class="p-2">${escapeHtml(e.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(e.full_name)}</td>
+        <td class="p-2">${escapeHtml(e.designation || '—')}</td>
         <td class="p-2 text-center text-red-600">${u.Casual}</td>
         <td class="p-2 text-center font-semibold ${clBal <= 2 ? 'text-red-600' : 'text-green-700'}">${clBal}</td>
         <td class="p-2 text-center text-red-600">${u.Sick}</td>
@@ -345,8 +345,8 @@
       const bg = i % 2 ? 'bg-slate-50' : '';
       return `<tr class="${bg} border-b">
         <td class="p-2">${i + 1}</td>
-        <td class="p-2">${e.emp_id}</td>
-        <td class="p-2 font-bold">${e.full_name}</td>
+        <td class="p-2">${escapeHtml(e.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(e.full_name)}</td>
         <td class="p-2">${fmtDate(e.date_of_joining)}</td>
         <td class="p-2 text-center">${LEAVE_QUOTA.Earned}</td>
         <td class="p-2 text-center">${elUsed}</td>

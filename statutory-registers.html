@@ -254,8 +254,8 @@
       const rate = Math.round((r.basic_wage || 380) / 8 * 2);
       const pay = Math.round(r.totalOT * rate);
       totH += r.totalOT; totP += pay;
-      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${r.emp_id}</td>
-        <td class="p-2 font-bold">${r.full_name}</td><td class="p-2">${r.designation||'—'}</td>
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${escapeHtml(r.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(r.full_name)}</td><td class="p-2">${escapeHtml(r.designation||'—')}</td>
         <td class="p-2 text-right">${r.totalOT.toFixed(1)}</td><td class="p-2 text-right">₹${rate}</td>
         <td class="p-2 text-right font-semibold">₹${fmtNum(pay)}</td></tr>`;
     }).join('') || '<tr><td colspan="7" class="p-4 text-center text-slate-400">No overtime records</td></tr>';
@@ -272,8 +272,8 @@
       const bonusWage = Math.min(annualBD, 7000 * 12);
       const bonus = Math.round(bonusWage * 0.0833);
       total += bonus;
-      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${e.emp_id}</td>
-        <td class="p-2 font-bold">${e.full_name}</td><td class="p-2">${e.designation||'—'}</td>
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${escapeHtml(e.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(e.full_name)}</td><td class="p-2">${escapeHtml(e.designation||'—')}</td>
         <td class="p-2 text-right">₹${fmtNum(annualBD)}</td><td class="p-2 text-center">8.33%</td>
         <td class="p-2 text-right font-semibold">₹${fmtNum(bonus)}</td>
         <td class="p-2 text-center"><span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] rounded border border-amber-300">Pending</span></td></tr>`;
@@ -290,8 +290,8 @@
     document.getElementById('tbody-arrearDA').innerHTML = (data||[]).map((t, i) => {
       const oldDA = parseFloat(t.old_value)||0, newDA = parseFloat(t.new_value)||0;
       const arrear = Math.round((newDA - oldDA) * 26); // Approx 26 working days
-      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${t.employees.emp_id}</td>
-        <td class="p-2 font-bold">${t.employees.full_name}</td><td class="p-2 text-right">₹${oldDA}</td>
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${escapeHtml(t.employees.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(t.employees.full_name)}</td><td class="p-2 text-right">₹${oldDA}</td>
         <td class="p-2 text-right font-semibold text-emerald-700">₹${newDA}</td><td class="p-2 text-right">26</td>
         <td class="p-2 text-right font-semibold">₹${fmtNum(arrear)}</td>
         <td class="p-2">${t.effective_date ? new Date(t.effective_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td></tr>`;
@@ -307,8 +307,8 @@
     document.getElementById('tbody-arrearWage').innerHTML = (data||[]).map((t, i) => {
       const oldB = parseFloat(t.old_value)||0, newB = parseFloat(t.new_value)||0;
       const arrear = Math.round((newB - oldB) * 26);
-      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${t.employees.emp_id}</td>
-        <td class="p-2 font-bold">${t.employees.full_name}</td><td class="p-2 text-right">₹${oldB}</td>
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${escapeHtml(t.employees.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(t.employees.full_name)}</td><td class="p-2 text-right">₹${oldB}</td>
         <td class="p-2 text-right font-semibold text-emerald-700">₹${newB}</td><td class="p-2 text-right">26</td>
         <td class="p-2 text-right font-semibold">₹${fmtNum(arrear)}</td>
         <td class="p-2">${t.effective_date ? new Date(t.effective_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td></tr>`;
@@ -322,8 +322,8 @@
       .select('employee_id, wage_month, advance_deduction, employees!inner(emp_id, full_name)')
       .eq('wage_month', monthStr).gt('advance_deduction', 0).order('employees(emp_id)');
     document.getElementById('tbody-advance').innerHTML = (data||[]).map((w, i) =>
-      `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${w.employees.emp_id}</td>
-        <td class="p-2 font-bold">${w.employees.full_name}</td><td class="p-2">${w.wage_month}</td>
+      `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${escapeHtml(w.employees.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(w.employees.full_name)}</td><td class="p-2">${escapeHtml(w.wage_month)}</td>
         <td class="p-2 text-right font-semibold text-red-600">₹${fmtNum(w.advance_deduction)}</td></tr>`
     ).join('') || '<tr><td colspan="5" class="p-4 text-center text-slate-400">No advance deductions this month</td></tr>';
   }
@@ -335,8 +335,8 @@
       .select('employee_id, wage_month, fine_deduction, employees!inner(emp_id, full_name)')
       .eq('wage_month', monthStr).gt('fine_deduction', 0).order('employees(emp_id)');
     document.getElementById('tbody-fine').innerHTML = (data||[]).map((w, i) =>
-      `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${w.employees.emp_id}</td>
-        <td class="p-2 font-bold">${w.employees.full_name}</td><td class="p-2">${w.wage_month}</td>
+      `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${escapeHtml(w.employees.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(w.employees.full_name)}</td><td class="p-2">${escapeHtml(w.wage_month)}</td>
         <td class="p-2 text-right font-semibold text-red-600">₹${fmtNum(w.fine_deduction)}</td></tr>`
     ).join('') || '<tr><td colspan="5" class="p-4 text-center text-slate-400">No fines this month</td></tr>';
   }
@@ -353,8 +353,8 @@
             fine=Number(w.fine_deduction)||0, other=Number(w.other_deductions)||0;
       const total = pf+esi+adv+fine+other;
       tPF+=pf; tESI+=esi; tAdv+=adv; tFine+=fine; tOther+=other; tDed+=total;
-      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${w.employees.emp_id}</td>
-        <td class="p-2 font-bold">${w.employees.full_name}</td>
+      return `<tr class="${i%2?'bg-slate-50':''} border-b"><td class="p-2">${i+1}</td><td class="p-2">${escapeHtml(w.employees.emp_id)}</td>
+        <td class="p-2 font-bold">${escapeHtml(w.employees.full_name)}</td>
         <td class="p-2 text-right">${fmtNum(pf)}</td><td class="p-2 text-right">${fmtNum(esi)}</td>
         <td class="p-2 text-right">${fmtNum(adv)}</td><td class="p-2 text-right">${fmtNum(fine)}</td>
         <td class="p-2 text-right">${fmtNum(other)}</td>

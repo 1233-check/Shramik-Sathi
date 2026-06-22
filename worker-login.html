@@ -513,7 +513,7 @@
     if (sb) {
       const { data: emp } = await sb.from('employees').select('id, full_name, emp_id, auth_user_id').eq('emp_id', empId).single();
       if (emp) {
-        status.innerHTML = `<span style="color:#10b981;font-weight:700;">✓ ${emp.full_name} (${emp.emp_id})</span><br><span style="color:var(--text-dim);font-size:11px;">${currentLang === 'hi' ? 'रीडायरेक्ट हो रहा है...' : 'Redirecting...'}</span>`;
+        status.innerHTML = `<span style="color:#10b981;font-weight:700;">✓ ${escapeHtml(emp.full_name)} (${escapeHtml(emp.emp_id)})</span><br><span style="color:var(--text-dim);font-size:11px;">${currentLang === 'hi' ? 'रीडायरेक्ट हो रहा है...' : 'Redirecting...'}</span>`;
         setTimeout(() => { window.location.href = 'get-hired.html'; }, 1500);
         return;
       }
