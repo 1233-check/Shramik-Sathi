@@ -117,6 +117,48 @@
         </div>
       </section>
 
+      <!-- KYC Documents -->
+      <section class="p-4 fade-in" style="animation-delay:0.08s">
+        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">KYC Documents</h3>
+        <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] overflow-hidden">
+
+          <!-- Aadhaar card -->
+          <div class="p-4 border-b border-gray-100 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="text-[#8b928f]"><i data-lucide="id-card" class="w-5 h-5"></i></div>
+              <div class="min-w-0">
+                <p class="text-xs text-[#8b928f] font-medium">Aadhaar Card</p>
+                <p class="text-[13px] font-bold text-[#1c211f]" id="aadhaarDocStatus">Not uploaded</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button type="button" id="aadhaarView" class="hidden text-xs font-bold text-[#4a5c54] border border-[#cdd4d0] px-3 py-1.5 rounded-lg active:scale-95 transition">View</button>
+              <label for="aadhaarInput" class="text-xs font-bold text-white bg-[#4a5c54] px-3 py-1.5 rounded-lg cursor-pointer active:scale-95 transition">Upload</label>
+              <input type="file" id="aadhaarInput" accept="image/*" class="hidden">
+            </div>
+          </div>
+
+          <!-- PAN card -->
+          <div class="p-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="text-[#8b928f]"><i data-lucide="credit-card" class="w-5 h-5"></i></div>
+              <div class="min-w-0">
+                <p class="text-xs text-[#8b928f] font-medium">PAN Card</p>
+                <p class="text-[13px] font-bold text-[#1c211f]" id="panDocStatus">Not uploaded</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button type="button" id="panView" class="hidden text-xs font-bold text-[#4a5c54] border border-[#cdd4d0] px-3 py-1.5 rounded-lg active:scale-95 transition">View</button>
+              <label for="panInput" class="text-xs font-bold text-white bg-[#4a5c54] px-3 py-1.5 rounded-lg cursor-pointer active:scale-95 transition">Upload</label>
+              <input type="file" id="panInput" accept="image/*" class="hidden">
+            </div>
+          </div>
+
+        </div>
+        <p class="text-[11px] text-[#8b928f] mt-2 px-1">Private — stored securely and visible only to you. Clear photos help speed up verification.</p>
+        <p class="text-[11px] font-semibold mt-1 px-1 h-3" id="kycStatusMsg"></p>
+      </section>
+
       <!-- Bank Details -->
       <section class="p-4 fade-in" style="animation-delay:0.1s">
         <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Bank Account Details</h3>
@@ -345,6 +387,10 @@
         document.getElementById('profileUan').textContent = emp.uan_no || 'Not linked';
         document.getElementById('profileEsi').textContent = emp.esi_no || 'Not linked';
 
+        // — KYC documents —
+        renderKycStatus('aadhaar');
+        renderKycStatus('pan');
+
         lucide.createIcons();
       } catch (e) {
         console.error('Profile load error:', e);
@@ -400,6 +446,65 @@
         console.error('avatar upload failed:', err);
         st.textContent = 'Upload failed: ' + (err.message || 'try again');
       }
+    });
+
+    // ============================================
+    // KYC DOCUMENTS  (private bucket + signed-URL view)
+    // ============================================
+    const KYC = {
+      aadhaar: { field: 'aadhaar_doc_path', input: 'aadhaarInput', status: 'aadhaarDocStatus', view: 'aadhaarView', label: 'Aadhaar' },
+      pan:     { field: 'pan_doc_path',     input: 'panInput',     status: 'panDocStatus',     view: 'panView',     label: 'PAN' },
+    };
+    function setKycMsg(t, ok) {
+      const el = document.getElementById('kycStatusMsg');
+      if (!el) return;
+      el.textContent = t || '';
+      el.style.color = ok ? '#059669' : '#b91c1c';
+    }
+    function renderKycStatus(kind) {
+      const cfg = KYC[kind];
+      const has = !!(_emp && _emp[cfg.field]);
+      const st = document.getElementById(cfg.status);
+      st.textContent = has ? 'Uploaded ✓' : 'Not uploaded';
+      st.className = 'text-[13px] font-bold ' + (has ? 'text-emerald-600' : 'text-[#8b928f]');
+      document.getElementById(cfg.view).classList.toggle('hidden', !has);
+    }
+    async function viewKyc(kind) {
+      const cfg = KYC[kind];
+      const path = _emp && _emp[cfg.field];
+      if (!path) return;
+      setKycMsg('Opening ' + cfg.label + '…', true);
+      const { data, error } = await sb.storage.from('kyc-documents').createSignedUrl(path, 120);
+      if (error || !data) { setKycMsg('Could not open document: ' + (error?.message || 'try again')); return; }
+      setKycMsg('');
+      window.open(data.signedUrl, '_blank', 'noopener');
+    }
+    async function uploadKyc(kind, file) {
+      const cfg = KYC[kind];
+      if (!file || !_uid || !_emp) return;
+      if (!file.type.startsWith('image/')) { setKycMsg('Please choose an image (JPG/PNG).'); return; }
+      if (file.size > 6 * 1024 * 1024) { setKycMsg('Image must be under 6 MB.'); return; }
+      setKycMsg('Uploading ' + cfg.label + '…', true);
+      try {
+        const blob = await downscale(file, 1600);  // larger than avatar so ID text stays legible
+        const path = `${_uid}/${kind}.jpg`;
+        const { error: upErr } = await sb.storage.from('kyc-documents').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+        if (upErr) throw upErr;
+        const { error: updErr } = await sb.from('employees').update({ [cfg.field]: path }).eq('id', _emp.id);
+        if (updErr) throw updErr;
+        _emp[cfg.field] = path;
+        renderKycStatus(kind);
+        setKycMsg(cfg.label + ' uploaded ✓', true);
+        setTimeout(() => setKycMsg(''), 2500);
+      } catch (err) {
+        console.error('KYC upload failed:', err);
+        setKycMsg('Upload failed: ' + (err.message || 'try again'));
+      }
+    }
+    ['aadhaar', 'pan'].forEach(kind => {
+      const cfg = KYC[kind];
+      document.getElementById(cfg.input).addEventListener('change', (e) => uploadKyc(kind, e.target.files[0]));
+      document.getElementById(cfg.view).addEventListener('click', () => viewKyc(kind));
     });
 
     // ============================================
