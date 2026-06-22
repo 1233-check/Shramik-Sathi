@@ -538,10 +538,10 @@
           <i data-lucide="${icon}" class="w-4 h-4"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-semibold text-gray-800 text-[12px] truncate">${title}</p>
-          <p class="text-[11px] text-gray-400 truncate">${sub}</p>
+          <p class="font-semibold text-gray-800 text-[12px] truncate">${escapeHtml(title)}</p>
+          <p class="text-[11px] text-gray-400 truncate">${escapeHtml(sub)}</p>
         </div>
-        <span class="text-[10px] text-gray-400 flex-shrink-0">${time}</span>
+        <span class="text-[10px] text-gray-400 flex-shrink-0">${escapeHtml(time)}</span>
       </div>`;
     }
 
@@ -657,7 +657,7 @@
               </div>`;
               lucide.createIcons();
             } catch (e) {
-              btn.innerHTML = 'Error: ' + (e.message || 'Failed');
+              btn.innerHTML = 'Error: ' + escapeHtml(e.message || 'Failed');
               btn.disabled = false;
               setTimeout(() => { btn.innerHTML = 'Confirm Attendance ✓'; }, 2000);
             }
@@ -816,8 +816,8 @@
         const fd = new Date(l.from_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
         const td = new Date(l.to_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
         return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2">
-          <div><span class="font-semibold">${l.leave_type}</span> · ${fd}–${td} (${l.days}d)</div>
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${l.status}</span></div>`;
+          <div><span class="font-semibold">${escapeHtml(l.leave_type)}</span> · ${fd}–${td} (${l.days}d)</div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${escapeHtml(l.status)}</span></div>`;
       }).join('') || '<p class="text-gray-400">No requests yet</p>';
     }
 
@@ -852,7 +852,7 @@
         btn.innerHTML = '✓ Submitted!'; btn.classList.replace('bg-amber-500', 'bg-green-500');
         loadLeaveBalance(); loadLeaveHistory();
         setTimeout(() => { document.getElementById('leaveModal').style.display = 'none'; btn.innerHTML = 'Submit Leave Request'; btn.classList.replace('bg-green-500', 'bg-amber-500'); btn.disabled = false; document.getElementById('leaveForm').reset(); }, 1500);
-      } else { btn.innerHTML = 'Error: ' + error.message; btn.disabled = false; setTimeout(() => { btn.innerHTML = 'Submit Leave Request'; }, 2000); }
+      } else { btn.innerHTML = 'Error: ' + escapeHtml(error.message); btn.disabled = false; setTimeout(() => { btn.innerHTML = 'Submit Leave Request'; }, 2000); }
     });
 
     // Advance
@@ -926,7 +926,7 @@
         btn.innerHTML = '✓ Report Submitted!'; btn.classList.replace('bg-red-600', 'bg-green-500');
         loadReportHistory();
         setTimeout(() => { document.getElementById('reportModal').style.display = 'none'; btn.innerHTML = 'Submit Report'; btn.classList.replace('bg-green-500', 'bg-red-600'); btn.disabled = false; document.getElementById('reportForm').reset(); }, 1500);
-      } else { btn.innerHTML = 'Error: ' + error.message; btn.disabled = false; setTimeout(() => { btn.innerHTML = 'Submit Report'; }, 2000); }
+      } else { btn.innerHTML = 'Error: ' + escapeHtml(error.message); btn.disabled = false; setTimeout(() => { btn.innerHTML = 'Submit Report'; }, 2000); }
     });
 
     async function loadReportHistory() {
@@ -938,8 +938,8 @@
         const sc = r.status === 'Resolved' || r.status === 'Closed' ? 'bg-green-100 text-green-700' : r.status === 'Escalated' ? 'bg-red-100 text-red-700' : r.status === 'In Progress' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700';
         const dt = new Date(r.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
         return `<div class="flex justify-between items-center bg-gray-50 rounded-lg p-2">
-          <div><span class="font-semibold">${r.category}</span> · ${dt}</div>
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${r.status}</span></div>`;
+          <div><span class="font-semibold">${escapeHtml(r.category)}</span> · ${dt}</div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${sc}">${escapeHtml(r.status)}</span></div>`;
       }).join('') || '<p class="text-gray-400">No reports yet</p>';
     }
 

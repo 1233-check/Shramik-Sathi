@@ -442,9 +442,9 @@
 
         tr.innerHTML = `
           <td class="p-2 border-r border-slate-200 text-center text-xs text-slate-500">${idx + 1}</td>
-          <td class="p-2 border-r border-slate-200 font-mono text-xs">${emp.emp_id}</td>
-          <td class="p-2 border-r border-slate-200 font-bold">${emp.full_name}</td>
-          <td class="p-2 border-r border-slate-200 text-slate-600">${emp.designation || '—'}</td>
+          <td class="p-2 border-r border-slate-200 font-mono text-xs">${escapeHtml(emp.emp_id)}</td>
+          <td class="p-2 border-r border-slate-200 font-bold">${escapeHtml(emp.full_name)}</td>
+          <td class="p-2 border-r border-slate-200 text-slate-600">${escapeHtml(emp.designation || '—')}</td>
           <td class="p-2 border-r border-slate-200">
             <select class="status-select w-full border border-slate-300 p-1 text-xs rounded focus:outline-none focus:border-[#0055a5]">
               <option value="Present" ${status === 'Present' ? 'selected' : ''}>Present</option>
@@ -555,7 +555,7 @@
       if (error) {
         console.error('Save error:', error);
         btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Save All Attendance';
-        statusEl.innerHTML = `<span class="text-red-600 font-semibold">❌ Error: ${error.message}</span>`;
+        statusEl.innerHTML = `<span class="text-red-600 font-semibold">❌ Error: ${escapeHtml(error.message)}</span>`;
       } else {
         btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Saved!';
         statusEl.innerHTML = `<span class="text-green-600 font-semibold">✅ Attendance saved for ${rows.length} employees — ${new Date().toLocaleTimeString()}</span>`;
@@ -621,8 +621,8 @@
         const empAttendance = attendanceMap[emp.id] || {};
         let totalPresent = 0;
         let tr = `<tr class="${idx % 2 === 1 ? 'bg-[#f9f9f9]' : ''} border-b border-slate-200 hover:bg-[#f1f1f1] text-xs">`;
-        tr += `<td class="p-1.5 border-r border-slate-200 font-mono sticky left-0 ${idx % 2 === 1 ? 'bg-[#f9f9f9]' : 'bg-white'} z-[5]">${emp.emp_id}</td>`;
-        tr += `<td class="p-1.5 border-r border-slate-200 font-bold sticky left-[70px] ${idx % 2 === 1 ? 'bg-[#f9f9f9]' : 'bg-white'} z-[5] truncate max-w-[130px]" title="${emp.full_name}">${emp.full_name}</td>`;
+        tr += `<td class="p-1.5 border-r border-slate-200 font-mono sticky left-0 ${idx % 2 === 1 ? 'bg-[#f9f9f9]' : 'bg-white'} z-[5]">${escapeHtml(emp.emp_id)}</td>`;
+        tr += `<td class="p-1.5 border-r border-slate-200 font-bold sticky left-[70px] ${idx % 2 === 1 ? 'bg-[#f9f9f9]' : 'bg-white'} z-[5] truncate max-w-[130px]" title="${escapeHtml(emp.full_name)}">${escapeHtml(emp.full_name)}</td>`;
 
         for (let d = 1; d <= daysInMonth; d++) {
           const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -716,10 +716,10 @@
           tbody.innerHTML += `
             <tr class="${i % 2 === 0 ? 'bg-[#f9f9f9]' : ''} border-b border-slate-200">
               <td class="p-2 border-r border-slate-200 text-center text-xs text-slate-500">${i}</td>
-              <td class="p-2 border-r border-slate-200 font-mono text-xs">${row.emp_id}</td>
-              <td class="p-2 border-r border-slate-200">${row.date}</td>
+              <td class="p-2 border-r border-slate-200 font-mono text-xs">${escapeHtml(row.emp_id)}</td>
+              <td class="p-2 border-r border-slate-200">${escapeHtml(row.date)}</td>
               <td class="p-2 border-r border-slate-200 font-semibold ${statusClass}">${row.status}</td>
-              <td class="p-2 border-r border-slate-200">${row.shift}</td>
+              <td class="p-2 border-r border-slate-200">${escapeHtml(row.shift)}</td>
               <td class="p-2">${row.overtime_hours}</td>
             </tr>`;
         }
@@ -808,10 +808,10 @@
       el.classList.remove('hidden');
       if (type === 'error') {
         el.className = 'mt-4 p-4 rounded-lg border border-red-300 bg-red-50 text-red-800 text-sm font-semibold';
-        el.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 inline mr-1"></i>${message}`;
+        el.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4 inline mr-1"></i>${escapeHtml(message)}`;
       } else {
         el.className = 'mt-4 p-4 rounded-lg border border-green-300 bg-green-50 text-green-800 text-sm font-semibold';
-        el.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 inline mr-1"></i>${message}`;
+        el.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 inline mr-1"></i>${escapeHtml(message)}`;
       }
       lucide.createIcons();
     }

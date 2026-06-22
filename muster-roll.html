@@ -198,11 +198,11 @@
       const bg = i%2 ? 'bg-slate-50' : 'bg-white';
       return `<tr class="${bg} border-b border-slate-200 hover:bg-slate-100">
         <td class="p-1.5 border-r sticky-col sticky-col-1 ${bg}">${i+1}</td>
-        <td class="p-1.5 border-r sticky-col sticky-col-2 ${bg}">${w.employees.emp_id}</td>
-        <td class="p-1.5 border-r font-bold sticky-col sticky-col-3 ${bg}">${w.employees.full_name}</td>
-        <td class="p-1.5 border-r">${w.employees.father_name||'—'}</td>
-        <td class="p-1.5 border-r">${(w.employees.designation||'').substring(0,10)}</td>
-        <td class="p-1.5 border-r">${(w.employees.category||'').substring(0,6)}</td>
+        <td class="p-1.5 border-r sticky-col sticky-col-2 ${bg}">${escapeHtml(w.employees.emp_id)}</td>
+        <td class="p-1.5 border-r font-bold sticky-col sticky-col-3 ${bg}">${escapeHtml(w.employees.full_name)}</td>
+        <td class="p-1.5 border-r">${escapeHtml(w.employees.father_name||'—')}</td>
+        <td class="p-1.5 border-r">${escapeHtml((w.employees.designation||'').substring(0,10))}</td>
+        <td class="p-1.5 border-r">${escapeHtml((w.employees.category||'').substring(0,6))}</td>
         <td class="p-1.5 border-r text-center">${w.days_worked}</td>
         <td class="p-1.5 border-r text-center">${N(w.overtime_pay)>0?'✓':'—'}</td>
         <td class="p-1.5 border-r text-right">${fmt(w.basic)}</td>

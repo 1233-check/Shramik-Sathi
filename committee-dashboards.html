@@ -290,11 +290,11 @@
       return `<tr class="${bg} border-b hover:bg-slate-100">
         <td class="p-2 font-mono text-[10px]">${r.id.slice(0,8)}</td>
         <td class="p-2">${dateStr}</td>
-        <td class="p-2"><span class="font-semibold">${empName}</span><br><span class="text-slate-400">${empId}</span></td>
-        <td class="p-2 ${cc}">${r.category}</td>
-        <td class="p-2">${r.route_to || '—'}</td>
-        <td class="p-2">${r.department || '—'}</td>
-        <td class="p-2 max-w-[200px] truncate">${r.description || '—'}</td>
+        <td class="p-2"><span class="font-semibold">${escapeHtml(empName)}</span><br><span class="text-slate-400">${escapeHtml(empId)}</span></td>
+        <td class="p-2 ${cc}">${escapeHtml(r.category)}</td>
+        <td class="p-2">${escapeHtml(r.route_to || '—')}</td>
+        <td class="p-2">${escapeHtml(r.department || '—')}</td>
+        <td class="p-2 max-w-[200px] truncate">${escapeHtml(r.description || '—')}</td>
         <td class="p-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${sc}">${r.status}</span></td>
         <td class="p-2 font-semibold ${ageHrs > ESCALATION_HOURS && r.status !== 'Resolved' && r.status !== 'Closed' ? 'text-red-600' : ''}">${ageStr}</td>
         <td class="p-2 text-center">
@@ -357,7 +357,7 @@
       .sort((a, b) => b[1] - a[1])
       .map(([cat, count]) => `
         <div class="flex items-center gap-2">
-          <span class="w-28 text-[11px] font-semibold text-slate-600 truncate">${cat}</span>
+          <span class="w-28 text-[11px] font-semibold text-slate-600 truncate">${escapeHtml(cat)}</span>
           <div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
             <div class="h-full rounded-full" style="width:${(count/maxCat)*100}%;background:${catColors[cat]||'#6b7280'}"></div>
           </div>

@@ -259,8 +259,8 @@
         <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
           <div class="bg-[#0055a5] text-white p-4 flex items-center justify-between sticky top-0 z-10">
             <div>
-              <h2 class="font-bold text-lg">Master Update — ${emp.full_name}</h2>
-              <p class="text-xs text-white/70">Emp ID: ${emp.emp_id} | ${emp.designation || 'N/A'}</p>
+              <h2 class="font-bold text-lg">Master Update — ${escapeHtml(emp.full_name)}</h2>
+              <p class="text-xs text-white/70">Emp ID: ${escapeHtml(emp.emp_id)} | ${escapeHtml(emp.designation || 'N/A')}</p>
             </div>
             <button id="closeWageModal" class="text-white/60 hover:text-white text-2xl">&times;</button>
           </div>

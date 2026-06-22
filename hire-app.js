@@ -58,7 +58,7 @@
     set('welcomeCompany', name);
 
     const filter = document.getElementById('companyFilter');
-    if (filter) filter.innerHTML = `<option selected>${name}</option>`;
+    if (filter) filter.innerHTML = `<option selected>${escapeHtml(name)}</option>`;
   }
 
   // ============================================
@@ -121,12 +121,12 @@
           <button class="text-teal-600 hover:underline mr-1 doc-btn" data-action="wageslip" data-empid="${e.emp_id}" title="Wage Slip"><i data-lucide="indian-rupee" class="w-3.5 h-3.5"></i></button>
           <button class="text-red-600 hover:underline doc-btn" data-action="delete" data-empid="${e.emp_id}" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
         </td>
-        <td class="p-2 border-r border-slate-200">${e.emp_id}</td>
-        <td class="p-2 border-r border-slate-200 font-bold">${e.full_name}</td>
-        <td class="p-2 border-r border-slate-200">${e.father_name || '—'}</td>
-        <td class="p-2 border-r border-slate-200">${e.aadhar_no || '—'}</td>
-        <td class="p-2 border-r border-slate-200">${e.designation || '—'}</td>
-        <td class="p-2 border-r border-slate-200">${e.uan_no || 'Pending'}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.emp_id)}</td>
+        <td class="p-2 border-r border-slate-200 font-bold">${escapeHtml(e.full_name)}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.father_name || '—')}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.aadhar_no || '—')}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.designation || '—')}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.uan_no || 'Pending')}</td>
         <td class="p-2 border-r border-slate-200">${gpDate}</td>
         <td class="p-2 text-center"><span class="${statusClass} px-2 py-0.5 rounded text-xs border">${e.status}</span></td>
       </tr>`;
@@ -190,13 +190,13 @@
       const rowBg = i % 2 === 1 ? 'bg-[#f9f9f9]' : '';
 
       return `<tr class="${rowBg} border-b border-slate-200 hover:bg-[#f1f1f1]">
-        <td class="p-2 border-r border-slate-200">${e.emp_id}</td>
-        <td class="p-2 border-r border-slate-200 font-bold">${e.full_name}</td>
-        <td class="p-2 border-r border-slate-200">${e.designation || '—'}</td>
-        <td class="p-2 border-r border-slate-200">${e.gate_pass_no || '—'}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.emp_id)}</td>
+        <td class="p-2 border-r border-slate-200 font-bold">${escapeHtml(e.full_name)}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.designation || '—')}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.gate_pass_no || '—')}</td>
         <td class="p-2 border-r border-slate-200">${fmtDate(e.gate_pass_issue_date)}</td>
         <td class="p-2 border-r border-slate-200 ${expired ? 'text-red-600' : 'text-[#0055a5]'} font-semibold">${fmtDate(e.gate_pass_valid_upto)}</td>
-        <td class="p-2 border-r border-slate-200">${e.gate_pass_area || '—'}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.gate_pass_area || '—')}</td>
         <td class="p-2 text-center"><span class="${statusClass} px-2 py-0.5 rounded text-xs border">${statusText}</span></td>
       </tr>`;
     }).join('');
@@ -219,11 +219,11 @@
       const esiClass = c.esi_status === 'Paid' ? 'bg-green-100 text-green-800 border-green-300' : 'bg-amber-100 text-amber-800 border-amber-300';
 
       return `<tr class="${rowBg} border-b border-slate-200 hover:bg-[#f1f1f1]">
-        <td class="p-2 border-r border-slate-200 font-bold">${c.month}</td>
-        <td class="p-2 border-r border-slate-200">${c.pf_challan_no || '—'}</td>
+        <td class="p-2 border-r border-slate-200 font-bold">${escapeHtml(c.month)}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(c.pf_challan_no || '—')}</td>
         <td class="p-2 border-r border-slate-200 text-right font-semibold">${fmtNum(c.pf_amount)}</td>
         <td class="p-2 border-r border-slate-200 text-center"><span class="${pfClass} px-2 py-0.5 rounded text-xs border">${c.pf_status}</span></td>
-        <td class="p-2 border-r border-slate-200">${c.esi_challan_no || '—'}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(c.esi_challan_no || '—')}</td>
         <td class="p-2 border-r border-slate-200 text-right font-semibold">${fmtNum(c.esi_amount)}</td>
         <td class="p-2 border-r border-slate-200 text-center"><span class="${esiClass} px-2 py-0.5 rounded text-xs border">${c.esi_status}</span></td>
         <td class="p-2 text-center">${fmtDate(c.filing_date)}</td>
@@ -278,9 +278,9 @@
       totalGross += Number(w.gross); totalNet += Number(w.net_pay);
       const rowBg = i % 2 === 1 ? 'bg-[#f9f9f9]' : '';
       return `<tr class="${rowBg} border-b border-slate-200 hover:bg-[#f1f1f1]">
-        <td class="p-2 border-r border-slate-200">${w.employees.emp_id}</td>
-        <td class="p-2 border-r border-slate-200 font-bold">${w.employees.full_name}</td>
-        <td class="p-2 border-r border-slate-200">${(w.employees.designation || '').substring(0,12)}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(w.employees.emp_id)}</td>
+        <td class="p-2 border-r border-slate-200 font-bold">${escapeHtml(w.employees.full_name)}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml((w.employees.designation || '').substring(0,12))}</td>
         <td class="p-2 border-r border-slate-200 text-center">${w.days_worked}</td>
         <td class="p-2 border-r border-slate-200 text-right">${fmtNum(w.basic)}</td>
         <td class="p-2 border-r border-slate-200 text-right">${fmtNum(w.da)}</td>
@@ -321,13 +321,13 @@
         : 'Fit';
 
       return `<tr class="${rowBg} border-b border-slate-200 hover:bg-[#f1f1f1]">
-        <td class="p-2 border-r border-slate-200">${e.emp_id}</td>
-        <td class="p-2 border-r border-slate-200 font-bold">${e.full_name}</td>
-        <td class="p-2 border-r border-slate-200">${(e.designation || '').substring(0,14)}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.emp_id)}</td>
+        <td class="p-2 border-r border-slate-200 font-bold">${escapeHtml(e.full_name)}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml((e.designation || '').substring(0,14))}</td>
         <td class="p-2 border-r border-slate-200">${fmtDate(e.medical_exam_date)}</td>
         <td class="p-2 border-r border-slate-200 text-[#0055a5] font-semibold">${fmtDate(e.medical_valid_until)}</td>
-        <td class="p-2 border-r border-slate-200">${e.medical_doctor || '—'}</td>
-        <td class="p-2 border-r border-slate-200">${e.blood_group || '—'}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.medical_doctor || '—')}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(e.blood_group || '—')}</td>
         <td class="p-2 text-center"><span class="${fitClass} px-2 py-0.5 rounded text-xs border">${fitLabel}</span></td>
       </tr>`;
     }).join('');
@@ -350,10 +350,10 @@
         : 'bg-red-100 text-red-800 border-red-300';
 
       return `<tr class="${rowBg} border-b border-slate-200 hover:bg-[#f1f1f1]">
-        <td class="p-2 border-r border-slate-200"><span class="${typeClass} px-2 py-0.5 rounded text-xs font-bold">${p.pass_type}</span></td>
-        <td class="p-2 border-r border-slate-200 font-semibold">${p.pass_no}</td>
-        <td class="p-2 border-r border-slate-200 font-bold">${p.contractor_name}</td>
-        <td class="p-2 border-r border-slate-200">${p.work_area}</td>
+        <td class="p-2 border-r border-slate-200"><span class="${typeClass} px-2 py-0.5 rounded text-xs font-bold">${escapeHtml(p.pass_type)}</span></td>
+        <td class="p-2 border-r border-slate-200 font-semibold">${escapeHtml(p.pass_no)}</td>
+        <td class="p-2 border-r border-slate-200 font-bold">${escapeHtml(p.contractor_name)}</td>
+        <td class="p-2 border-r border-slate-200">${escapeHtml(p.work_area)}</td>
         <td class="p-2 border-r border-slate-200 text-center">${p.workers_covered}</td>
         <td class="p-2 border-r border-slate-200">${fmtDate(p.issue_date)}</td>
         <td class="p-2 border-r border-slate-200 ${p.status === 'Expired' ? 'text-red-600' : 'text-[#0055a5]'} font-semibold">${fmtDate(p.expiry_date)}</td>
