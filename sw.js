@@ -4,7 +4,7 @@
  * and background sync for queued attendance/report submissions.
  */
 
-const CACHE_NAME = 'shramik-sathi-v13';
+const CACHE_NAME = 'shramik-sathi-v14';
 const OFFLINE_URL = '/offline.html';
 
 // Critical assets to pre-cache on install
@@ -30,7 +30,7 @@ const PRECACHE_ASSETS = [
 
 // ──────────────── INSTALL ────────────────
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing Shramik Sathi Service Worker v13');
+  console.log('[SW] Installing Shramik Sathi Service Worker v14');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
