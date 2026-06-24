@@ -165,7 +165,7 @@
 
     const { data, error } = await sb
       .from('job_applications')
-      .select('*, employees(full_name, emp_id, category, designation, mobile)')
+      .select('*, employees(full_name, emp_id, category, designation, mobile, cv_path)')
       .eq('job_id', job.id)
       .order('applied_at', { ascending: false });
 
@@ -184,6 +184,15 @@
 
     applicantsList.querySelectorAll('[data-app-action]').forEach(btn => {
       btn.addEventListener('click', () => setStatus(btn.dataset.appId, btn.dataset.appAction));
+    });
+
+    // View CV — open the worker's CV via a short-lived signed URL (employer-read RLS)
+    applicantsList.querySelectorAll('[data-cv-path]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const { data, error } = await sb.storage.from('cv-documents').createSignedUrl(btn.dataset.cvPath, 120);
+        if (error || !data) { alert('Could not open CV: ' + (error?.message || 'try again')); return; }
+        window.open(data.signedUrl, '_blank', 'noopener');
+      });
     });
   }
 
@@ -219,6 +228,7 @@
           <span class="${statusStyle} text-[11px] font-bold px-2 py-0.5 rounded-full">${a.status}</span>
         </div>
         <p class="text-xs text-slate-500 mt-0.5 truncate">${esc(e.designation || '—')} · ${esc(e.category || '—')}${e.mobile ? ' · ' + esc(e.mobile) : ''}</p>
+        ${e.cv_path ? `<button data-cv-path="${esc(e.cv_path)}" class="mt-1 text-[11px] font-semibold text-[#0055a5] inline-flex items-center gap-1 hover:underline"><i data-lucide="file-text" class="w-3 h-3"></i> View CV</button>` : ''}
       </div>
       <div class="flex items-center gap-2 flex-shrink-0">${actions}</div>
     </div>`;
