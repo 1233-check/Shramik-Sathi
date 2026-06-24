@@ -39,6 +39,7 @@
       comp_police: 'Police Verification',
       // profile page
       edit_profile: 'Edit Profile',
+      edit_pending: '⏳ Profile changes awaiting employer approval',
       sec_identity: 'Identity Information', sec_kyc: 'KYC Documents', sec_bank: 'Bank Account Details',
       sec_contact: 'Contact Information', sec_compliance: 'Compliance IDs',
       lbl_aadhaar_no: 'Aadhar Number', lbl_dob: 'Date of Birth', lbl_gender: 'Gender', lbl_blood: 'Blood Group',
@@ -76,6 +77,7 @@
       comp_police: 'पुलिस सत्यापन',
       // profile page
       edit_profile: 'प्रोफ़ाइल संपादित करें',
+      edit_pending: '⏳ प्रोफ़ाइल परिवर्तन नियोक्ता की मंज़ूरी की प्रतीक्षा में',
       sec_identity: 'पहचान जानकारी', sec_kyc: 'केवाईसी दस्तावेज़', sec_bank: 'बैंक खाता विवरण',
       sec_contact: 'संपर्क जानकारी', sec_compliance: 'अनुपालन आईडी',
       lbl_aadhaar_no: 'आधार नंबर', lbl_dob: 'जन्म तिथि', lbl_gender: 'लिंग', lbl_blood: 'रक्त समूह',

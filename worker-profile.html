@@ -74,6 +74,7 @@
         <button id="editProfileBtn" class="mt-1 text-sm font-semibold text-[#4a5c54] border border-[#cdd5d1] rounded-lg px-4 py-2 hover:bg-[#eef1ee] transition flex items-center gap-2">
           <i data-lucide="pencil" class="w-4 h-4"></i> <span data-i18n="edit_profile">Edit profile</span>
         </button>
+        <p id="editPendingBanner" data-i18n="edit_pending" class="hidden text-[12px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 mt-2">⏳ Profile changes awaiting employer approval</p>
       </div>
 
       <!-- Identity Details -->
@@ -392,6 +393,7 @@
         // — KYC documents —
         renderKycStatus('aadhaar');
         renderKycStatus('pan');
+        checkEditPending();
 
         lucide.createIcons();
       } catch (e) {
@@ -545,6 +547,20 @@
         state: g('ef_state') || null, pin_code: pin || null, bank_name: g('ef_bank') || null,
         account_no: g('ef_account') || null, ifsc_code: ifsc || null,
       };
+      // Onboarded workers: changes go to the employer for approval (not applied directly).
+      if (_emp.company_id) {
+        const changes = {};
+        Object.keys(payload).forEach(k => { if ((payload[k] || null) !== (_emp[k] || null)) changes[k] = payload[k]; });
+        if (!Object.keys(changes).length) { btn.disabled = false; btn.textContent = orig; return showErr('No changes to submit.'); }
+        const { error } = await sb.from('profile_edit_requests').insert({ employee_id: _emp.id, changes });
+        btn.disabled = false; btn.textContent = orig;
+        if (error) return showErr('Could not submit: ' + error.message);
+        editModal.classList.add('hidden');
+        showEditPending();
+        return;
+      }
+
+      // Not yet onboarded: apply directly (no employer to approve).
       const { error } = await sb.from('employees').update(payload).eq('id', _emp.id);
       btn.disabled = false; btn.textContent = orig;
       if (error) { showErr('Could not save: ' + error.message); return; }
@@ -558,6 +574,20 @@
       document.getElementById('profileIfsc').textContent = payload.ifsc_code || '—';
       editModal.classList.add('hidden');
     });
+
+    // ============================================
+    // EDIT-APPROVAL STATUS
+    // ============================================
+    function showEditPending() {
+      const b = document.getElementById('editPendingBanner');
+      if (b) b.classList.remove('hidden');
+    }
+    async function checkEditPending() {
+      if (!_emp || !_emp.company_id) return;  // only onboarded workers route through approval
+      const { data } = await sb.from('profile_edit_requests')
+        .select('id').eq('employee_id', _emp.id).eq('status', 'Pending').limit(1);
+      if (data && data.length) showEditPending();
+    }
 
     // ============================================
     // SIGN OUT
