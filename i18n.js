@@ -54,6 +54,8 @@
       empty_jobs: 'No open jobs right now', empty_search: 'No jobs match your search', empty_apps: "You haven't applied to any jobs yet", err_load_jobs: 'Could not load jobs',
       // news page
       news_title: 'Company News',
+      news_locked_title: 'News unlocks after onboarding',
+      news_locked_msg: 'Company news and updates appear once an employer hires you. Browse jobs and apply to get started.',
     },
     hi: {
       nav_home: 'होम', nav_jobs: 'नौकरियां', nav_news: 'समाचार', nav_profile: 'प्रोफ़ाइल',
@@ -89,6 +91,8 @@
       empty_jobs: 'अभी कोई नौकरी उपलब्ध नहीं', empty_search: 'खोज से मेल खाने वाली कोई नौकरी नहीं', empty_apps: 'आपने अभी तक किसी नौकरी के लिए आवेदन नहीं किया', err_load_jobs: 'नौकरियां लोड नहीं हो सकीं',
       // news page
       news_title: 'कंपनी समाचार',
+      news_locked_title: 'ऑनबोर्डिंग के बाद समाचार खुलेंगे',
+      news_locked_msg: 'नियोक्ता द्वारा काम पर रखे जाने के बाद कंपनी समाचार और अपडेट दिखेंगे। शुरू करने के लिए नौकरियां देखें और आवेदन करें।',
     },
   };
 
