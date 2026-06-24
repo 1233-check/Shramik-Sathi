@@ -13,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="i18n.js"></script>
+  <script src="notifications.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -70,7 +71,7 @@
         </nav>
         <div class="flex items-center gap-0.5">
           <button id="langToggle" class="h-9 min-w-9 px-2.5 flex items-center justify-center text-[13px] font-bold text-[#4a5c54] hover:text-[#1c211f] hover:bg-white rounded-full transition-colors" aria-label="Change language">हिं</button>
-          <button class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#1c211f] hover:bg-white rounded-full transition-colors" aria-label="Notifications">
+          <button id="notifBell" class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#1c211f] hover:bg-white rounded-full transition-colors" aria-label="Notifications">
             <i data-lucide="bell" class="w-5 h-5"></i>
           </button>
           <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#e76f51] hover:bg-white rounded-full transition-colors" aria-label="Logout">
