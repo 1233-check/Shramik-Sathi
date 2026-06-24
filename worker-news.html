@@ -6,6 +6,8 @@
   <title>News & Updates | Shramik Sathi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="i18n.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -52,8 +54,22 @@
       </div>
     </header>
 
+    <!-- Locked state — shown until an employer onboards the worker -->
+    <div id="newsLocked" class="!hidden flex flex-1 flex-col items-center justify-center px-6 pb-28 lg:pb-12">
+      <div class="w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-sm p-7 mt-6 text-center">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-gray-100 text-gray-500 flex items-center justify-center mb-4">
+          <i data-lucide="lock" class="w-8 h-8"></i>
+        </div>
+        <h2 data-i18n="news_locked_title" class="text-xl font-extrabold text-gray-900">News unlocks after onboarding</h2>
+        <p data-i18n="news_locked_msg" class="text-sm text-gray-500 mt-2 leading-relaxed">Company news and updates appear once an employer hires you. Browse jobs and apply to get started.</p>
+        <a href="worker-jobs.html" class="mt-6 w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:bg-gray-700 transition-colors">
+          <i data-lucide="search" class="w-5 h-5"></i> <span data-i18n="browse_jobs">Browse Jobs</span>
+        </a>
+      </div>
+    </div>
+
     <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto no-scrollbar pb-24 px-4 py-6 flex flex-col gap-4 lg:overflow-visible lg:pb-12 lg:px-8 lg:max-w-5xl lg:mx-auto lg:w-full lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-5 lg:content-start">
+    <div id="newsContent" class="!hidden flex flex-1 overflow-y-auto no-scrollbar pb-24 px-4 py-6 flex-col gap-4 lg:overflow-visible lg:pb-12 lg:px-8 lg:max-w-5xl lg:mx-auto lg:w-full lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-5 lg:content-start">
       
       <!-- News Item 1 -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden active:bg-gray-50 transition-colors cursor-pointer">
@@ -126,6 +142,28 @@
     </nav>
   </main>
 
-  <script>lucide.createIcons();</script>
+  <script>
+    lucide.createIcons();
+    // Onboarding gate: company news is visible only once an employer hires the worker
+    (async () => {
+      const sb = typeof getSupabaseClient === 'function' ? getSupabaseClient() : null;
+      const content = document.getElementById('newsContent');
+      const locked = document.getElementById('newsLocked');
+      const reveal = (el) => { el.classList.remove('!hidden'); };  // base 'flex'/'lg:grid' classes then apply
+      if (!sb) { reveal(content); return; }   // fail open — news isn't sensitive
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { window.location.replace('worker-login.html'); return; }
+        const { data: emp } = await sb.from('employees')
+          .select('company_id').eq('auth_user_id', session.user.id).maybeSingle();
+        if (!emp) { window.location.replace('worker-registration.html'); return; }
+        reveal(emp.company_id ? content : locked);
+      } catch (e) {
+        console.error('news gate', e);
+        reveal(content);
+      }
+      if (window.lucide) lucide.createIcons();
+    })();
+  </script>
 </body>
 </html>

@@ -168,8 +168,20 @@
   <div class="content">
     <!-- Header -->
     <div class="reg-header" id="regHeader">
+      <div style="display:flex;justify-content:center;margin-bottom:14px;">
+        <div style="position:relative;width:84px;height:84px;">
+          <div id="regAvatar" style="width:84px;height:84px;border-radius:50%;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-dim,#9aa0a6);overflow:hidden;background-size:cover;background-position:center;">
+            <i data-lucide="user" style="width:32px;height:32px"></i>
+          </div>
+          <label for="regAvatarInput" title="Add photo" style="position:absolute;bottom:-2px;right:-2px;width:30px;height:30px;border-radius:50%;background:var(--emerald,#10b981);color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid #0f172a;cursor:pointer;">
+            <i data-lucide="camera" style="width:15px;height:15px"></i>
+          </label>
+          <input type="file" id="regAvatarInput" accept="image/*" style="display:none">
+        </div>
+      </div>
       <h1>Complete Your <span>Profile</span></h1>
       <p>Fill in your details as per your Aadhar card and official documents. This is required for compliance.</p>
+      <p id="regAvatarStatus" style="font-size:12px;min-height:16px;margin-top:6px;"></p>
     </div>
 
     <!-- Progress Steps -->
@@ -414,6 +426,8 @@
           <option>Security Guard</option><option>Housekeeping</option>
           <option>Office Boy / Peon</option><option>Other</option>
         </select>
+        <input type="text" id="designationOther" placeholder="Type your trade — what do you do?" style="display:none;margin-top:10px;">
+        <span class="hint" id="designationOtherHint" style="display:none;">Tell us your actual work so employers understand your skills.</span>
       </div>
 
       <div class="field">
@@ -454,6 +468,64 @@
 <script>
   lucide.createIcons();
   const sb = getSupabaseClient();
+
+  // Trade/Designation: reveal a free-text field when "Other" is chosen
+  (function () {
+    const sel = document.getElementById('designation');
+    const other = document.getElementById('designationOther');
+    const hint = document.getElementById('designationOtherHint');
+    if (!sel || !other) return;
+    sel.addEventListener('change', () => {
+      const show = sel.value === 'Other';
+      other.style.display = show ? 'block' : 'none';
+      hint.style.display = show ? 'block' : 'none';
+      if (!show) other.value = '';
+    });
+  })();
+
+  // Profile photo (optional) — uploaded to the public avatars bucket, saved on submit
+  let _photoUrl = null;
+  function rzDownscale(file, max) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          let { width: w, height: h } = img;
+          const scale = Math.min(1, max / Math.max(w, h));
+          w = Math.round(w * scale); h = Math.round(h * scale);
+          const c = document.createElement('canvas'); c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          c.toBlob(b => b ? resolve(b) : reject(new Error('encode failed')), 'image/jpeg', 0.85);
+        };
+        img.onerror = reject; img.src = reader.result;
+      };
+      reader.onerror = reject; reader.readAsDataURL(file);
+    });
+  }
+  document.getElementById('regAvatarInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    const st = document.getElementById('regAvatarStatus');
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { st.style.color = '#fca5a5'; st.textContent = 'Please choose an image.'; return; }
+    if (file.size > 2 * 1024 * 1024) { st.style.color = '#fca5a5'; st.textContent = 'Image must be under 2 MB.'; return; }
+    if (!_userId) { st.style.color = '#fca5a5'; st.textContent = 'Please wait — still signing you in…'; return; }
+    st.style.color = '#9aa0a6'; st.textContent = 'Uploading photo…';
+    try {
+      const blob = await rzDownscale(file, 512);
+      const path = `${_userId}/avatar.jpg`;
+      const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+      if (upErr) throw upErr;
+      const { data: pub } = sb.storage.from('avatars').getPublicUrl(path);
+      _photoUrl = pub.publicUrl;
+      const av = document.getElementById('regAvatar');
+      av.innerHTML = ''; av.style.backgroundImage = `url("${_photoUrl}?t=${Date.now()}")`;
+      st.style.color = '#6ee7b7'; st.textContent = 'Photo added ✓';
+    } catch (err) {
+      console.error('reg photo upload failed', err);
+      st.style.color = '#fca5a5'; st.textContent = 'Upload failed: ' + (err.message || 'try again');
+    }
+  });
 
   // ============================================
   // AUTH GUARD — Must be logged in
@@ -583,6 +655,16 @@
       }
     }
 
+    if (step === 5) {
+      // If "Other" trade is chosen, the worker must type what they do
+      const desg = document.getElementById('designation').value;
+      const other = document.getElementById('designationOther');
+      if (desg === 'Other' && !other.value.trim()) {
+        other.classList.add('invalid');
+        valid = false;
+      }
+    }
+
     if (!valid) {
       // Shake first invalid field
       const firstInvalid = stepEl.querySelector('.invalid');
@@ -628,8 +710,11 @@
       account_no: document.getElementById('accountNo').value.trim() || null,
       ifsc_code: document.getElementById('ifscCode').value.toUpperCase().trim() || null,
       category: document.getElementById('category').value || null,
-      designation: document.getElementById('designation').value || null,
+      designation: (document.getElementById('designation').value === 'Other'
+        ? (document.getElementById('designationOther').value.trim() || 'Other')
+        : document.getElementById('designation').value) || null,
       employee_type: document.getElementById('employeeType').value || 'Contractual',
+      photo_url: _photoUrl,
       status: 'Pending',
       date_of_joining: new Date().toISOString().slice(0, 10),
     };

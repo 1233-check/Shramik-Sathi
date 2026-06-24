@@ -356,8 +356,8 @@
 
         // ── Onboarding gate: the dashboard only applies once an employer hires the worker ──
         if (!emp.company_id) {
-          document.getElementById('quickStats').classList.add('hidden');
-          document.getElementById('dashboardContent').classList.add('hidden');
+          document.getElementById('quickStats').classList.add('!hidden');
+          document.getElementById('dashboardContent').classList.add('!hidden');  // !important so it beats lg:grid on desktop
           const ao = document.getElementById('awaitingOnboarding');
           ao.classList.remove('hidden'); ao.classList.add('flex');
           document.getElementById('aoHeading').textContent = SSi18n.t('await_title').replace('{name}', firstName);
