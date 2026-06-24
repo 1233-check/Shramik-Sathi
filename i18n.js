@@ -37,6 +37,23 @@
       recent_activity: 'Recent Activity',
       compliance_status: 'Compliance Status',
       comp_police: 'Police Verification',
+      // profile page
+      edit_profile: 'Edit Profile',
+      sec_identity: 'Identity Information', sec_kyc: 'KYC Documents', sec_bank: 'Bank Account Details',
+      sec_contact: 'Contact Information', sec_compliance: 'Compliance IDs',
+      lbl_aadhaar_no: 'Aadhar Number', lbl_dob: 'Date of Birth', lbl_gender: 'Gender', lbl_blood: 'Blood Group',
+      lbl_aadhaar_card: 'Aadhaar Card', lbl_pan_card: 'PAN Card', kyc_upload: 'Upload', kyc_view: 'View',
+      lbl_account_no: 'Account Number', lbl_ifsc: 'IFSC Code',
+      lbl_mobile: 'Mobile Number', lbl_emergency: 'Emergency Contact', lbl_address: 'Address',
+      lbl_pan_no: 'PAN Number', lbl_uan: 'UAN (PF)', lbl_esic: 'ESIC Number',
+      // jobs page
+      jobs_title: 'Jobs', jobs_sub: 'Find and apply to verified roles',
+      tab_browse: 'Browse', tab_apps: 'My Applications', search_ph: 'Search role or location',
+      cat_all: 'All', cat_unskilled: 'Unskilled', cat_semi: 'Semi-skilled', cat_skilled: 'Skilled', cat_highly: 'Highly Skilled',
+      job_apply: 'Apply', job_applied: 'Applied', job_applying: 'Applying…', wage_on_apply: 'Wage on apply',
+      empty_jobs: 'No open jobs right now', empty_search: 'No jobs match your search', empty_apps: "You haven't applied to any jobs yet", err_load_jobs: 'Could not load jobs',
+      // news page
+      news_title: 'Company News',
     },
     hi: {
       nav_home: 'होम', nav_jobs: 'नौकरियां', nav_news: 'समाचार', nav_profile: 'प्रोफ़ाइल',
@@ -55,6 +72,23 @@
       recent_activity: 'हाल की गतिविधि',
       compliance_status: 'अनुपालन स्थिति',
       comp_police: 'पुलिस सत्यापन',
+      // profile page
+      edit_profile: 'प्रोफ़ाइल संपादित करें',
+      sec_identity: 'पहचान जानकारी', sec_kyc: 'केवाईसी दस्तावेज़', sec_bank: 'बैंक खाता विवरण',
+      sec_contact: 'संपर्क जानकारी', sec_compliance: 'अनुपालन आईडी',
+      lbl_aadhaar_no: 'आधार नंबर', lbl_dob: 'जन्म तिथि', lbl_gender: 'लिंग', lbl_blood: 'रक्त समूह',
+      lbl_aadhaar_card: 'आधार कार्ड', lbl_pan_card: 'पैन कार्ड', kyc_upload: 'अपलोड', kyc_view: 'देखें',
+      lbl_account_no: 'खाता संख्या', lbl_ifsc: 'आईएफएससी कोड',
+      lbl_mobile: 'मोबाइल नंबर', lbl_emergency: 'आपातकालीन संपर्क', lbl_address: 'पता',
+      lbl_pan_no: 'पैन नंबर', lbl_uan: 'यूएएन (पीएफ)', lbl_esic: 'ईएसआईसी नंबर',
+      // jobs page
+      jobs_title: 'नौकरियां', jobs_sub: 'सत्यापित नौकरियां खोजें और आवेदन करें',
+      tab_browse: 'ब्राउज़ करें', tab_apps: 'मेरे आवेदन', search_ph: 'भूमिका या स्थान खोजें',
+      cat_all: 'सभी', cat_unskilled: 'अकुशल', cat_semi: 'अर्ध-कुशल', cat_skilled: 'कुशल', cat_highly: 'अति कुशल',
+      job_apply: 'आवेदन करें', job_applied: 'आवेदन किया', job_applying: 'आवेदन हो रहा है…', wage_on_apply: 'आवेदन पर वेतन',
+      empty_jobs: 'अभी कोई नौकरी उपलब्ध नहीं', empty_search: 'खोज से मेल खाने वाली कोई नौकरी नहीं', empty_apps: 'आपने अभी तक किसी नौकरी के लिए आवेदन नहीं किया', err_load_jobs: 'नौकरियां लोड नहीं हो सकीं',
+      // news page
+      news_title: 'कंपनी समाचार',
     },
   };
 
@@ -75,7 +109,22 @@
     root.querySelectorAll('[data-i18n-ph]').forEach(el => {
       el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
     });
+    refreshToggleLabels();
     document.documentElement.setAttribute('lang', lang);
+  }
+
+  // Any element marked [data-ss-lang-toggle] becomes a working EN<->HI switch
+  // with no per-page JS — its label auto-updates to the language you'd switch to.
+  function refreshToggleLabels() {
+    document.querySelectorAll('[data-ss-lang-toggle]').forEach(btn => { btn.textContent = otherLabel(); });
+  }
+  function wireToggles() {
+    document.querySelectorAll('[data-ss-lang-toggle]').forEach(btn => {
+      if (btn.__ssWired) return;
+      btn.__ssWired = true;
+      btn.addEventListener('click', toggle);
+    });
+    refreshToggleLabels();
   }
 
   function setLang(l) {
@@ -96,8 +145,8 @@
   };
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { apply(); });
+    document.addEventListener('DOMContentLoaded', function () { apply(); wireToggles(); });
   } else {
-    apply();
+    apply(); wireToggles();
   }
 })();

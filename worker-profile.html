@@ -8,6 +8,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="i18n.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -36,11 +37,12 @@
       <div class="flex items-center justify-between lg:max-w-5xl lg:mx-auto lg:w-full">
         <h1 class="font-bold text-xl text-[#1c211f] tracking-tight">My Profile</h1>
         <nav class="hidden lg:flex items-center gap-1 mr-auto ml-6" aria-label="Primary">
-          <a href="get-hired.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">Home</a>
-          <a href="worker-jobs.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">Jobs</a>
-          <a href="worker-news.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">News</a>
-          <a href="worker-profile.html" class="px-3 py-2 rounded-lg text-sm font-bold text-[#1c211f] bg-white shadow-sm">Profile</a>
+          <a href="get-hired.html" data-i18n="nav_home" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">Home</a>
+          <a href="worker-jobs.html" data-i18n="nav_jobs" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">Jobs</a>
+          <a href="worker-news.html" data-i18n="nav_news" class="px-3 py-2 rounded-lg text-sm font-semibold text-[#4a514e] hover:text-[#1c211f] hover:bg-white transition-colors">News</a>
+          <a href="worker-profile.html" data-i18n="nav_profile" class="px-3 py-2 rounded-lg text-sm font-bold text-[#1c211f] bg-white shadow-sm">Profile</a>
         </nav>
+        <button data-ss-lang-toggle class="h-9 min-w-9 px-2.5 mr-0.5 flex items-center justify-center text-[13px] font-bold text-[#4a5c54] hover:text-[#1c211f] hover:bg-white rounded-full transition-colors" aria-label="Change language">हिं</button>
         <button id="logoutBtn" class="w-10 h-10 flex items-center justify-center text-[#4a514e] hover:text-[#e76f51] hover:bg-white rounded-full transition-colors" aria-label="Logout">
           <i data-lucide="log-out" class="w-5 h-5"></i>
         </button>
@@ -70,20 +72,20 @@
         <span class="mt-3 px-3 py-1 text-xs font-bold rounded-full" id="profileStatus">—</span>
         <p id="avatarStatus" class="text-[11px] text-[#8b928f] mt-2 h-4"></p>
         <button id="editProfileBtn" class="mt-1 text-sm font-semibold text-[#4a5c54] border border-[#cdd5d1] rounded-lg px-4 py-2 hover:bg-[#eef1ee] transition flex items-center gap-2">
-          <i data-lucide="pencil" class="w-4 h-4"></i> Edit profile
+          <i data-lucide="pencil" class="w-4 h-4"></i> <span data-i18n="edit_profile">Edit profile</span>
         </button>
       </div>
 
       <!-- Identity Details -->
       <section class="p-4 mt-2 fade-in" style="animation-delay:0.05s">
-        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Identity Information</h3>
+        <h3 data-i18n="sec_identity" class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Identity Information</h3>
         <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] overflow-hidden">
 
           <div class="p-4 border-b border-gray-100 flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="text-[#8b928f]"><i data-lucide="credit-card" class="w-5 h-5"></i></div>
               <div>
-                <p class="text-xs text-[#8b928f] font-medium">Aadhar Number</p>
+                <p data-i18n="lbl_aadhaar_no" class="text-xs text-[#8b928f] font-medium">Aadhar Number</p>
                 <p class="text-[15px] font-bold text-[#1c211f]" id="profileAadhar">—</p>
               </div>
             </div>
@@ -93,7 +95,7 @@
           <div class="p-4 border-b border-gray-100 flex items-center gap-3">
             <div class="text-[#8b928f]"><i data-lucide="calendar" class="w-5 h-5"></i></div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">Date of Birth</p>
+              <p data-i18n="lbl_dob" class="text-xs text-[#8b928f] font-medium">Date of Birth</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profileDob">—</p>
             </div>
           </div>
@@ -101,7 +103,7 @@
           <div class="p-4 border-b border-gray-100 flex items-center gap-3">
             <div class="text-[#8b928f]"><i data-lucide="user" class="w-5 h-5"></i></div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">Gender</p>
+              <p data-i18n="lbl_gender" class="text-xs text-[#8b928f] font-medium">Gender</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profileGender">—</p>
             </div>
           </div>
@@ -109,7 +111,7 @@
           <div class="p-4 flex items-center gap-3">
             <div class="text-[#8b928f]"><i data-lucide="droplet" class="w-5 h-5"></i></div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">Blood Group</p>
+              <p data-i18n="lbl_blood" class="text-xs text-[#8b928f] font-medium">Blood Group</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profileBlood">—</p>
             </div>
           </div>
@@ -119,7 +121,7 @@
 
       <!-- KYC Documents -->
       <section class="p-4 fade-in" style="animation-delay:0.08s">
-        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">KYC Documents</h3>
+        <h3 data-i18n="sec_kyc" class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">KYC Documents</h3>
         <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] overflow-hidden">
 
           <!-- Aadhaar card -->
@@ -127,13 +129,13 @@
             <div class="flex items-center gap-3 min-w-0">
               <div class="text-[#8b928f]"><i data-lucide="id-card" class="w-5 h-5"></i></div>
               <div class="min-w-0">
-                <p class="text-xs text-[#8b928f] font-medium">Aadhaar Card</p>
+                <p data-i18n="lbl_aadhaar_card" class="text-xs text-[#8b928f] font-medium">Aadhaar Card</p>
                 <p class="text-[13px] font-bold text-[#1c211f]" id="aadhaarDocStatus">Not uploaded</p>
               </div>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
-              <button type="button" id="aadhaarView" class="hidden text-xs font-bold text-[#4a5c54] border border-[#cdd4d0] px-3 py-1.5 rounded-lg active:scale-95 transition">View</button>
-              <label for="aadhaarInput" class="text-xs font-bold text-white bg-[#4a5c54] px-3 py-1.5 rounded-lg cursor-pointer active:scale-95 transition">Upload</label>
+              <button type="button" id="aadhaarView" data-i18n="kyc_view" class="hidden text-xs font-bold text-[#4a5c54] border border-[#cdd4d0] px-3 py-1.5 rounded-lg active:scale-95 transition">View</button>
+              <label for="aadhaarInput" data-i18n="kyc_upload" class="text-xs font-bold text-white bg-[#4a5c54] px-3 py-1.5 rounded-lg cursor-pointer active:scale-95 transition">Upload</label>
               <input type="file" id="aadhaarInput" accept="image/*" class="hidden">
             </div>
           </div>
@@ -143,13 +145,13 @@
             <div class="flex items-center gap-3 min-w-0">
               <div class="text-[#8b928f]"><i data-lucide="credit-card" class="w-5 h-5"></i></div>
               <div class="min-w-0">
-                <p class="text-xs text-[#8b928f] font-medium">PAN Card</p>
+                <p data-i18n="lbl_pan_card" class="text-xs text-[#8b928f] font-medium">PAN Card</p>
                 <p class="text-[13px] font-bold text-[#1c211f]" id="panDocStatus">Not uploaded</p>
               </div>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
-              <button type="button" id="panView" class="hidden text-xs font-bold text-[#4a5c54] border border-[#cdd4d0] px-3 py-1.5 rounded-lg active:scale-95 transition">View</button>
-              <label for="panInput" class="text-xs font-bold text-white bg-[#4a5c54] px-3 py-1.5 rounded-lg cursor-pointer active:scale-95 transition">Upload</label>
+              <button type="button" id="panView" data-i18n="kyc_view" class="hidden text-xs font-bold text-[#4a5c54] border border-[#cdd4d0] px-3 py-1.5 rounded-lg active:scale-95 transition">View</button>
+              <label for="panInput" data-i18n="kyc_upload" class="text-xs font-bold text-white bg-[#4a5c54] px-3 py-1.5 rounded-lg cursor-pointer active:scale-95 transition">Upload</label>
               <input type="file" id="panInput" accept="image/*" class="hidden">
             </div>
           </div>
@@ -161,7 +163,7 @@
 
       <!-- Bank Details -->
       <section class="p-4 fade-in" style="animation-delay:0.1s">
-        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Bank Account Details</h3>
+        <h3 data-i18n="sec_bank" class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Bank Account Details</h3>
         <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] p-4">
           <div class="flex items-start gap-3 mb-4">
             <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
@@ -174,11 +176,11 @@
           </div>
           <div class="grid grid-cols-2 gap-4 mt-2">
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">Account Number</p>
+              <p data-i18n="lbl_account_no" class="text-xs text-[#8b928f] font-medium">Account Number</p>
               <p class="text-[15px] font-bold text-[#1c211f] mt-0.5" id="profileAccountNo">—</p>
             </div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">IFSC Code</p>
+              <p data-i18n="lbl_ifsc" class="text-xs text-[#8b928f] font-medium">IFSC Code</p>
               <p class="text-[15px] font-bold text-[#1c211f] mt-0.5" id="profileIfsc">—</p>
             </div>
           </div>
@@ -187,14 +189,14 @@
 
       <!-- Contact Details -->
       <section class="p-4 fade-in" style="animation-delay:0.15s">
-        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Contact Information</h3>
+        <h3 data-i18n="sec_contact" class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Contact Information</h3>
         <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] overflow-hidden">
           <div class="p-4 border-b border-gray-100 flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-emerald-50 text-[#5d7369] flex items-center justify-center flex-shrink-0">
               <i data-lucide="phone" class="w-5 h-5"></i>
             </div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">Mobile Number</p>
+              <p data-i18n="lbl_mobile" class="text-xs text-[#8b928f] font-medium">Mobile Number</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profileMobile">—</p>
             </div>
           </div>
@@ -203,7 +205,7 @@
               <i data-lucide="phone-call" class="w-5 h-5"></i>
             </div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">Emergency Contact</p>
+              <p data-i18n="lbl_emergency" class="text-xs text-[#8b928f] font-medium">Emergency Contact</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profileEmergency">—</p>
             </div>
           </div>
@@ -212,7 +214,7 @@
               <i data-lucide="map-pin" class="w-5 h-5"></i>
             </div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">Address</p>
+              <p data-i18n="lbl_address" class="text-xs text-[#8b928f] font-medium">Address</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profileAddress">—</p>
             </div>
           </div>
@@ -221,26 +223,26 @@
 
       <!-- Compliance IDs -->
       <section class="p-4 fade-in" style="animation-delay:0.2s">
-        <h3 class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Compliance IDs</h3>
+        <h3 data-i18n="sec_compliance" class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Compliance IDs</h3>
         <div class="bg-white rounded-2xl shadow-sm border border-[#e2e4e2] overflow-hidden">
           <div class="p-4 border-b border-gray-100 flex items-center gap-3">
             <div class="text-[#8b928f]"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">PAN Number</p>
+              <p data-i18n="lbl_pan_no" class="text-xs text-[#8b928f] font-medium">PAN Number</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profilePan">—</p>
             </div>
           </div>
           <div class="p-4 border-b border-gray-100 flex items-center gap-3">
             <div class="text-[#8b928f]"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">UAN (PF)</p>
+              <p data-i18n="lbl_uan" class="text-xs text-[#8b928f] font-medium">UAN (PF)</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profileUan">—</p>
             </div>
           </div>
           <div class="p-4 flex items-center gap-3">
             <div class="text-[#8b928f]"><i data-lucide="heart-pulse" class="w-5 h-5"></i></div>
             <div>
-              <p class="text-xs text-[#8b928f] font-medium">ESIC Number</p>
+              <p data-i18n="lbl_esic" class="text-xs text-[#8b928f] font-medium">ESIC Number</p>
               <p class="text-[15px] font-bold text-[#1c211f]" id="profileEsi">—</p>
             </div>
           </div>
@@ -260,19 +262,19 @@
     <nav class="absolute bottom-0 w-full bg-[#f4f5f4] border-t border-[#e2e4e2] flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[68px] shadow-sm lg:hidden">
       <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
         <i data-lucide="layout-dashboard" class="w-[20px] h-[20px] mb-0.5"></i>
-        <span class="text-[10px] font-semibold">Home</span>
+        <span data-i18n="nav_home" class="text-[10px] font-semibold">Home</span>
       </a>
       <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
         <i data-lucide="briefcase" class="w-[20px] h-[20px] mb-0.5"></i>
-        <span class="text-[10px] font-semibold">Jobs</span>
+        <span data-i18n="nav_jobs" class="text-[10px] font-semibold">Jobs</span>
       </a>
       <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-[#4a5c54] active:bg-white rounded-xl transition-colors">
         <i data-lucide="newspaper" class="w-[20px] h-[20px] mb-0.5"></i>
-        <span class="text-[10px] font-semibold">News</span>
+        <span data-i18n="nav_news" class="text-[10px] font-semibold">News</span>
       </a>
       <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center h-full text-[#4a5c54]">
         <i data-lucide="user-circle" class="w-[20px] h-[20px] mb-0.5"></i>
-        <span class="text-[10px] font-bold">Profile</span>
+        <span data-i18n="nav_profile" class="text-[10px] font-bold">Profile</span>
       </a>
     </nav>
   </main>

@@ -267,7 +267,8 @@
   // ============================================
   // i18n — Hindi/English Translation
   // ============================================
-  let currentLang = 'en';
+  // Seed from the shared portal language choice so login matches the rest of the app
+  let currentLang = (() => { try { return localStorage.getItem('ss_lang') || 'en'; } catch (e) { return 'en'; } })();
 
   const LANG = {
     en: {
@@ -327,8 +328,13 @@
   }
 
   document.getElementById('hindiToggle').addEventListener('click', () => {
-    applyTranslation(currentLang === 'en' ? 'hi' : 'en');
+    const next = currentLang === 'en' ? 'hi' : 'en';
+    applyTranslation(next);
+    try { localStorage.setItem('ss_lang', next); } catch (e) {}
   });
+
+  // Apply the persisted language on load (so a worker who chose हिन्दी sees it here too)
+  if (currentLang !== 'en') applyTranslation(currentLang);
 
   // ============================================
   // GOOGLE OAUTH SIGN-IN

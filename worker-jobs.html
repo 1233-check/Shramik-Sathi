@@ -11,6 +11,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="i18n.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } };
@@ -51,16 +52,19 @@
         <div class="lg:max-w-5xl lg:mx-auto lg:w-full">
           <nav class="hidden lg:flex items-center gap-1 mb-4" aria-label="Primary">
             <a href="get-hired.html" class="flex items-center gap-2 mr-auto font-extrabold text-gray-900"><i data-lucide="hard-hat" class="w-5 h-5 text-gray-700"></i> Shramik Sathi</a>
-            <a href="get-hired.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Home</a>
-            <a href="worker-jobs.html" class="px-3 py-2 rounded-lg text-sm font-bold text-gray-900 bg-gray-100">Jobs</a>
-            <a href="worker-news.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">News</a>
-            <a href="worker-profile.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Profile</a>
+            <a href="get-hired.html" data-i18n="nav_home" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Home</a>
+            <a href="worker-jobs.html" data-i18n="nav_jobs" class="px-3 py-2 rounded-lg text-sm font-bold text-gray-900 bg-gray-100">Jobs</a>
+            <a href="worker-news.html" data-i18n="nav_news" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">News</a>
+            <a href="worker-profile.html" data-i18n="nav_profile" class="px-3 py-2 rounded-lg text-sm font-semibold text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors">Profile</a>
           </nav>
-          <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Jobs</h1>
-          <p class="text-sm text-gray-500 mt-0.5">Find and apply to verified roles</p>
+          <div class="flex items-center justify-between gap-2">
+            <h1 data-i18n="jobs_title" class="text-2xl font-extrabold tracking-tight text-gray-900">Jobs</h1>
+            <button data-ss-lang-toggle class="h-9 min-w-9 px-2.5 flex items-center justify-center text-[13px] font-bold text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors" aria-label="Change language">हिं</button>
+          </div>
+          <p data-i18n="jobs_sub" class="text-sm text-gray-500 mt-0.5">Find and apply to verified roles</p>
           <div class="mt-4 grid grid-cols-2 gap-1 bg-gray-100 rounded-xl p-1 lg:max-w-sm">
-            <button id="tabBrowse" class="seg-tab active py-2 rounded-lg text-sm font-semibold">Browse</button>
-            <button id="tabApps" class="seg-tab py-2 rounded-lg text-sm font-semibold">My Applications</button>
+            <button id="tabBrowse" data-i18n="tab_browse" class="seg-tab active py-2 rounded-lg text-sm font-semibold">Browse</button>
+            <button id="tabApps" data-i18n="tab_apps" class="seg-tab py-2 rounded-lg text-sm font-semibold">My Applications</button>
           </div>
         </div>
       </header>
@@ -72,16 +76,16 @@
         <section id="browseView" class="px-5 py-4 flex flex-col gap-4">
           <div class="relative">
             <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input id="jobSearch" type="text" placeholder="Search role or location"
+            <input id="jobSearch" type="text" data-i18n-ph="search_ph" placeholder="Search role or location"
               class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-[15px] font-medium outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition placeholder-gray-400">
           </div>
 
           <div id="catChips" class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
-            <button data-cat="" class="cat-chip active flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">All</button>
-            <button data-cat="Unskilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Unskilled</button>
-            <button data-cat="Semi-skilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Semi-skilled</button>
-            <button data-cat="Skilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Skilled</button>
-            <button data-cat="Highly Skilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Highly Skilled</button>
+            <button data-cat="" data-i18n="cat_all" class="cat-chip active flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">All</button>
+            <button data-cat="Unskilled" data-i18n="cat_unskilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Unskilled</button>
+            <button data-cat="Semi-skilled" data-i18n="cat_semi" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Semi-skilled</button>
+            <button data-cat="Skilled" data-i18n="cat_skilled" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Skilled</button>
+            <button data-cat="Highly Skilled" data-i18n="cat_highly" class="cat-chip flex-shrink-0 text-sm font-semibold px-3.5 py-1.5 rounded-full bg-white border border-gray-200">Highly Skilled</button>
           </div>
 
           <div id="browseList" class="flex flex-col gap-3 lg:grid lg:grid-cols-2 xl:grid-cols-3"></div>
@@ -98,16 +102,16 @@
     <!-- Bottom Navigation (mobile only) -->
     <nav class="absolute bottom-0 w-full bg-white border-t border-gray-200 flex justify-between items-center pb-safe pt-2 px-2 z-50 h-[70px] lg:hidden">
       <a href="get-hired.html" class="flex-1 flex flex-col items-center justify-center text-gray-400 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-semibold">Home</span>
+        <i data-lucide="home" class="w-[22px] h-[22px] mb-1"></i><span data-i18n="nav_home" class="text-[11px] font-semibold">Home</span>
       </a>
       <a href="worker-jobs.html" class="flex-1 flex flex-col items-center justify-center text-gray-900 h-full">
-        <i data-lucide="briefcase" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-bold">Jobs</span>
+        <i data-lucide="briefcase" class="w-[22px] h-[22px] mb-1"></i><span data-i18n="nav_jobs" class="text-[11px] font-bold">Jobs</span>
       </a>
       <a href="worker-news.html" class="flex-1 flex flex-col items-center justify-center text-gray-400 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="newspaper" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-semibold">News</span>
+        <i data-lucide="newspaper" class="w-[22px] h-[22px] mb-1"></i><span data-i18n="nav_news" class="text-[11px] font-semibold">News</span>
       </a>
       <a href="worker-profile.html" class="flex-1 flex flex-col items-center justify-center text-gray-400 h-full active:bg-gray-50 rounded-xl transition-colors">
-        <i data-lucide="user" class="w-[22px] h-[22px] mb-1"></i><span class="text-[11px] font-semibold">Profile</span>
+        <i data-lucide="user" class="w-[22px] h-[22px] mb-1"></i><span data-i18n="nav_profile" class="text-[11px] font-semibold">Profile</span>
       </a>
     </nav>
   </main>
@@ -125,7 +129,8 @@
     const $ = (id) => document.getElementById(id);
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => (
       { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    const wageStr = (j) => j.wage_amount ? `₹${Number(j.wage_amount).toLocaleString('en-IN')}/${j.wage_period || 'day'}` : 'Wage on apply';
+    const T = (k, fb) => (window.SSi18n ? SSi18n.t(k) : fb);
+    const wageStr = (j) => j.wage_amount ? `₹${Number(j.wage_amount).toLocaleString('en-IN')}/${j.wage_period || 'day'}` : T('wage_on_apply', 'Wage on apply');
 
     // ============================================
     // AUTH GATE
@@ -152,6 +157,12 @@
     $('tabBrowse').addEventListener('click', () => switchTab('browse'));
     $('tabApps').addEventListener('click', () => switchTab('apps'));
 
+    // Re-render dynamic lists when the language is switched
+    document.addEventListener('ss-lang-changed', () => {
+      if (!$('browseView').classList.contains('hidden')) renderBrowse();
+      else loadApps();
+    });
+
     function switchTab(which) {
       const browse = which === 'browse';
       $('tabBrowse').classList.toggle('active', browse);
@@ -173,7 +184,7 @@
         .eq('status', 'Open')
         .order('created_at', { ascending: false });
 
-      if (error) { console.error('[jobs] browse', error); $('browseList').innerHTML = emptyState('Could not load jobs'); return; }
+      if (error) { console.error('[jobs] browse', error); $('browseList').innerHTML = emptyState(T('err_load_jobs', 'Could not load jobs')); return; }
 
       _jobs = data || [];
       _appliedJobIds = new Set(_jobs.filter(j => j.job_applications && j.job_applications.length).map(j => j.id));
@@ -189,7 +200,7 @@
       });
 
       if (!list.length) {
-        $('browseList').innerHTML = emptyState(_jobs.length ? 'No jobs match your search' : 'No open jobs right now');
+        $('browseList').innerHTML = emptyState(_jobs.length ? T('empty_search', 'No jobs match your search') : T('empty_jobs', 'No open jobs right now'));
         if (window.lucide) lucide.createIcons();
         return;
       }
@@ -205,8 +216,8 @@
     function jobCard(j) {
       const applied = _appliedJobIds.has(j.id);
       const btn = applied
-        ? `<button disabled class="w-full mt-4 bg-gray-100 text-gray-500 font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Applied</button>`
-        : `<button data-apply="${j.id}" class="w-full mt-4 bg-gray-900 text-white font-bold py-3 rounded-xl text-sm active:bg-gray-700 transition-colors">Apply Now</button>`;
+        ? `<button disabled class="w-full mt-4 bg-gray-100 text-gray-500 font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> ${T('job_applied', 'Applied')}</button>`
+        : `<button data-apply="${j.id}" class="w-full mt-4 bg-gray-900 text-white font-bold py-3 rounded-xl text-sm active:bg-gray-700 transition-colors">${T('job_apply', 'Apply Now')}</button>`;
 
       return `<div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm fade-in">
         <div class="flex justify-between items-start gap-2">
@@ -226,15 +237,15 @@
 
     async function apply(jobId, btn) {
       btn.disabled = true;
-      btn.innerHTML = 'Applying…';
+      btn.innerHTML = T('job_applying', 'Applying…');
       const { error } = await sb.from('job_applications').insert({ job_id: jobId, employee_id: _empId });
       if (error && error.code !== '23505') { // 23505 = already applied (unique violation)
         console.error('[jobs] apply', error);
-        btn.disabled = false; btn.textContent = 'Apply Now';
+        btn.disabled = false; btn.textContent = T('job_apply', 'Apply Now');
         return;
       }
       _appliedJobIds.add(jobId);
-      btn.outerHTML = `<button disabled class="w-full mt-4 bg-gray-100 text-gray-500 font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Applied</button>`;
+      btn.outerHTML = `<button disabled class="w-full mt-4 bg-gray-100 text-gray-500 font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> ${T('job_applied', 'Applied')}</button>`;
       if (window.lucide) lucide.createIcons();
     }
 
@@ -263,9 +274,9 @@
         .eq('employee_id', _empId)
         .order('applied_at', { ascending: false });
 
-      if (error) { console.error('[jobs] apps', error); $('appsList').innerHTML = emptyState('Could not load applications'); return; }
+      if (error) { console.error('[jobs] apps', error); $('appsList').innerHTML = emptyState(T('err_load_jobs', 'Could not load applications')); return; }
       if (!data || !data.length) {
-        $('appsList').innerHTML = emptyState('You haven’t applied to any jobs yet');
+        $('appsList').innerHTML = emptyState(T('empty_apps', 'You have not applied to any jobs yet'));
         if (window.lucide) lucide.createIcons();
         return;
       }
