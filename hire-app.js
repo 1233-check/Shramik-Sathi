@@ -81,9 +81,58 @@
       loadMedical(),
       loadPasses(),
       loadEditRequests(),
+      loadCompanyNews(),
       loadComplianceStats()
     ]);
   }
+
+  // ============================================
+  // COMPANY NEWS: post + manage updates shown to workers
+  // ============================================
+  async function loadCompanyNews() {
+    const tbody = document.getElementById('newsTbody');
+    if (!tbody) return;
+    const { data, error } = await sb.from('company_news')
+      .select('*').order('created_at', { ascending: false }).limit(50);
+    if (error) { console.error('[news]', error); return; }
+    if (!data || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">No news posted yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map((n, i) => `<tr class="${i % 2 ? 'bg-[#f9f9f9]' : ''} border-b border-slate-200">
+      <td class="p-2 border-r border-slate-200">${escapeHtml(n.category)}</td>
+      <td class="p-2 border-r border-slate-200 font-semibold">${escapeHtml(n.title)}</td>
+      <td class="p-2 border-r border-slate-200 text-center text-[12px]">${n.created_at ? new Date(n.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : ''}</td>
+      <td class="p-2 text-center"><button class="news-del px-2 py-1 bg-red-500 text-white text-[11px] rounded font-bold hover:bg-red-600" data-id="${escapeHtml(n.id)}">Delete</button></td>
+    </tr>`).join('');
+    tbody.querySelectorAll('.news-del').forEach(b => b.addEventListener('click', () => deleteNews(b.dataset.id)));
+  }
+
+  async function postNews() {
+    const cat = document.getElementById('newsCategory').value;
+    const title = document.getElementById('newsTitle').value.trim();
+    const body = document.getElementById('newsBody').value.trim();
+    const msg = document.getElementById('newsPostMsg');
+    if (!title) { msg.style.color = '#b91c1c'; msg.textContent = 'Title is required.'; return; }
+    if (!_company) { return; }
+    msg.style.color = '#475569'; msg.textContent = 'Posting…';
+    const { error } = await sb.from('company_news').insert({ company_id: _company.id, title, body: body || null, category: cat });
+    if (error) { msg.style.color = '#b91c1c'; msg.textContent = 'Failed: ' + error.message; return; }
+    document.getElementById('newsTitle').value = '';
+    document.getElementById('newsBody').value = '';
+    msg.style.color = '#059669'; msg.textContent = 'Posted ✓';
+    setTimeout(() => { msg.textContent = ''; }, 2500);
+    loadCompanyNews();
+  }
+
+  async function deleteNews(id) {
+    if (!confirm('Delete this news post?')) return;
+    const { error } = await sb.from('company_news').delete().eq('id', id);
+    if (error) { alert('Could not delete: ' + error.message); return; }
+    loadCompanyNews();
+  }
+
+  document.getElementById('postNewsBtn')?.addEventListener('click', postNews);
 
   // ============================================
   // PROFILE EDIT REQUESTS: worker changes awaiting employer approval
