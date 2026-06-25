@@ -9,6 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="i18n.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -76,6 +77,24 @@
         </button>
         <p id="editPendingBanner" data-i18n="edit_pending" class="hidden text-[12px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5 mt-2">⏳ Profile changes awaiting employer approval</p>
       </div>
+
+      <!-- Digital ID card -->
+      <section class="p-4 mt-2 fade-in lg:col-span-2">
+        <h3 data-i18n="sec_digital_id" class="text-[13px] font-bold text-[#8b928f] uppercase tracking-wider mb-3 px-1">Digital ID</h3>
+        <div class="bg-[#4a5c54] rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-28 h-28 bg-white/10 rounded-full -translate-y-1/3 translate-x-1/3"></div>
+          <div class="relative flex items-center gap-4">
+            <div class="w-16 h-16 rounded-xl bg-white/15 flex items-center justify-center text-2xl font-bold bg-cover bg-center flex-shrink-0" id="idAvatar">SS</div>
+            <div class="min-w-0 flex-1">
+              <p class="font-extrabold text-lg leading-tight truncate" id="idName">—</p>
+              <p class="text-[13px] text-white/80 truncate" id="idDesignation">—</p>
+              <p class="text-[12px] font-mono mt-1 text-white/90" id="idUid">—</p>
+            </div>
+            <div class="bg-white p-1.5 rounded-lg flex-shrink-0 w-[64px] h-[64px] flex items-center justify-center" id="idQr"></div>
+          </div>
+          <p data-i18n="id_scan_hint" class="relative text-[11px] text-white/70 mt-3 text-center">Show this at the site gate for verification</p>
+        </div>
+      </section>
 
       <!-- Identity Details -->
       <section class="p-4 mt-2 fade-in" style="animation-delay:0.05s">
@@ -345,6 +364,27 @@
       return parts[0].slice(0, 2).toUpperCase();
     }
 
+    // Digital ID card — name, designation, SS-… ID, photo + a QR of the worker's ID
+    function renderDigitalId(emp) {
+      document.getElementById('idName').textContent = emp.full_name || 'Worker';
+      document.getElementById('idDesignation').textContent = emp.designation || emp.category || 'Employee';
+      document.getElementById('idUid').textContent = emp.ss_uid || emp.emp_id || '—';
+      const av = document.getElementById('idAvatar');
+      if (emp.photo_url) { av.textContent = ''; av.style.backgroundImage = `url("${emp.photo_url}")`; }
+      else av.textContent = getInitials(emp.full_name);
+      try {
+        if (typeof qrcode === 'function') {
+          const qr = qrcode(0, 'M');
+          qr.addData(emp.ss_uid || emp.emp_id || 'SHRAMIK-SATHI');
+          qr.make();
+          const box = document.getElementById('idQr');
+          box.innerHTML = qr.createImgTag(2, 0);
+          const img = box.querySelector('img');
+          if (img) { img.style.width = '100%'; img.style.height = '100%'; img.style.imageRendering = 'pixelated'; }
+        }
+      } catch (e) { console.warn('ID QR generation failed', e); }
+    }
+
     // ============================================
     // AUTH GUARD + LOAD PROFILE DATA
     // ============================================
@@ -368,6 +408,9 @@
         document.getElementById('profileName').textContent = emp.full_name || 'Worker';
         document.getElementById('profileDesignation').textContent =
           [emp.designation, emp.emp_id ? `ID: ${emp.emp_id}` : null].filter(Boolean).join(' | ') || 'Employee';
+
+        // — Digital ID card —
+        renderDigitalId(emp);
 
         // — Status badge —
         const badge = document.getElementById('profileStatus');
