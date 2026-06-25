@@ -13,6 +13,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="i18n.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -166,6 +167,8 @@
   </div>
 
   <div class="content">
+    <button data-ss-lang-toggle style="position:fixed;top:14px;right:14px;z-index:60;height:34px;min-width:42px;padding:0 12px;border-radius:9999px;background:var(--glass);border:1px solid var(--border);color:var(--text,#e2e8f0);font-weight:700;font-size:13px;cursor:pointer;">हिं</button>
+
     <!-- Header -->
     <div class="reg-header" id="regHeader">
       <div style="display:flex;justify-content:center;margin-bottom:14px;">
@@ -179,8 +182,8 @@
           <input type="file" id="regAvatarInput" accept="image/*" style="display:none">
         </div>
       </div>
-      <h1>Complete Your <span>Profile</span></h1>
-      <p>Fill in your details as per your Aadhar card and official documents. This is required for compliance.</p>
+      <h1 data-i18n="reg_title">Complete Your Profile</h1>
+      <p data-i18n="reg_subtitle">Fill in your details as per your Aadhar card and official documents. This is required for compliance.</p>
       <p id="regAvatarStatus" style="font-size:12px;min-height:16px;margin-top:6px;"></p>
     </div>
 
@@ -201,27 +204,27 @@
     <!-- STEP 1: Personal Information -->
     <!-- ============================================ -->
     <div class="form-step active" id="step1">
-      <div class="section-badge"><i data-lucide="user" style="width:14px;height:14px"></i> Personal Information</div>
+      <div class="section-badge"><i data-lucide="user" style="width:14px;height:14px"></i> <span data-i18n="reg_badge_personal">Personal Information</span></div>
 
       <div class="field">
-        <label>Full Name (as per Aadhar) <span class="req">*</span></label>
-        <input type="text" id="fullName" placeholder="Enter your full name" required>
+        <label><span data-i18n="reg_l_fullname">Full Name (as per Aadhar)</span> <span class="req">*</span></label>
+        <input type="text" id="fullName" data-i18n-ph="reg_ph_fullname" placeholder="Enter your full name" required>
       </div>
 
       <div class="field">
-        <label>Father's / Husband's Name <span class="req">*</span></label>
-        <input type="text" id="fatherName" placeholder="Father's or Husband's name">
+        <label><span data-i18n="reg_l_father">Father's / Husband's Name</span> <span class="req">*</span></label>
+        <input type="text" id="fatherName" data-i18n-ph="reg_ph_father" placeholder="Father's or Husband's name">
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label>Date of Birth <span class="req">*</span></label>
+          <label><span data-i18n="reg_l_dob">Date of Birth</span> <span class="req">*</span></label>
           <input type="date" id="dob" required>
         </div>
         <div class="field">
-          <label>Gender <span class="req">*</span></label>
+          <label><span data-i18n="reg_l_gender">Gender</span> <span class="req">*</span></label>
           <select id="gender" required>
-            <option value="">Select</option>
+            <option value="" data-i18n="reg_opt_select">Select</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
@@ -231,26 +234,26 @@
 
       <div class="field-row">
         <div class="field">
-          <label>Blood Group</label>
+          <label data-i18n="reg_l_blood">Blood Group</label>
           <select id="bloodGroup">
-            <option value="">Select</option>
+            <option value="" data-i18n="reg_opt_select">Select</option>
             <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
             <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
           </select>
         </div>
         <div class="field">
-          <label>Marital Status</label>
+          <label data-i18n="reg_l_marital">Marital Status</label>
           <select id="maritalStatus">
-            <option value="">Select</option>
+            <option value="" data-i18n="reg_opt_select">Select</option>
             <option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option>
           </select>
         </div>
       </div>
 
       <div class="field">
-        <label>Identification Mark</label>
-        <input type="text" id="identityMark" placeholder="e.g. Mole on left cheek">
-        <span class="hint">As required under Factories Act, 1948 — Form No. 25-B</span>
+        <label data-i18n="reg_l_idmark">Identification Mark</label>
+        <input type="text" id="identityMark" data-i18n-ph="reg_ph_idmark" placeholder="e.g. Mole on left cheek">
+        <span class="hint" data-i18n="reg_hint_idmark">As required under Factories Act, 1948 — Form No. 25-B</span>
       </div>
 
       <div class="info-banner">
@@ -259,7 +262,7 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn-next" onclick="goToStep(2)">Next — Contact Details <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+        <button class="btn-next" onclick="goToStep(2)"><span data-i18n="reg_next_contact">Next — Contact Details</span> <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
       </div>
     </div>
 
@@ -267,28 +270,28 @@
     <!-- STEP 2: Contact & Address -->
     <!-- ============================================ -->
     <div class="form-step" id="step2">
-      <div class="section-badge"><i data-lucide="map-pin" style="width:14px;height:14px"></i> Contact & Address</div>
+      <div class="section-badge"><i data-lucide="map-pin" style="width:14px;height:14px"></i> <span data-i18n="reg_badge_contact">Contact & Address</span></div>
 
       <div class="field">
-        <label>Mobile Number <span class="req">*</span></label>
-        <input type="tel" id="mobile" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" required>
+        <label><span data-i18n="reg_l_mobile">Mobile Number</span> <span class="req">*</span></label>
+        <input type="tel" id="mobile" data-i18n-ph="reg_ph_mobile" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" required>
       </div>
 
       <div class="field">
-        <label>Emergency Contact Number <span class="req">*</span></label>
-        <input type="tel" id="emergencyContact" placeholder="Family/relative number" maxlength="10" inputmode="numeric">
+        <label><span data-i18n="reg_l_emergency">Emergency Contact Number</span> <span class="req">*</span></label>
+        <input type="tel" id="emergencyContact" data-i18n-ph="reg_ph_emergency" placeholder="Family/relative number" maxlength="10" inputmode="numeric">
       </div>
 
       <div class="field">
-        <label>Permanent Address <span class="req">*</span></label>
-        <textarea id="address" placeholder="Full address including village/town, district" required></textarea>
+        <label><span data-i18n="reg_l_address">Permanent Address</span> <span class="req">*</span></label>
+        <textarea id="address" data-i18n-ph="reg_ph_address" placeholder="Full address including village/town, district" required></textarea>
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label>State <span class="req">*</span></label>
+          <label><span data-i18n="reg_l_state">State</span> <span class="req">*</span></label>
           <select id="state" required>
-            <option value="">Select State</option>
+            <option value="" data-i18n="reg_opt_state">Select State</option>
             <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
             <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option>
             <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
@@ -303,14 +306,14 @@
           </select>
         </div>
         <div class="field">
-          <label>PIN Code <span class="req">*</span></label>
-          <input type="text" id="pinCode" placeholder="6-digit PIN" maxlength="6" inputmode="numeric" required>
+          <label><span data-i18n="reg_l_pin">PIN Code</span> <span class="req">*</span></label>
+          <input type="text" id="pinCode" data-i18n-ph="reg_ph_pin" placeholder="6-digit PIN" maxlength="6" inputmode="numeric" required>
         </div>
       </div>
 
       <div class="btn-row">
-        <button class="btn-back" onclick="goToStep(1)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back</button>
-        <button class="btn-next" onclick="goToStep(3)">Next — ID & Compliance <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+        <button class="btn-back" onclick="goToStep(1)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> <span data-i18n="reg_back">Back</span></button>
+        <button class="btn-next" onclick="goToStep(3)"><span data-i18n="reg_next_id">Next — ID & Compliance</span> <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
       </div>
     </div>
 
@@ -318,35 +321,35 @@
     <!-- STEP 3: Compliance & Government IDs -->
     <!-- ============================================ -->
     <div class="form-step" id="step3">
-      <div class="section-badge"><i data-lucide="shield-check" style="width:14px;height:14px"></i> Compliance & IDs</div>
+      <div class="section-badge"><i data-lucide="shield-check" style="width:14px;height:14px"></i> <span data-i18n="reg_badge_compliance">Compliance & IDs</span></div>
 
       <div class="field">
-        <label>Aadhar Number <span class="req">*</span></label>
-        <input type="text" id="aadharNo" placeholder="12-digit Aadhar number" maxlength="14" inputmode="numeric" required>
-        <span class="hint">Required for UAN/PF registration (EPFO Form 11) and ESIC (Form 1).</span>
+        <label><span data-i18n="reg_l_aadhar">Aadhar Number</span> <span class="req">*</span></label>
+        <input type="text" id="aadharNo" data-i18n-ph="reg_ph_aadhar" placeholder="12-digit Aadhar number" maxlength="14" inputmode="numeric" required>
+        <span class="hint" data-i18n="reg_hint_aadhar">Required for UAN/PF registration (EPFO Form 11) and ESIC (Form 1).</span>
       </div>
 
       <div class="field">
-        <label>PAN Number</label>
+        <label data-i18n="reg_l_pan">PAN Number</label>
         <input type="text" id="panNo" placeholder="e.g. ABCDE1234F" maxlength="10" style="text-transform:uppercase">
-        <span class="hint">Required if salary exceeds ₹2,50,000/year (Income Tax Act, Section 206AA).</span>
+        <span class="hint" data-i18n="reg_hint_pan">Required if salary exceeds ₹2,50,000/year (Income Tax Act, Section 206AA).</span>
       </div>
 
       <div class="field">
-        <label>Voter ID</label>
-        <input type="text" id="voterId" placeholder="Voter ID card number">
+        <label data-i18n="reg_l_voter">Voter ID</label>
+        <input type="text" id="voterId" data-i18n-ph="reg_ph_voter" placeholder="Voter ID card number">
       </div>
 
       <div class="field-row">
         <div class="field">
-          <label>UAN Number (PF)</label>
-          <input type="text" id="uanNo" placeholder="12-digit UAN" maxlength="12" inputmode="numeric">
-          <span class="hint">If previously enrolled in EPF.</span>
+          <label data-i18n="reg_l_uan">UAN Number (PF)</label>
+          <input type="text" id="uanNo" data-i18n-ph="reg_ph_uan" placeholder="12-digit UAN" maxlength="12" inputmode="numeric">
+          <span class="hint" data-i18n="reg_hint_uan">If previously enrolled in EPF.</span>
         </div>
         <div class="field">
-          <label>ESIC Number</label>
-          <input type="text" id="esiNo" placeholder="17-digit ESIC IP No" maxlength="17" inputmode="numeric">
-          <span class="hint">If previously registered.</span>
+          <label data-i18n="reg_l_esic">ESIC Number</label>
+          <input type="text" id="esiNo" data-i18n-ph="reg_ph_esic" placeholder="17-digit ESIC IP No" maxlength="17" inputmode="numeric">
+          <span class="hint" data-i18n="reg_hint_esic">If previously registered.</span>
         </div>
       </div>
 
@@ -356,8 +359,8 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn-back" onclick="goToStep(2)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back</button>
-        <button class="btn-next" onclick="goToStep(4)">Next — Bank Details <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+        <button class="btn-back" onclick="goToStep(2)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> <span data-i18n="reg_back">Back</span></button>
+        <button class="btn-next" onclick="goToStep(4)"><span data-i18n="reg_next_bank">Next — Bank Details</span> <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
       </div>
     </div>
 
@@ -365,20 +368,20 @@
     <!-- STEP 4: Bank Details -->
     <!-- ============================================ -->
     <div class="form-step" id="step4">
-      <div class="section-badge"><i data-lucide="landmark" style="width:14px;height:14px"></i> Bank Account Details</div>
+      <div class="section-badge"><i data-lucide="landmark" style="width:14px;height:14px"></i> <span data-i18n="reg_badge_bank">Bank Account Details</span></div>
 
       <div class="field">
-        <label>Bank Name <span class="req">*</span></label>
-        <input type="text" id="bankName" placeholder="e.g. State Bank of India" required>
+        <label><span data-i18n="reg_l_bank">Bank Name</span> <span class="req">*</span></label>
+        <input type="text" id="bankName" data-i18n-ph="reg_ph_bank" placeholder="e.g. State Bank of India" required>
       </div>
 
       <div class="field">
-        <label>Account Number <span class="req">*</span></label>
-        <input type="text" id="accountNo" placeholder="Savings account number" inputmode="numeric" required>
+        <label><span data-i18n="reg_l_account">Account Number</span> <span class="req">*</span></label>
+        <input type="text" id="accountNo" data-i18n-ph="reg_ph_account" placeholder="Savings account number" inputmode="numeric" required>
       </div>
 
       <div class="field">
-        <label>IFSC Code <span class="req">*</span></label>
+        <label><span data-i18n="reg_l_ifsc">IFSC Code</span> <span class="req">*</span></label>
         <input type="text" id="ifscCode" placeholder="e.g. SBIN0001234" maxlength="11" style="text-transform:uppercase" required>
       </div>
 
@@ -388,8 +391,8 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn-back" onclick="goToStep(3)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back</button>
-        <button class="btn-next" onclick="goToStep(5)">Next — Trade & Skill <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+        <button class="btn-back" onclick="goToStep(3)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> <span data-i18n="reg_back">Back</span></button>
+        <button class="btn-next" onclick="goToStep(5)"><span data-i18n="reg_next_trade">Next — Trade & Skill</span> <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
       </div>
     </div>
 
@@ -397,24 +400,24 @@
     <!-- STEP 5: Trade/Skill & Declaration -->
     <!-- ============================================ -->
     <div class="form-step" id="step5">
-      <div class="section-badge"><i data-lucide="wrench" style="width:14px;height:14px"></i> Trade & Skill</div>
+      <div class="section-badge"><i data-lucide="wrench" style="width:14px;height:14px"></i> <span data-i18n="reg_badge_trade">Trade & Skill</span></div>
 
       <div class="field">
-        <label>Category <span class="req">*</span></label>
+        <label><span data-i18n="reg_l_category">Category</span> <span class="req">*</span></label>
         <select id="category" required>
-          <option value="">Select Skill Category</option>
+          <option value="" data-i18n="reg_opt_category">Select Skill Category</option>
           <option value="Unskilled">Unskilled</option>
           <option value="Semi-skilled">Semi-skilled</option>
           <option value="Skilled">Skilled</option>
           <option value="Highly Skilled">Highly Skilled</option>
         </select>
-        <span class="hint">As classified under the Minimum Wages Act, 1948 (Central/State Schedule).</span>
+        <span class="hint" data-i18n="reg_hint_category">As classified under the Minimum Wages Act, 1948 (Central/State Schedule).</span>
       </div>
 
       <div class="field">
-        <label>Trade / Designation <span class="req">*</span></label>
+        <label><span data-i18n="reg_l_trade">Trade / Designation</span> <span class="req">*</span></label>
         <select id="designation" required>
-          <option value="">Select your trade</option>
+          <option value="" data-i18n="reg_opt_trade">Select your trade</option>
           <option>Fitter</option><option>Welder (MIG/TIG)</option>
           <option>Electrician</option><option>Crane Operator</option>
           <option>Rigger</option><option>Scaffolder</option>
@@ -426,12 +429,12 @@
           <option>Security Guard</option><option>Housekeeping</option>
           <option>Office Boy / Peon</option><option>Other</option>
         </select>
-        <input type="text" id="designationOther" placeholder="Type your trade — what do you do?" style="display:none;margin-top:10px;">
-        <span class="hint" id="designationOtherHint" style="display:none;">Tell us your actual work so employers understand your skills.</span>
+        <input type="text" id="designationOther" data-i18n-ph="reg_ph_designation_other" placeholder="Type your trade — what do you do?" style="display:none;margin-top:10px;">
+        <span class="hint" id="designationOtherHint" data-i18n="reg_hint_designation_other" style="display:none;">Tell us your actual work so employers understand your skills.</span>
       </div>
 
       <div class="field">
-        <label>Employee Type</label>
+        <label data-i18n="reg_l_emptype">Employee Type</label>
         <select id="employeeType">
           <option value="Contractual">Contractual (Contract Labour)</option>
           <option value="Permanent">Permanent / Regular</option>
@@ -446,21 +449,21 @@
       </div>
 
       <div class="btn-row">
-        <button class="btn-back" onclick="goToStep(4)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> Back</button>
-        <button class="btn-next" id="submitBtn" onclick="submitRegistration()">Submit & Complete <i data-lucide="check" style="width:18px;height:18px"></i></button>
+        <button class="btn-back" onclick="goToStep(4)"><i data-lucide="arrow-left" style="width:16px;height:16px"></i> <span data-i18n="reg_back">Back</span></button>
+        <button class="btn-next" id="submitBtn" onclick="submitRegistration()"><span data-i18n="reg_submit">Submit & Complete</span> <i data-lucide="check" style="width:18px;height:18px"></i></button>
       </div>
     </div>
 
     <!-- SUCCESS SCREEN -->
     <div class="success-screen" id="successScreen">
       <div class="success-check"><i data-lucide="check" style="width:40px;height:40px;color:white;stroke-width:3"></i></div>
-      <h2>Registration Complete!</h2>
-      <p>Your profile is saved. This is your permanent Shramik Sathi ID:</p>
+      <h2 data-i18n="reg_done_title">Registration Complete!</h2>
+      <p data-i18n="reg_done_msg">Your profile is saved. This is your permanent Shramik Sathi ID:</p>
       <div style="display:inline-flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--border);border-radius:9999px;padding:8px 16px;">
         <i data-lucide="badge-check" style="width:16px;height:16px;color:var(--emerald-light)"></i>
         <span id="successUid" style="font-size:16px;font-weight:800;color:var(--text);letter-spacing:0.5px;">—</span>
       </div>
-      <p style="font-size:12px;">Taking you to your dashboard…</p>
+      <p style="font-size:12px;" data-i18n="reg_done_redirect">Taking you to your dashboard…</p>
     </div>
   </div>
 </div>
