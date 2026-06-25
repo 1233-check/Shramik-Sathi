@@ -142,7 +142,7 @@
           </div>
 
           <!-- PAN card -->
-          <div class="p-4 flex items-center justify-between gap-3">
+          <div class="p-4 border-b border-gray-100 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0">
               <div class="text-[#8b928f]"><i data-lucide="credit-card" class="w-5 h-5"></i></div>
               <div class="min-w-0">
@@ -154,6 +154,22 @@
               <button type="button" id="panView" data-i18n="kyc_view" class="hidden text-xs font-bold text-[#4a5c54] border border-[#cdd4d0] px-3 py-1.5 rounded-lg active:scale-95 transition">View</button>
               <label for="panInput" data-i18n="kyc_upload" class="text-xs font-bold text-white bg-[#4a5c54] px-3 py-1.5 rounded-lg cursor-pointer active:scale-95 transition">Upload</label>
               <input type="file" id="panInput" accept="image/*" class="hidden">
+            </div>
+          </div>
+
+          <!-- Resume / CV -->
+          <div class="p-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="text-[#8b928f]"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+              <div class="min-w-0">
+                <p data-i18n="lbl_cv" class="text-xs text-[#8b928f] font-medium">Resume / CV</p>
+                <p class="text-[13px] font-bold text-[#1c211f]" id="cvDocStatus">Not uploaded</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button type="button" id="cvView" data-i18n="kyc_view" class="hidden text-xs font-bold text-[#4a5c54] border border-[#cdd4d0] px-3 py-1.5 rounded-lg active:scale-95 transition">View</button>
+              <label for="cvInput" data-i18n="kyc_upload" class="text-xs font-bold text-white bg-[#4a5c54] px-3 py-1.5 rounded-lg cursor-pointer active:scale-95 transition">Upload</label>
+              <input type="file" id="cvInput" accept=".pdf,image/*" class="hidden">
             </div>
           </div>
 
@@ -393,6 +409,7 @@
         // — KYC documents —
         renderKycStatus('aadhaar');
         renderKycStatus('pan');
+        renderCvStatus();
         checkEditPending();
 
         lucide.createIcons();
@@ -510,6 +527,48 @@
       document.getElementById(cfg.input).addEventListener('change', (e) => uploadKyc(kind, e.target.files[0]));
       document.getElementById(cfg.view).addEventListener('click', () => viewKyc(kind));
     });
+
+    // Resume / CV — private cv-documents bucket; accepts PDF or image (no downscale)
+    function renderCvStatus() {
+      const has = !!(_emp && _emp.cv_path);
+      const st = document.getElementById('cvDocStatus');
+      st.textContent = has ? 'Uploaded ✓' : 'Not uploaded';
+      st.className = 'text-[13px] font-bold ' + (has ? 'text-emerald-600' : 'text-[#8b928f]');
+      document.getElementById('cvView').classList.toggle('hidden', !has);
+    }
+    async function viewCv() {
+      const path = _emp && _emp.cv_path;
+      if (!path) return;
+      setKycMsg('Opening CV…', true);
+      const { data, error } = await sb.storage.from('cv-documents').createSignedUrl(path, 120);
+      if (error || !data) { setKycMsg('Could not open CV: ' + (error?.message || 'try again')); return; }
+      setKycMsg('');
+      window.open(data.signedUrl, '_blank', 'noopener');
+    }
+    async function uploadCv(file) {
+      if (!file || !_uid || !_emp) return;
+      const okType = file.type === 'application/pdf' || file.type.startsWith('image/');
+      if (!okType) { setKycMsg('Please choose a PDF or image.'); return; }
+      if (file.size > 5 * 1024 * 1024) { setKycMsg('File must be under 5 MB.'); return; }
+      setKycMsg('Uploading CV…', true);
+      try {
+        const ext = file.type === 'application/pdf' ? 'pdf' : 'jpg';
+        const path = `${_uid}/cv.${ext}`;
+        const { error: upErr } = await sb.storage.from('cv-documents').upload(path, file, { upsert: true, contentType: file.type });
+        if (upErr) throw upErr;
+        const { error: updErr } = await sb.from('employees').update({ cv_path: path }).eq('id', _emp.id);
+        if (updErr) throw updErr;
+        _emp.cv_path = path;
+        renderCvStatus();
+        setKycMsg('CV uploaded ✓', true);
+        setTimeout(() => setKycMsg(''), 2500);
+      } catch (err) {
+        console.error('CV upload failed:', err);
+        setKycMsg('Upload failed: ' + (err.message || 'try again'));
+      }
+    }
+    document.getElementById('cvInput').addEventListener('change', (e) => uploadCv(e.target.files[0]));
+    document.getElementById('cvView').addEventListener('click', viewCv);
 
     // ============================================
     // EDIT PROFILE
