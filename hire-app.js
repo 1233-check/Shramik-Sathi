@@ -80,8 +80,66 @@
       loadWageRegister(),
       loadMedical(),
       loadPasses(),
+      loadEditRequests(),
       loadComplianceStats()
     ]);
+  }
+
+  // ============================================
+  // PROFILE EDIT REQUESTS: worker changes awaiting employer approval
+  // ============================================
+  const EDIT_FIELD_LABELS = {
+    mobile: 'Mobile', emergency_contact: 'Emergency Contact', address: 'Address',
+    state: 'State', pin_code: 'PIN Code', bank_name: 'Bank', account_no: 'Account No', ifsc_code: 'IFSC',
+  };
+
+  async function loadEditRequests() {
+    const tbody = document.getElementById('editReqTbody');
+    if (!tbody) return;
+    const { data, error } = await sb
+      .from('profile_edit_requests')
+      .select('*, employees!inner(full_name, emp_id)')
+      .eq('status', 'Pending')
+      .order('requested_at', { ascending: false });
+
+    const badge = document.getElementById('editReqCount');
+    if (error) { console.error('[edit-req]', error); tbody.innerHTML = ''; return; }
+
+    if (badge) badge.textContent = (data && data.length) ? String(data.length) : '';
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">No pending profile-change requests.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.map((r, i) => {
+      const e = r.employees || {};
+      const changeRows = Object.entries(r.changes || {})
+        .map(([k, v]) => `<div><span class="text-slate-500">${escapeHtml(EDIT_FIELD_LABELS[k] || k)}:</span> <span class="font-semibold">${escapeHtml(v == null || v === '' ? '—' : v)}</span></div>`)
+        .join('');
+      const when = r.requested_at ? new Date(r.requested_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : '';
+      return `<tr class="${i % 2 === 1 ? 'bg-[#f9f9f9]' : ''} border-b border-slate-200 align-top">
+        <td class="p-2 border-r border-slate-200"><div class="font-bold">${escapeHtml(e.full_name || 'Unknown')}</div><div class="text-[11px] text-slate-500">${escapeHtml(e.emp_id || '')}</div></td>
+        <td class="p-2 border-r border-slate-200 text-[12px] leading-relaxed">${changeRows || '<span class="text-slate-400">—</span>'}</td>
+        <td class="p-2 border-r border-slate-200 text-center text-[12px]">${when}</td>
+        <td class="p-2 text-center whitespace-nowrap">
+          <button class="edit-req-act px-2 py-1 bg-green-600 text-white text-[11px] rounded font-bold hover:bg-green-700 mr-1" data-id="${escapeHtml(r.id)}" data-decision="Approved">✓ Approve</button>
+          <button class="edit-req-act px-2 py-1 bg-red-500 text-white text-[11px] rounded font-bold hover:bg-red-600" data-id="${escapeHtml(r.id)}" data-decision="Rejected">✗ Reject</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    tbody.querySelectorAll('.edit-req-act').forEach(btn => {
+      btn.addEventListener('click', () => decideEditRequest(btn.dataset.id, btn.dataset.decision, btn));
+    });
+  }
+
+  async function decideEditRequest(id, decision, btn) {
+    btn.disabled = true;
+    const { error } = await sb.from('profile_edit_requests').update({ status: decision }).eq('id', id);
+    if (error) { btn.disabled = false; alert('Could not update request: ' + error.message); return; }
+    loadEditRequests();      // refresh the list (+ badge)
+    if (decision === 'Approved') loadEmployees();  // approved changes now live on the worker
   }
 
   // ============================================

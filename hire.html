@@ -199,6 +199,7 @@
         <button data-tab="medical" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Medical Clearances</button>
         <button data-tab="bpass" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">B-Pass / C-Pass</button>
         <button data-tab="reports" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Compliance Reports</button>
+        <button data-tab="editRequests" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Edit Requests <span id="editReqCount" class="ml-1 inline-block min-w-4 text-amber-300 font-bold"></span></button>
         <a href="attendance.html" class="px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0 flex items-center gap-1">Attendance ↗</a>
         <a href="statutory-registers.html" class="px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0 flex items-center gap-1">Registers ↗</a>
         <a href="muster-roll.html" class="px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0 flex items-center gap-1">Muster Roll ↗</a>
@@ -537,6 +538,24 @@
           <div class="bg-emerald-50 p-3 border-t border-slate-300 flex items-center gap-2 text-sm text-emerald-800 font-semibold"><i data-lucide="shield-check" class="w-4 h-4"></i> Overall compliance score: 93% — 6 of 8 areas fully compliant. Last audit: 15-Apr-2026 by Labour Inspector, East Singhbhum.</div>
         </div>
       </div><!-- end reports tab -->
+
+      <!-- TAB: Profile Edit Requests -->
+      <div data-tab-content="editRequests" class="tab-panel hidden">
+        <div class="bg-white border border-slate-300 shadow-sm overflow-x-auto">
+          <div class="bg-[#f5f5f5] border-b border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700">Profile change requests — review &amp; approve worker edits</div>
+          <table class="w-full text-left text-sm border-collapse">
+            <thead class="bg-[#eef2f6] text-[11px] uppercase tracking-wider text-slate-600">
+              <tr>
+                <th class="p-2 border-r border-slate-200">Worker</th>
+                <th class="p-2 border-r border-slate-200">Requested changes</th>
+                <th class="p-2 border-r border-slate-200 text-center">Date</th>
+                <th class="p-2 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="editReqTbody" class="text-[13px] text-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
 
     </div>
 
