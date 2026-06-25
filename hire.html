@@ -200,6 +200,7 @@
         <button data-tab="bpass" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">B-Pass / C-Pass</button>
         <button data-tab="reports" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Compliance Reports</button>
         <button data-tab="editRequests" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Edit Requests <span id="editReqCount" class="ml-1 inline-block min-w-4 text-amber-300 font-bold"></span></button>
+        <button data-tab="companyNews" class="clms-tab px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0">Company News</button>
         <a href="attendance.html" class="px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0 flex items-center gap-1">Attendance ↗</a>
         <a href="statutory-registers.html" class="px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0 flex items-center gap-1">Registers ↗</a>
         <a href="muster-roll.html" class="px-3 sm:px-4 py-2.5 border-r border-[#004080] hover:bg-[#003d7a] flex-shrink-0 flex items-center gap-1">Muster Roll ↗</a>
@@ -553,6 +554,47 @@
               </tr>
             </thead>
             <tbody id="editReqTbody" class="text-[13px] text-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: Company News -->
+      <div data-tab-content="companyNews" class="tab-panel hidden">
+        <div class="bg-white border border-slate-300 shadow-sm p-4 mb-4">
+          <div class="text-sm font-bold text-slate-700 mb-3">Post an update to your workers</div>
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Category</label>
+              <select id="newsCategory" class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
+                <option>General</option><option>Payroll</option><option>Safety</option><option>Health</option><option>Policy</option>
+              </select>
+            </div>
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Title</label>
+              <input id="newsTitle" type="text" placeholder="e.g. Diwali bonus credited on 25th" class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]">
+            </div>
+            <div class="sm:col-span-4">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Details</label>
+              <textarea id="newsBody" rows="2" placeholder="Write the announcement…" class="w-full border border-slate-300 p-1.5 text-sm focus:outline-none focus:border-[#0055a5]"></textarea>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 mt-3">
+            <button id="postNewsBtn" class="px-4 py-2 bg-[#0055a5] text-white text-sm font-bold rounded hover:bg-[#003d7a]">Post News</button>
+            <span id="newsPostMsg" class="text-xs font-semibold"></span>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-300 shadow-sm overflow-x-auto">
+          <div class="bg-[#f5f5f5] border-b border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700">Published news</div>
+          <table class="w-full text-left text-sm border-collapse">
+            <thead class="bg-[#eef2f6] text-[11px] uppercase tracking-wider text-slate-600">
+              <tr>
+                <th class="p-2 border-r border-slate-200">Category</th>
+                <th class="p-2 border-r border-slate-200">Title</th>
+                <th class="p-2 border-r border-slate-200 text-center">Posted</th>
+                <th class="p-2 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="newsTbody" class="text-[13px] text-slate-800"></tbody>
           </table>
         </div>
       </div>
