@@ -14,6 +14,8 @@
   <script src="supabase-config.js"></script>
   <script src="i18n.js"></script>
   <script src="notifications.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="pdf-generator.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -183,7 +185,7 @@
             <span data-i18n="act_report" class="font-semibold text-gray-700 text-[11px] leading-tight text-center">Report Issue</span>
           </button>
 
-          <button id="viewPayslipBtn" onclick="alert('Your payslip for this month has not been generated yet. Payslips are issued on the 1st of every month.')" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-[#e2e4e2] flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
+          <button id="viewPayslipBtn" class="action-card bg-white p-4 rounded-2xl shadow-sm border border-[#e2e4e2] flex flex-col items-center justify-center gap-2.5 min-h-[100px]">
             <div class="w-12 h-12 rounded-2xl bg-gray-50 text-slate-600 flex items-center justify-center border border-gray-100">
               <i data-lucide="receipt-indian-rupee" class="w-6 h-6"></i>
             </div>
@@ -889,6 +891,24 @@
     document.getElementById('advanceAmount')?.addEventListener('input', updateAdvPreview);
     document.getElementById('advanceRepay')?.addEventListener('change', updateAdvPreview);
     document.getElementById('advanceSalaryBtn')?.addEventListener('click', () => { document.getElementById('advanceModal').style.display = 'flex'; updateAdvPreview(); lucide.createIcons(); });
+
+    // Payslip — download the worker's latest wage slip as a PDF (RLS: workers read their own wages)
+    document.getElementById('viewPayslipBtn')?.addEventListener('click', async () => {
+      if (!_empId) return;
+      try {
+        const [{ data: emp }, { data: wages }] = await Promise.all([
+          sb.from('employees').select('*').eq('id', _empId).maybeSingle(),
+          sb.from('wage_records').select('*').eq('employee_id', _empId).order('created_at', { ascending: false }).limit(1),
+        ]);
+        const wage = wages && wages[0];
+        if (!wage) { alert('No payslip yet — it appears here once your employer runs payroll for the month.'); return; }
+        if (window.SSPdf && emp) SSPdf.wageSlip(emp, wage);
+        else alert('Could not generate the payslip. Please try again.');
+      } catch (e) {
+        console.error('payslip', e);
+        alert('Could not load your payslip: ' + (e.message || 'please try again'));
+      }
+    });
 
     document.getElementById('advanceForm')?.addEventListener('submit', async (e) => {
       e.preventDefault();
