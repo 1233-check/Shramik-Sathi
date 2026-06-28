@@ -23,6 +23,15 @@ ALTER TABLE employees DROP CONSTRAINT IF EXISTS employees_auth_user_id_key;
 ALTER TABLE employees ADD CONSTRAINT employees_auth_user_id_key UNIQUE (auth_user_id);
 
 -- 2. One worker per Aadhaar (partial — ignores rows without an Aadhaar) -------
+--    First de-dupe: a duplicate Aadhaar means the same person registered more
+--    than once (Aadhaar is unique per individual), so keep the EARLIEST row and
+--    remove the rest. Then the unique index can be created.
+DELETE FROM employees a
+USING employees b
+WHERE a.aadhar_no = b.aadhar_no
+  AND a.aadhar_no IS NOT NULL
+  AND a.ctid > b.ctid;
+
 CREATE UNIQUE INDEX IF NOT EXISTS uq_employees_aadhar
   ON employees (aadhar_no) WHERE aadhar_no IS NOT NULL;
 
