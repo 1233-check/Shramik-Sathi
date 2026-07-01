@@ -399,7 +399,7 @@
       const { data: records, error } = await sb
         .from('attendance')
         .select('*')
-        .eq('date', date)
+        .eq('attendance_date', date)
         .in('employee_id', empIds);
 
       if (error) {
@@ -538,18 +538,18 @@
       rows.forEach(row => {
         records.push({
           employee_id: row.dataset.employeeId,
-          date: currentDate,
+          attendance_date: currentDate,
           status: row.querySelector('.status-select').value,
           shift: row.querySelector('.shift-select').value,
           overtime_hours: parseFloat(row.querySelector('.ot-input').value) || 0,
           remarks: row.querySelector('.remarks-input').value.trim(),
-          marked_by: 'employer_portal'
+          method: 'manual'
         });
       });
 
       const { error } = await sb
         .from('attendance')
-        .upsert(records, { onConflict: 'employee_id,date' });
+        .upsert(records, { onConflict: 'employee_id,attendance_date' });
 
       btn.disabled = false;
       if (error) {
@@ -597,9 +597,9 @@
 
       const { data: records, error } = await sb
         .from('attendance')
-        .select('employee_id, date, status')
-        .gte('date', startDate)
-        .lte('date', endDate)
+        .select('employee_id, attendance_date, status')
+        .gte('attendance_date', startDate)
+        .lte('attendance_date', endDate)
         .in('employee_id', employees.map(e => e.id));
 
       if (error) {
@@ -611,7 +611,7 @@
       const attendanceMap = {};
       (records || []).forEach(r => {
         if (!attendanceMap[r.employee_id]) attendanceMap[r.employee_id] = {};
-        attendanceMap[r.employee_id][r.date] = r.status;
+        attendanceMap[r.employee_id][r.attendance_date] = r.status;
       });
 
       const tbody = document.getElementById('monthlyTbody');
@@ -768,11 +768,11 @@
         }
         records.push({
           employee_id: employeeId,
-          date: r.date,
+          attendance_date: r.date,
           status: r.status,
           shift: r.shift,
           overtime_hours: r.overtime_hours,
-          marked_by: 'csv_import',
+          method: 'manual',
         });
       });
 
@@ -786,7 +786,7 @@
 
       const { error: upsertError } = await sb
         .from('attendance')
-        .upsert(records, { onConflict: 'employee_id,date' });
+        .upsert(records, { onConflict: 'employee_id,attendance_date' });
 
       btn.disabled = false;
       if (upsertError) {
@@ -826,10 +826,10 @@
       const endDate = `${year}-${String(month).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
 
       sb.from('attendance')
-        .select('employee_id, date, status, shift, overtime_hours, remarks, employees!inner(emp_id, full_name, designation)')
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .order('date', { ascending: true })
+        .select('employee_id, attendance_date, status, shift, overtime_hours, remarks, employees!inner(emp_id, full_name, designation)')
+        .gte('attendance_date', startDate)
+        .lte('attendance_date', endDate)
+        .order('attendance_date', { ascending: true })
         .then(({ data, error }) => {
           if (error) { alert('Export failed: ' + error.message); return; }
           if (!data || !data.length) { alert('No attendance data for this month.'); return; }
@@ -837,7 +837,7 @@
           let csv = 'Emp ID,Employee Name,Designation,Date,Status,Shift,OT Hours,Remarks\n';
           data.forEach(r => {
             const emp = r.employees;
-            csv += `"${emp.emp_id}","${emp.full_name}","${emp.designation || ''}","${r.date}","${r.status}","${r.shift}","${r.overtime_hours}","${(r.remarks || '').replace(/"/g, '""')}"\n`;
+            csv += `"${emp.emp_id}","${emp.full_name}","${emp.designation || ''}","${r.attendance_date}","${r.status}","${r.shift}","${r.overtime_hours}","${(r.remarks || '').replace(/"/g, '""')}"\n`;
           });
 
           const blob = new Blob([csv], { type: 'text/csv' });
