@@ -61,14 +61,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sb = getSupabaseClient();
     const v = (id) => document.getElementById(id)?.value?.trim() || null;
+    const fail = (msg) => { submitBtn.textContent = 'Complete Onboarding'; submitBtn.disabled = false; alert(msg); };
 
-    // Get the company_id (first company or from session)
-    const { data: companies } = await sb.from('companies').select('id').limit(1);
-    const companyId = companies?.[0]?.id || null;
+    // Must be a signed-in employer with a company
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { fail('Please sign in as an employer first.'); window.location.href = 'employer-login.html'; return; }
+    const { data: company } = await sb.from('companies').select('id').eq('auth_user_id', session.user.id).maybeSingle();
+    if (!company) { fail('No employer company is linked to your account.'); return; }
+    const companyId = company.id;
 
-    // Auto-generate emp_id
-    const { data: lastEmp } = await sb.from('employees').select('emp_id').order('emp_id', { ascending: false }).limit(1);
-    const nextId = lastEmp?.[0] ? String(Number(lastEmp[0].emp_id) + 1) : '20180';
+    // Robust emp_id: highest numeric existing (within this company via RLS) + 1, else 20180
+    const { data: emps } = await sb.from('employees').select('emp_id');
+    const maxNum = (emps || []).map(e => parseInt(e.emp_id, 10)).filter(n => !isNaN(n)).reduce((a, b) => Math.max(a, b), 0);
+    const nextId = String(maxNum >= 20180 ? maxNum + 1 : 20180);
 
     const employee = {
       company_id: companyId,
@@ -101,15 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
       address: v('inp_address'),
       state: v('inp_state'),
       pin_code: v('inp_pin'),
-      status: 'Pending'
+      status: 'Active'
     };
 
     const { data, error } = await sb.from('employees').insert([employee]).select();
 
     if (error) {
-      submitBtn.textContent = 'Complete Onboarding';
-      submitBtn.disabled = false;
-      alert('Error saving: ' + error.message);
+      if (error.code === '23505') {
+        fail('A worker with this Aadhaar is already registered. If they signed up themselves, use "Onboard via Shramik Sathi" to attach them instead.');
+      } else {
+        fail('Error saving: ' + error.message);
+      }
       return;
     }
 
