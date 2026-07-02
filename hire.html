@@ -820,16 +820,23 @@
         <div class="p-8 space-y-4">
           <p class="text-slate-500 mb-6 text-sm">Choose how you want to add this employee to your compliance management system.</p>
           
-          <!-- Option 1: Shramik Sathi (Seamless) -->
-          <button class="w-full flex items-center p-4 border-2 border-emerald-100 bg-emerald-50 rounded-xl hover:border-emerald-500 hover:bg-emerald-100 transition-all group text-left">
-            <div class="w-12 h-12 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center mr-4 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-              <i data-lucide="zap" class="w-6 h-6"></i>
+          <!-- Option 1: Shramik Sathi (attach an existing registered worker) -->
+          <div class="w-full p-4 border-2 border-emerald-100 bg-emerald-50 rounded-xl">
+            <div class="flex items-center mb-3">
+              <div class="w-12 h-12 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center mr-4">
+                <i data-lucide="zap" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-emerald-900 text-lg">Onboard via Shramik Sathi</h3>
+                <p class="text-emerald-700/80 text-sm">Attach a worker already registered on Shramik Sathi — imports their verified KYC/PF/ESI.</p>
+              </div>
             </div>
-            <div>
-              <h3 class="font-bold text-emerald-900 text-lg">Onboard via Shramik Sathi</h3>
-              <p class="text-emerald-700/80 text-sm">Seamlessly import pre-verified KYC, PF, and ESI data.</p>
+            <div class="flex gap-2">
+              <input id="attachInput" type="text" placeholder="SS ID / Aadhaar / mobile" class="flex-1 border border-emerald-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+              <button id="attachBtn" type="button" class="bg-emerald-600 text-white text-sm font-bold px-4 py-2 rounded-lg hover:bg-emerald-700 whitespace-nowrap">Attach</button>
             </div>
-          </button>
+            <p id="attachMsg" class="text-xs font-semibold mt-2 h-4"></p>
+          </div>
 
           <!-- Option 2: Manual (Non-Shramik) -->
           <a href="manual-compliance.html" class="w-full flex items-center p-4 border border-slate-200 bg-white rounded-xl hover:border-primary hover:shadow-md transition-all group text-left">
@@ -946,6 +953,27 @@
     closeModalBtn.addEventListener('click', closeModal);
     addEmployeeModal.addEventListener('click', (e) => {
       if (e.target === addEmployeeModal) closeModal();
+    });
+
+    // Onboard via Shramik Sathi — attach an existing registered worker by SS-id / Aadhaar / mobile
+    document.getElementById('attachBtn')?.addEventListener('click', async () => {
+      const input = document.getElementById('attachInput');
+      const msg = document.getElementById('attachMsg');
+      const id = (input.value || '').trim();
+      if (!id) { msg.style.color = '#b91c1c'; msg.textContent = 'Enter an SS ID, Aadhaar, or mobile number.'; return; }
+      const sb = getSupabaseClient();
+      msg.style.color = '#475569'; msg.textContent = 'Attaching…';
+      try {
+        const { data, error } = await sb.rpc('ss_attach_worker', { p_identifier: id });
+        if (error) { msg.style.color = '#b91c1c'; msg.textContent = 'Failed: ' + error.message; return; }
+        if (!data || !data.ok) { msg.style.color = '#b91c1c'; msg.textContent = (data && data.error) || 'Could not attach.'; return; }
+        msg.style.color = '#059669';
+        msg.textContent = `Attached ${data.name || 'worker'} (${data.ss_uid || data.emp_id || ''}) ✓`;
+        input.value = '';
+        setTimeout(() => window.location.reload(), 1300);   // refresh Employee Master
+      } catch (e) {
+        msg.style.color = '#b91c1c'; msg.textContent = 'Error: ' + (e.message || 'try again');
+      }
     });
 
     // Onboard Candidate Logic
